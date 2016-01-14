@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6FDF9BB1-AE07-4820-BEEE-A2F52CFBE770}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gabriel.Cat.Utilitats</RootNamespace>
+    <AssemblyName>Gabriel.Cat.Utilitats</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Clases de Internet\Apng\APNG.cs" />
+    <Compile Include="Clases de Internet\Apng\Chunks.cs" />
+    <Compile Include="Clases de Internet\Apng\CRC.cs" />
+    <Compile Include="Clases de Internet\Apng\PNG.cs" />
+    <Compile Include="Clases de Internet\Miniaturas.cs" />
+    <Compile Include="Clases de Internet\Sha3\HMACSHA3.cs" />
+    <Compile Include="Clases de Internet\Sha3\SHA3.cs" />
+    <Compile Include="Clases de Internet\Sha3\SHA3Managed.cs" />
+    <Compile Include="Clases de Internet\Sha3\_Utils.cs" />
+    <Compile Include="ClasesExtension.cs" />
+    <Compile Include="Enumerador.cs" />
+    <Compile Include="GeneradorHex.cs" />
+    <Compile Include="GeneradorID.cs" />
+    <Compile Include="GeneradorInt.cs" />
+    <Compile Include="Hex.cs" />
+    <Compile Include="IClonable.cs" />
+    <Compile Include="Imagen.cs" />
+    <Compile Include="ImagenConRuta.cs" />
+    <Compile Include="ListaUnica.cs" />
+    <Compile Include="Llista.cs" />
+    <Compile Include="LlistaOrdenada.cs" />
+    <Compile Include="MiPool.cs" />
+    <Compile Include="MiRandom.cs" />
+    <Compile Include="Pila.cs" />
+    <Compile Include="PointZ.cs" />
+    <Compile Include="Por Acabar\DiscoLogico.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recursos.cs" />
+    <Compile Include="Serializar.cs" />
+    <Compile Include="Temporizador.cs" />
+    <Compile Include="text.cs" />
+    <Compile Include="TwoKeysList.cs" />
+    <Compile Include="Xsd\AtributoXsd.cs" />
+    <Compile Include="Xsd\DocumentoXsd.cs" />
+    <Compile Include="Xsd\ElementoXsd.cs" />
+    <Compile Include="Xsd\IDeclaracionesXsd.cs" />
+    <Compile Include="Xsd\Restricciones.cs" />
+    <Compile Include="Xsd\RestriccionXsd.cs" />
+    <Compile Include="Xsd\TipoComplejoXsd.cs" />
+    <Compile Include="Xsd\TiposBaseXsd.cs" />
+    <Compile Include="Xsd\TipoSimpleXsd.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
