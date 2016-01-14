@@ -130,6 +130,7 @@ namespace Gabriel.Cat
 
         public Bitmap CrearCollage()
         {//funciona bien ;)
+            const int ARGB = 4;
             int amplitudBitmapMax = 1, amplitudBitmapMin=0;
             int alturaBitmapMax = 1,alturaBitmapMin=0;
             int saltoLinea;
@@ -142,23 +143,25 @@ namespace Gabriel.Cat
                                    //obtengo las medidas maximas
                 for (int i = 0; i < fragments.Count; i++)
                 {
-                    //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                    if (amplitudBitmapMin > fragments[i].Localizacion.X+fragments[i].Imagen.Width*4)
-                        amplitudBitmapMin = fragments[i].Localizacion.X + fragments[i].Imagen.Width * 4;
-                    if (alturaBitmapMax < fragments[i].Localizacion.Y + fragments[i].Imagen.Height * 4)
-                        alturaBitmapMax = fragments[i].Localizacion.Y + fragments[i].Imagen.Height * 4;
+                  
+                    if (amplitudBitmapMax < (fragments[i].Localizacion.X  + fragments[i].Imagen.Width))
+                        amplitudBitmapMax = (fragments[i].Localizacion.X + fragments[i].Imagen.Width);
+                    if (amplitudBitmapMin > fragments[i].Localizacion.X)
+                        amplitudBitmapMin = fragments[i].Localizacion.X;
+                    if (alturaBitmapMax < (fragments[i].Localizacion.Y + fragments[i].Imagen.Height))
+                        alturaBitmapMax = (fragments[i].Localizacion.Y + fragments[i].Imagen.Height) ;
                      if (alturaBitmapMin> fragments[i].Localizacion.Y)
                         alturaBitmapMin = fragments[i].Localizacion.Y;
                 }
-                imagen = new Bitmap(amplitudBitmapMax / 4 + (amplitudBitmapMin*-1), alturaBitmapMax/4 +(alturaBitmapMin*-1), fragments[0].Imagen.PixelFormat);
-                saltoLinea=amplitudBitmapMax;
+                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin*-1), alturaBitmapMax +(alturaBitmapMin*-1), fragments[0].Imagen.PixelFormat);
+                saltoLinea=amplitudBitmapMax*ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                 imagen.TrataBytes((bytes) =>
                 {
                 //pongo en el bitmap los fragmentos de forma ordenada
                 for (int i = fragments.Count - 1; i >= 0; i--)
                     {
                         matrizFragmento = fragments[i].RgbValuesMatriu;
-                        puntoXInicioFila = (saltoLinea * (fragments[i].Localizacion.Y+(alturaBitmapMin*-1))) + (fragments[i].Localizacion.X+(amplitudBitmapMin*-1));
+                        puntoXInicioFila = (saltoLinea * (fragments[i].Localizacion.Y+(alturaBitmapMin*-1))) + (fragments[i].Localizacion.X+(amplitudBitmapMin*-1))*ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                         //pongo los fragmentos
                         for (int y = 0, yFinal = matrizFragmento.GetLength(DimensionMatriz.Y), xFinal = matrizFragmento.GetLength(DimensionMatriz.X); y < yFinal; y++, puntoXInicioFila += saltoLinea)
                             for (int x = 0; x < xFinal; x++) 
