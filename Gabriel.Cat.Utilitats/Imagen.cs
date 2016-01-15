@@ -25,6 +25,10 @@ namespace Gabriel.Cat
         {
             fragments = new Llista<ImageFragment>();
         }
+        public Collage(IEnumerable<ImageFragment> imgsCollage) : this()
+        {
+            fragments.AfegirMolts(imgsCollage);
+        }
         public int Count
         {
             get { return fragments.Count; }
