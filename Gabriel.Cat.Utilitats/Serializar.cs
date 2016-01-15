@@ -297,7 +297,7 @@ namespace Gabriel.Cat
 
 		#endregion
 		#region To
-		public static object DameObjetoAceptado(TiposAceptados objHaLeer, Stream ms)
+		public static object ToObjetoAceptado(TiposAceptados objHaLeer, Stream ms)
 		{
 			object obj = null;
 			switch (objHaLeer) {
@@ -357,9 +357,9 @@ namespace Gabriel.Cat
 			return obj;
 		}
 
-        public static T DameObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, Stream ms)
+        public static T ToObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, Stream ms)
         {
-            return (T)DameObjetoAceptado(objHaLeer, ms);
+            return (T)ToObjetoAceptado(objHaLeer, ms);
         }
         public static Object ToTipoAceptado(string assemblyQualifiedName, byte[] bytesTipo)
         {
@@ -375,51 +375,9 @@ namespace Gabriel.Cat
 		public static Object ToTipoAceptado(TiposAceptados tipo, byte[] bytesTipo)
 		{
 			Object obj = null;
-            if(bytesTipo.Length>0)
-			switch (tipo) {
-				case TiposAceptados.Bool:
-					obj = ToBoolean(bytesTipo);
-					break;
-				case TiposAceptados.Short:
-					obj = ToShort(bytesTipo);
-					break;
-				case TiposAceptados.UShort:
-					obj = ToUShort(bytesTipo);
-					break;
-				case TiposAceptados.Int:
-					obj = ToInt(bytesTipo);
-					break;
-				case TiposAceptados.UInt:
-					obj = ToUInt(bytesTipo);
-					break;
-				case TiposAceptados.Long:
-					obj = ToLong(bytesTipo);
-					break;
-				case TiposAceptados.ULong:
-					obj = ToULong(bytesTipo);
-					break;
-				case TiposAceptados.Double:
-					obj = ToDouble(bytesTipo);
-					break;
-				case TiposAceptados.Float:
-					obj = ToFloat(bytesTipo);
-					break;
-				case TiposAceptados.Char:
-					obj = ToChar(bytesTipo);
-					break;
-				case TiposAceptados.String:
-					obj = ToString(bytesTipo);
-					break;
-				case TiposAceptados.Bitmap:
-                    obj = ToBitmap(bytesTipo);
-					break;
-				case TiposAceptados.DateTime:
-					obj = ToDateTime(bytesTipo);
-					break;
-				case TiposAceptados.Byte:
-					obj = bytesTipo[0];
-					break;
-			}
+            Stream str = new MemoryStream(bytesTipo);
+            obj = ToObjetoAceptado(tipo, str);
+            str.Close();
 			return obj;
 		}
         public static T ToTipoAceptadoTipado<T>(TiposAceptados tipo, byte[] bytesTipo)

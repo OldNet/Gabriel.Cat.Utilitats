@@ -1058,7 +1058,19 @@ namespace Gabriel.Cat.Extension
 			}
 			return llistaDesordenada;
 		}
-		public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source)
+        public static byte[] CastingToByte(this object[] source)
+        {
+            byte[] bytes = new byte[source.Length];
+            for (int i=0;i<source.Length;i++) {
+                try
+                {
+                    bytes[i]=(Convert.ToByte(source[i]));
+                }
+                catch { }
+            }
+            return bytes;
+        }
+        public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source)
 		{
 			return source.Casting<TResult>(false);
 		}
@@ -1067,7 +1079,7 @@ namespace Gabriel.Cat.Extension
 			Llista<TResult> llista = new Llista<TResult>();
 			foreach (Object obj in source) {
 				try {
-					llista.Afegir((TResult)obj);//lo malo es cuando no es un int casting double
+                    llista.Afegir((TResult)obj);//lo malo es cuando no es un int casting double
 				} catch {
 					//mirar de poder convertir el valor en caso de que sea posible ...
 					if (conservarNoCompatiblesCasting)
