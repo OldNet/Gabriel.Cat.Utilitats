@@ -31,8 +31,11 @@ namespace Gabriel.Cat
 		public const string BOOLEANASSEMBLYNAME = "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
 		public const string BITMAPASSEMBLYNAME = "System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 		public const string UINTASSEMBLYNAME = "System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
-		//se añade la constante en la lista :D
-		public static readonly string[] AsseblyQualifiedNameTiposMicrosoft = new String[] {
+        public const string POINTASSEMBLYNAME = "System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+        //mis clases
+        public const string POINTZASSEMBLYNAME = "Gabriel.Cat.PointZ, Gabriel.Cat.Utilitats, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";//mientras no le cambie esta info sera valida...
+        //se añade la constante en la lista :D
+        public static readonly string[] AsseblyQualifiedNameTiposMicrosoft = new String[] {
 			STRINGASSEMBLYNAME,
 			INTASSEMBLYNAME,
 			SHORTASSEMBLYNAME,
@@ -47,7 +50,9 @@ namespace Gabriel.Cat
 			BOOLEANASSEMBLYNAME,
 			BITMAPASSEMBLYNAME,
 			UINTASSEMBLYNAME,
-			BYTEASSEMBLYNAME
+			BYTEASSEMBLYNAME,
+            POINTASSEMBLYNAME,
+            POINTZASSEMBLYNAME
 		};
 		#endregion
 		//Si se añaden mas se tiene que dar de alta aqui :D y en el metodo ToTipoAceptado y GetBytes(TipoAceptado,Object)
@@ -68,13 +73,16 @@ namespace Gabriel.Cat
 			DateTime,
 			String,
 			Bitmap,
+            Point,
+            PointZ
 		}
-	
-		
-		
-		
-		//la clase es para convertir a byte[] los objetos
-		#region GetBytes
+
+
+
+
+        //la clase es para convertir a byte[] los objetos
+        #region GetBytes
+
 		public static byte[] GetBytes(IEnumerable<Object> objsTipoAceptado)
 		{
 			List<byte> bytesList = new List<byte>();
@@ -89,7 +97,13 @@ namespace Gabriel.Cat
 			byte[] bytes = new byte[] { };
 				try {
 				switch (tipo) {
-					case TiposAceptados.Bool:
+                    case TiposAceptados.Point:
+                        bytes = GetBytes((Point)objTipoAceptado);
+                        break;
+                    case TiposAceptados.PointZ:
+                        bytes = GetBytes((PointZ)objTipoAceptado);
+                        break;
+                    case TiposAceptados.Bool:
 						bytes = GetBytes((bool)objTipoAceptado);
 						break;
 					case TiposAceptados.Short:
@@ -196,18 +210,32 @@ namespace Gabriel.Cat
                 case Serializar.USHORTASSEMBLYNAME:
                     tipo = TiposAceptados.UShort;
                     break;
+                case Serializar.POINTASSEMBLYNAME:
+                    tipo = TiposAceptados.Point;
+                    break;
+                case Serializar.POINTZASSEMBLYNAME:
+                    tipo = TiposAceptados.PointZ;
+                    break;
             }
             return tipo;
         }
-		//mirar de poder serializar null
-		/// <summary>
-		/// Deserializa un objeto ISerializar. Si el nombre de Ensamblado o la version no se corresponde probar con el metodoConParametros generico
-		/// </summary>
-		/// <param name="iSerializarObj"></param>
-		/// <returns>Si el objeto no se ha podido crear devuelve un ObjetoNoCreado con los datos del objeto leido</returns>
-		public static byte[] GetBytes(Bitmap img)
+        public static byte[] GetBytes(Point point)
+        {
+            return GetBytes(new PointZ(point.X, point.Y, 0)).SubArray(0,8);
+        }
+        public static byte[] GetBytes(PointZ point)
+        {
+            List<byte> bytesPoint = new List<byte>();
+            bytesPoint.AddRange(GetBytes(point.X));
+            bytesPoint.AddRange(GetBytes(point.Y));
+            bytesPoint.AddRange(GetBytes(point.Z));
+            return bytesPoint.ToArray();
+
+        }
+        //mirar de poder serializar null
+        public static byte[] GetBytes(Bitmap img)
 		{
-            return GetBytes(img, System.Drawing.Imaging.ImageFormat.Jpeg);
+            return GetBytes(img,img.RawFormat);
 		}
         public static byte[] GetBytes(Bitmap img,System.Drawing.Imaging.ImageFormat formato)
         {
@@ -269,7 +297,7 @@ namespace Gabriel.Cat
 
 		#endregion
 		#region To
-		public static object DameObjetoAceptado(TiposAceptados objHaLeer, MemoryStream ms)
+		public static object DameObjetoAceptado(TiposAceptados objHaLeer, Stream ms)
 		{
 			object obj = null;
 			switch (objHaLeer) {
@@ -311,7 +339,13 @@ namespace Gabriel.Cat
 				case TiposAceptados.DateTime:
 					obj=ToDateTime(ms.Read(4));
 					break;
-				case TiposAceptados.String:
+                case TiposAceptados.Point:
+                    obj = ToPoint(ms.Read(8));
+                    break;
+                case TiposAceptados.PointZ:
+                    obj = ToPointZ(ms.Read(12));
+                    break;
+                case TiposAceptados.String:
 					obj=ToString(ms.Read(ToLong(ms.Read(8))));
 					break;
 				case TiposAceptados.Bitmap:
@@ -322,7 +356,8 @@ namespace Gabriel.Cat
 			}
 			return obj;
 		}
-        public static T DameObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, MemoryStream ms)
+
+        public static T DameObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, Stream ms)
         {
             return (T)DameObjetoAceptado(objHaLeer, ms);
         }
@@ -392,6 +427,15 @@ namespace Gabriel.Cat
             return (T)ToTipoAceptado(tipo,bytesTipo);
         }
         #region Desserializar Medida Fija
+        public static PointZ ToPointZ(byte[] bytesObj)
+        {
+            return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubArray(8)));
+        }
+
+        public static Point ToPoint(byte[] bytesObj)
+        {
+            return new Point(ToInt(bytesObj), ToInt(bytesObj.SubArray(4)));
+        }
         public static bool ToBoolean(byte[] boolean)
 		{
 			return BitConverter.ToBoolean(boolean, 0);

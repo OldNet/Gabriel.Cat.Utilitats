@@ -576,13 +576,13 @@ namespace Gabriel.Cat.Extension
 
         #endregion
         #region Bitmap
-        public static void ChangeColorBitmap(this Bitmap bmp, Image.PixelColors color)
+        public static void ChangeColorBitmap(this Bitmap bmp, PixelColors color)
         {
-            Image.ChangeColor(bmp, color);
+            Collage.ChangeColor(bmp, color);
         }
-        public static Bitmap ChangeColorBitmapCopy(this Bitmap bmp, Image.PixelColors color)
+        public static Bitmap ChangeColorBitmapCopy(this Bitmap bmp, PixelColors color)
         {
-            return  Image.ChangeColorCopy(bmp, color);
+            return  Collage.ChangeColorCopy(bmp, color);
         }
         /// <summary>
         /// Recorta una imagen en formato Bitmap

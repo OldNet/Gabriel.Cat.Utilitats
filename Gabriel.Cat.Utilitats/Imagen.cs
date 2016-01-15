@@ -1,46 +1,39 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Gabriel.Cat;
 using Gabriel.Cat.Extension;
 
 namespace Gabriel.Cat
 {
-
-    /// <summary>
-    /// El Collage no se ha testeado...aun...
-    /// </summary>
-    public class Image:IEnumerable<ImageFragment>
+    public enum PixelColors//no se si tiene un nombre descriptivo...
     {
-        public enum PixelColors
-        {
-            Red,
-            Green,
-            Blue,
-            GrayScale,
-            Sepia,
-            Inverted
-        }
+        Red,
+        Green,
+        Blue,
+        GrayScale,
+        Sepia,
+        Inverted
+    }
 
-        public struct PixelByte
-        {
-            public int X;
-            public int Y;
-            public byte Data;
-        }
-
+    public class Collage : IEnumerable<ImageFragment>
+    {
         Llista<ImageFragment> fragments;
-        public Image()
+
+        public Collage()
         {
             fragments = new Llista<ImageFragment>();
         }
+        public int Count
+        {
+            get { return fragments.Count; }
+        }
 
+        public void Add(ImageFragment imgFragment)
+        {
+            fragments.Afegir(imgFragment);
+        }
         public ImageFragment Add(Bitmap imatge, PointZ localizacio)
         {
             if (localizacio == null)
@@ -63,20 +56,24 @@ namespace Gabriel.Cat
         }
         public ImageFragment Add(Bitmap imagen, int x = 0, int y = 0, int z = 0)
         {
+            if (imagen == null)
+                throw new ArgumentNullException("Se necesita una imagen");
+
             ImageFragment fragment = null;
-            if (imagen != null)
-            {
-                fragment = new ImageFragment(imagen, x, y, z);
-                try
-                {
-                    fragments.Afegir(fragment);
-                }
-                catch
-                {
-                    fragment = null;
-                }
-            }
+            PointZ location = new PointZ(x, y, z);
+            fragment = new ImageFragment(imagen,location);
+            fragments.Afegir(fragment);
+
+
             return fragment;
+        }
+        public void RemoveAll()
+        {
+            fragments.Buida();
+        }
+        public void Remove(ImageFragment fragmento)
+        {
+            fragments.Elimina(fragmento);
         }
         public ImageFragment Remove(int x = 0, int y = 0, int z = 0)
         {
@@ -113,64 +110,89 @@ namespace Gabriel.Cat
             fragments.Ordena();
             while (pos < this.fragments.Count && !acabado)
             {
-                if (this.fragments[pos].Localizacion.Z > z)
+
+                if (this.fragments[pos].Location.Z > z)
                     acabado = true;
-                else
+                else if (this.fragments[pos].Location.Z == z)
                     fragmentosCapaZero.Add(this.fragments[pos]);
+                pos++;
             }
             for (int i = 0; i < fragmentosCapaZero.Count && fragmento == null; i++)
             {
-                rectangle = new Rectangle(fragmentosCapaZero[i].Localizacion.X, fragmentosCapaZero[i].Localizacion.Y, fragmentosCapaZero[i].Imagen.Width, fragmentosCapaZero[i].Imagen.Height);
+                rectangle = new Rectangle(fragmentosCapaZero[i].Location.X, fragmentosCapaZero[i].Location.Y, fragmentosCapaZero[i].Image.Width, fragmentosCapaZero[i].Image.Height);
                 if (rectangle.Contains(x, y))
                     fragmento = fragmentosCapaZero[i];
 
             }
             return fragmento;
         }
+        public ImageFragment[] GetFragments(PointZ location)
+        {
+            return GetFragments(location.X, location.Y, location.Z);
+        }
+        public ImageFragment[] GetFragments(int x, int y, int z)
+        {
+            List<ImageFragment> fragmentosSeleccionados = new List<ImageFragment>();
+            ImageFragment img;
+
+            do
+            {
+                img = GetFragment(x, y, z);
+                if (img != null)
+                {//los quito para no molestar
+                    fragmentosSeleccionados.Add(img);
+                    fragments.Elimina(img);
+                }
+            } while (img != null);
+
+            fragments.AfegirMolts(fragmentosSeleccionados);
+
+            return fragmentosSeleccionados.ToArray();
+        }
 
         public Bitmap CrearCollage()
-        {//funciona bien ;)
+        {
+            //funciona bien ;)
             const int ARGB = 4;
-            int amplitudBitmapMax = 1, amplitudBitmapMin=0;
-            int alturaBitmapMax = 1,alturaBitmapMin=0;
+            int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
+            int alturaBitmapMax = 1, alturaBitmapMin = 0;
             int saltoLinea;
-            Bitmap imagen=null;
+            Bitmap imagen = null;
             byte[,] matrizFragmento;
-            int  puntoXInicioFila;
+            int puntoXInicioFila;
             if (fragments.Count != 0)
             {
                 fragments.Ordena();//ordeno los fragmentos
                                    //obtengo las medidas maximas
                 for (int i = 0; i < fragments.Count; i++)
                 {
-                  
-                    if (amplitudBitmapMax < (fragments[i].Localizacion.X  + fragments[i].Imagen.Width))
-                        amplitudBitmapMax = (fragments[i].Localizacion.X + fragments[i].Imagen.Width);
-                    if (amplitudBitmapMin > fragments[i].Localizacion.X)
-                        amplitudBitmapMin = fragments[i].Localizacion.X;
-                    if (alturaBitmapMax < (fragments[i].Localizacion.Y + fragments[i].Imagen.Height))
-                        alturaBitmapMax = (fragments[i].Localizacion.Y + fragments[i].Imagen.Height) ;
-                     if (alturaBitmapMin> fragments[i].Localizacion.Y)
-                        alturaBitmapMin = fragments[i].Localizacion.Y;
+                    if (amplitudBitmapMax < (fragments[i].Location.X + fragments[i].Image.Width))
+                        amplitudBitmapMax = (fragments[i].Location.X + fragments[i].Image.Width);
+                    if (amplitudBitmapMin > fragments[i].Location.X)
+                        amplitudBitmapMin = fragments[i].Location.X;
+                    if (alturaBitmapMax < (fragments[i].Location.Y + fragments[i].Image.Height))
+                        alturaBitmapMax = (fragments[i].Location.Y + fragments[i].Image.Height);
+                    if (alturaBitmapMin > fragments[i].Location.Y)
+                        alturaBitmapMin = fragments[i].Location.Y;
                 }
-                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin*-1), alturaBitmapMax +(alturaBitmapMin*-1), fragments[0].Imagen.PixelFormat);
-                saltoLinea=amplitudBitmapMax*ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
+                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
+                saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                 imagen.TrataBytes((bytes) =>
                 {
-                //pongo en el bitmap los fragmentos de forma ordenada
-                for (int i = fragments.Count - 1; i >= 0; i--)
+                    //pongo en el bitmap los fragmentos de forma ordenada
+                    for (int i = fragments.Count - 1; i >= 0; i--)
                     {
                         matrizFragmento = fragments[i].RgbValuesMatriu;
-                        puntoXInicioFila = (saltoLinea * (fragments[i].Localizacion.Y+(alturaBitmapMin*-1))) + (fragments[i].Localizacion.X+(amplitudBitmapMin*-1))*ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
+                        puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                         //pongo los fragmentos
                         for (int y = 0, yFinal = matrizFragmento.GetLength(DimensionMatriz.Y), xFinal = matrizFragmento.GetLength(DimensionMatriz.X); y < yFinal; y++, puntoXInicioFila += saltoLinea)
-                            for (int x = 0; x < xFinal; x++) 
+                            for (int x = 0; x < xFinal; x++)
                             {
                                 //ahora tengo que poner la matriz donde toca...
                                 bytes[puntoXInicioFila + x] = matrizFragmento[x, y];
                             }
 
-                }
+                    }
                 });
             }
             return imagen;
@@ -205,7 +227,7 @@ namespace Gabriel.Cat
 
         private static void ICambiaColor(byte[] rgbImg, PixelColors color)
         {
-            if (rgbImg.Length % 3!=0)
+            if (rgbImg.Length % 3 != 0)
                 throw new ArgumentException("la tabla rgb no tiene la longitud divisible enteramente en 3 bytes");
             //de momento no vale la pena usar threads porque va mas lento...
             const int R = 0, G = 1, B = 2;
@@ -250,12 +272,12 @@ namespace Gabriel.Cat
         #region Pixels
         public static Color ToRed(Color pixel)
         {
-            return ToRed(0, 0, pixel.R);
+            return ToRed(pixel.R, 0, 0);
 
         }
         public static Color ToBlue(Color pixel)
         {
-            return ToBlue(pixel.B, 0, 0);
+            return ToBlue(0, 0, pixel.B);
         }
         public static Color ToGreen(Color pixel)
         {
@@ -335,9 +357,9 @@ namespace Gabriel.Cat
         }
         static void IToSepia(ref byte r, ref byte g, ref byte b)
         {
-           int  rInt = Convert.ToInt32(r * 0.393 + g * 0.769 + b * 0.189);
-           int gInt = Convert.ToInt32(r * 0.349 + g * 0.686 + b * 0.168);
-           int bInt = Convert.ToInt32(r * 0.272 + g * 0.534 + b * 0.131);
+            int rInt = Convert.ToInt32(r * 0.393 + g * 0.769 + b * 0.189);
+            int gInt = Convert.ToInt32(r * 0.349 + g * 0.686 + b * 0.168);
+            int bInt = Convert.ToInt32(r * 0.272 + g * 0.534 + b * 0.131);
             if (rInt > 255)
                 rInt = 255;
             if (gInt > 255)
@@ -345,7 +367,7 @@ namespace Gabriel.Cat
             if (bInt > 255)
                 bInt = 255;
             r = (byte)rInt;
-            g =(byte) gInt;
+            g = (byte)gInt;
             b = (byte)bInt;
         }
 
@@ -357,8 +379,7 @@ namespace Gabriel.Cat
 
 
     }
-
-    public class ImageFragment : IComparable, IComparable<ImageFragment>, IClauUnicaPerObjecte
+    public class ImageFragment : IComparable, IComparable<ImageFragment>
     {
         PointZ localizacion;
         ImageBase imagen;
@@ -380,7 +401,7 @@ namespace Gabriel.Cat
             if (imagen == null)
                 throw new NullReferenceException("La imagen no puede ser null");
             this.imagen = new ImageBase(imagen);
-            Localizacion = localizacion;
+            Location = localizacion;
         }
 
 
@@ -392,7 +413,7 @@ namespace Gabriel.Cat
         {
             get { return imagen.Array; }
         }
-        public PointZ Localizacion
+        public PointZ Location
         {
             get
             {
@@ -404,11 +425,11 @@ namespace Gabriel.Cat
             }
         }
 
-        public Bitmap Imagen
+        public Bitmap Image
         {
             get
             {
-                return imagen.Imatge;
+                return imagen.Image;
             }
         }
 
@@ -417,33 +438,20 @@ namespace Gabriel.Cat
         {
             int compareTo;
             if (other != null)
-                compareTo = Localizacion.CompareTo(other.Localizacion);
+                compareTo = Location.CompareTo(other.Location);
             else
                 compareTo = -1;
             return compareTo;
         }
-
-        #region IClauUnicaPerObjecte implementation
-
-
-        public IComparable Clau()
+        public int CompareTo(Object other)
         {
-            return Localizacion as IComparable;
+            return CompareTo(other as ImageFragment);
         }
+            #endregion
 
-        public int CompareTo(object obj)
-        {
-            return CompareTo(obj as ImageFragment);
+
+
         }
-
-
-        #endregion
-
-        #endregion
-
-
-
-    }
     public class ImageBase
     {
         Bitmap bmp;
@@ -453,12 +461,14 @@ namespace Gabriel.Cat
         {
             if (bmp == null)
                 throw new NullReferenceException("La imagen no puede ser null");
-            this.bmp = bmp.Clone(new Rectangle(new Point(),bmp.Size),PixelFormat.Format32bppPArgb);//asi todos tienen el mismo PixelFormat :)
+            this.bmp = bmp.Clone(new Rectangle(new Point(), bmp.Size), PixelFormat.Format32bppPArgb);//asi todos tienen el mismo PixelFormat :)
 
         }
 
-        public byte[] Array {
-            get {
+        public byte[] Array
+        {
+            get
+            {
                 if (bmpArray == null)
                     bmpArray = bmp.GetBytes();
                 return bmpArray;
@@ -471,7 +481,7 @@ namespace Gabriel.Cat
             }
         }
 
-        public Bitmap Imatge
+        public Bitmap Image
         {
             get
             {

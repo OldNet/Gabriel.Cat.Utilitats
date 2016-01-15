@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 namespace Gabriel.Cat
 {
@@ -10,7 +11,7 @@ namespace Gabriel.Cat
 
 		int z;
 
-		public PointZ(int x, int y, int z)
+        public PointZ(int x, int y, int z)
 		{
 			X = x;
 			Y = y;
@@ -21,7 +22,11 @@ namespace Gabriel.Cat
 		{
 		}
 
-		public int X {
+        public PointZ(Point point, int z):this(point.X,point.Y,z)
+        {
+        }
+
+        public int X {
 			get {
 				return x;
 			}
