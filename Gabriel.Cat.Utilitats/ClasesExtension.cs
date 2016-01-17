@@ -23,7 +23,7 @@ namespace Gabriel.Cat.Extension
 {
 	public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
 	public delegate void MetodoTratarByteArray(byte[] byteArray);
-    public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray);
+    public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray,int lenght);
     public delegate bool ComprovaEventHanler<Tvalue>(Tvalue valorAComprovar);
 	public enum DimensionMatriz
 	{
@@ -577,14 +577,6 @@ namespace Gabriel.Cat.Extension
 
         #endregion
         #region Bitmap
-        public static void ChangeColorBitmap(this Bitmap bmp, PixelColors color)
-        {
-            Collage.ChangeColor(bmp, color);
-        }
-        public static Bitmap ChangeColorBitmapCopy(this Bitmap bmp, PixelColors color)
-        {
-            return Collage.ChangeColorCopy(bmp, color);
-        }
         /// <summary>
         /// Recorta una imagen en formato Bitmap
         /// </summary>
@@ -1886,12 +1878,13 @@ namespace Gabriel.Cat.Extension
 		}
         public static unsafe void TrataBytes(this Bitmap bmp, MetodoTratarBytePointer metodo)
         {
+            const int RGB = 3;
             BitmapData bmpData = bmp.LockBits();
             // Get the address of the first line.
             IntPtr ptr = bmpData.Scan0;
             if (metodo != null)
             {
-                metodo((byte*)ptr.ToPointer());//se modifican los bytes :D
+                metodo((byte*)ptr.ToPointer(), bmp.Height * bmp.Width * RGB);//se modifican los bytes :D
             }
             // Unlock the bits.
             bmp.UnlockBits(bmpData);

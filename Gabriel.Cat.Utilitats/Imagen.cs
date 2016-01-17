@@ -154,103 +154,11 @@ namespace Gabriel.Cat
             return fragmentosSeleccionados.ToArray();
         }
 
-        public Bitmap CrearCollage()
-        {
-            //funciona bien ;)
-            const int ARGB = 4;
-            int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
-            int alturaBitmapMax = 1, alturaBitmapMin = 0;
-            int saltoLinea;
-            Bitmap imagen = null;
-            byte[] argbFragmento;
-            int puntoXInicioFila;
-            if (fragments.Count != 0)
-            {
-                fragments.Ordena();//ordeno los fragmentos
-                                   //obtengo las medidas maximas
-                for (int i = 0; i < fragments.Count; i++)
-                {
-                    if (amplitudBitmapMax < (fragments[i].Location.X + fragments[i].Image.Width))
-                        amplitudBitmapMax = (fragments[i].Location.X + fragments[i].Image.Width);
-                    if (amplitudBitmapMin > fragments[i].Location.X)
-                        amplitudBitmapMin = fragments[i].Location.X;
-                    if (alturaBitmapMax < (fragments[i].Location.Y + fragments[i].Image.Height))
-                        alturaBitmapMax = (fragments[i].Location.Y + fragments[i].Image.Height);
-                    if (alturaBitmapMin > fragments[i].Location.Y)
-                        alturaBitmapMin = fragments[i].Location.Y;
-                }
-                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
-                saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                imagen.TrataBytes((bytesImg) =>
-                {
-                    //pongo en el bitmap los fragmentos de forma ordenada
-                    for (int i = fragments.Count - 1; i >= 0; i--)
-                    {
-                        argbFragmento = fragments[i].RgbValues;
-                        puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                        //pongo los fragmentos
-                        for (int y = 0, yFinal =fragments[i].Image.Height, xFinal = fragments[i].Image.Width*ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
-                            for (int x = 0; x < xFinal; x++)
-                            {
-                                //ahora tengo que poner la matriz donde toca...
-                                bytesImg[puntoXInicioFila + x] = argbFragmento[y * xFinal + x];
-                            }
 
-                    }
-                });
-            }
-            return imagen;
-        }
-        public unsafe Bitmap CrearCollageUnsafe1()
+        public unsafe Bitmap CrearCollage()
         {
             //funciona bien ;)
-            const int ARGB = 4;
-            int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
-            int alturaBitmapMax = 1, alturaBitmapMin = 0;
-            int saltoLinea;
-            Bitmap imagen = null;
-            byte[] argbFragment;
-            int puntoXInicioFila;
-            if (fragments.Count != 0)
-            {
-                fragments.Ordena();//ordeno los fragmentos
-                                   //obtengo las medidas maximas
-                for (int i = 0; i < fragments.Count; i++)
-                {
-                    if (amplitudBitmapMax < (fragments[i].Location.X + fragments[i].Image.Width))
-                        amplitudBitmapMax = (fragments[i].Location.X + fragments[i].Image.Width);
-                    if (amplitudBitmapMin > fragments[i].Location.X)
-                        amplitudBitmapMin = fragments[i].Location.X;
-                    if (alturaBitmapMax < (fragments[i].Location.Y + fragments[i].Image.Height))
-                        alturaBitmapMax = (fragments[i].Location.Y + fragments[i].Image.Height);
-                    if (alturaBitmapMin > fragments[i].Location.Y)
-                        alturaBitmapMin = fragments[i].Location.Y;
-                }
-                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
-                saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                imagen.TrataBytes((MetodoTratarBytePointer)((bytes) =>
-                {
-                    //pongo en el bitmap los fragmentos de forma ordenada
-                    for (int i = fragments.Count - 1; i >= 0; i--)
-                    {
-                        argbFragment = fragments[i].RgbValues;
-                        puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                        //pongo los fragmentos
-                        for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width*ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
-                            for (int x = 0; x < xFinal; x++)
-                            {
-                                //ahora tengo que poner la matriz donde toca...
-                                bytes[puntoXInicioFila + x] = argbFragment[y*xFinal+x];
-                            }
-
-                    }
-                }));
-            }
-            return imagen;
-        }
-        public unsafe Bitmap CrearCollageUnsafe2()
-        {
-            //funciona bien ;)
+            //al usar punteros ahora va 3 veces mas rapido :)
             const int ARGB = 4;
             int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
             int alturaBitmapMax = 1, alturaBitmapMin = 0;
@@ -274,13 +182,13 @@ namespace Gabriel.Cat
                 }
                 imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
                 saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                imagen.TrataBytes((MetodoTratarBytePointer)((bytesImgTotal)=>{
+                imagen.TrataBytes((MetodoTratarBytePointer)((bytesImgTotal,lenghtImgTotal)=>{
                     //pongo en el bitmap los fragmentos de forma ordenada
                     for (int i = fragments.Count - 1; i >= 0; i--)
                     {
 
                         puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                        fragments[i].Image.TrataBytes((MetodoTratarBytePointer)((bytesImgFragmento) =>
+                        fragments[i].Image.TrataBytes((MetodoTratarBytePointer)((bytesImgFragmento, lenghtImgFragment) =>
                         {
                            //pongo los fragmentos
                            for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width*ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
@@ -309,31 +217,28 @@ namespace Gabriel.Cat
             return GetEnumerator();
         }
 
-        #region Metodos de clase
-        public static Bitmap ChangeColorCopy(Bitmap bmp, PixelColors color)
+
+    }
+    public static class Image
+    {
+
+        public static Bitmap ChangeColorCopy(this Bitmap bmp, PixelColors color)
         {
-            if (bmp == null)
-                throw new ArgumentNullException();
             Bitmap bmpClon = bmp.Clone() as Bitmap;
             ChangeColor(bmpClon, color);
             return bmpClon;
         }
-        public static void ChangeColor(Bitmap bmp, PixelColors color)
+        public static unsafe void ChangeColor(this Bitmap bmp, PixelColors color)
         {
-            if (bmp == null)
-                throw new ArgumentNullException();
-            bmp.TrataBytes((rgbArray) => { ICambiaColor(rgbArray, color); });
-
+            bmp.TrataBytes((rgbArray,lenght) => { ICambiaColor(rgbArray, lenght, color); });
         }
 
-        private static void ICambiaColor(byte[] rgbImg, PixelColors color)
+        private static unsafe void ICambiaColor(byte* rgbImg, int lenght, PixelColors color)
         {
-            if (rgbImg.Length % 3 != 0)
-                throw new ArgumentException("la tabla rgb no tiene la longitud divisible enteramente en 3 bytes");
-            //de momento no vale la pena usar threads porque va mas lento...
+
             const int R = 0, G = 1, B = 2;
             byte r, g, b;
-            for (int i = 0; i < rgbImg.Length; i += 3)
+            for (int i = 0; i < lenght; i += 3)
             {
 
                 r = rgbImg[i + R];
@@ -371,29 +276,29 @@ namespace Gabriel.Cat
 
         }
         #region Pixels
-        public static Color ToRed(Color pixel)
+        public static Color ToRed(this Color pixel)
         {
             return ToRed(pixel.R, 0, 0);
 
         }
-        public static Color ToBlue(Color pixel)
+        public static Color ToBlue(this Color pixel)
         {
             return ToBlue(0, 0, pixel.B);
         }
-        public static Color ToGreen(Color pixel)
+        public static Color ToGreen(this Color pixel)
         {
             return ToGreen(0, pixel.G, 0);
         }
-        public static Color ToEscalaGrises(Color pixel)
+        public static Color ToEscalaGrises(this Color pixel)
         {
             return ToGrayScale(pixel.R, pixel.G, pixel.B);
 
         }
-        public static Color ToInverted(Color pixel)
+        public static Color ToInverted(this Color pixel)
         {
             return ToInverted(255 - pixel.R, 255 - pixel.G, 255 - pixel.B);
         }
-        public static Color ToSepia(Color pixel)
+        public static Color ToSepia(this Color pixel)
         {
             return ToSepia(pixel.R, pixel.G, pixel.B);
         }
@@ -475,9 +380,6 @@ namespace Gabriel.Cat
 
         #endregion
         #endregion
-
-        #endregion
-
 
     }
     public class ImageFragment : IComparable, IComparable<ImageFragment>
