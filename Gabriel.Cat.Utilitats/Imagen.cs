@@ -158,7 +158,7 @@ namespace Gabriel.Cat
         public unsafe Bitmap CrearCollage()
         {
             //funciona bien ;)
-            //al usar punteros ahora va 3 veces mas rapido :)
+            //al usar punteros ahora va 3 veces mas rapido :) //aun se puede optimizar 4 veces mas osea un total de 12 veces mas rapi:D
             const int ARGB = 4;
             int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
             int alturaBitmapMax = 1, alturaBitmapMin = 0;
@@ -462,6 +462,7 @@ namespace Gabriel.Cat
         byte[] bmpArray;
         public ImageBase(Bitmap bmp)
         {
+         
             if (bmp == null)
                 throw new NullReferenceException("La imagen no puede ser null");
             this.bmp = bmp.Clone(new Rectangle(new Point(), bmp.Size), PixelFormat.Format32bppPArgb);//asi todos tienen el mismo PixelFormat :)
