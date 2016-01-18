@@ -159,7 +159,11 @@ namespace Gabriel.Cat
         {
             //funciona bien ;)
             //al usar punteros ahora va 3 veces mas rapido :) //aun se puede optimizar 4 veces mas osea un total de 12 veces mas rapi:D
-            const int ARGB = 4;
+            const int R = 0, G = 1, B = 2, A = 3;
+            const byte OPACO = 0xFF, TRANSPARENTE = 0x00;
+            byte byteR, byteG, byteB, byteA;
+            Color colorMezclado;
+            int argbMultiplicador;
             int amplitudBitmapMax = 1, amplitudBitmapMin = 0;
             int alturaBitmapMax = 1, alturaBitmapMin = 0;
             int saltoLinea;
@@ -180,25 +184,48 @@ namespace Gabriel.Cat
                     if (alturaBitmapMin > fragments[i].Location.Y)
                         alturaBitmapMin = fragments[i].Location.Y;
                 }
-                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
-                saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
+                imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), ImageBase.DefaultPixelFormat);
+                argbMultiplicador = imagen.IsArgb() ? 4 : 3;
+                saltoLinea = amplitudBitmapMax * argbMultiplicador;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                 imagen.TrataBytes((MetodoTratarBytePointer)((bytesImgTotal) =>
                 {
                     //pongo en el bitmap los fragmentos de forma ordenada
                     for (int i = fragments.Count - 1; i >= 0; i--)
                     {
 
-                        puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
+                        puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * argbMultiplicador;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
                         fragments[i].Image.TrataBytes((MetodoTratarBytePointer)((bytesImgFragmento) =>
                         {
                             //pongo los fragmentos
-                            for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width * ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
+                            for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width * argbMultiplicador,posicionActual; y < yFinal; y++, puntoXInicioFila += saltoLinea)
                             {
 
-                                for (int x = 0; x < xFinal; x++)
+                                for (int x = 0; x < xFinal; x+=argbMultiplicador)
                                 {
-                                    //ahora tengo que poner la matriz donde toca...
-                                    bytesImgTotal[puntoXInicioFila + x] = bytesImgFragmento[y * xFinal + x];
+                                    posicionActual =y * xFinal + x;
+                                    if (argbMultiplicador == 3||bytesImgFragmento[posicionActual + A] == OPACO)
+                                    {
+                                        //ahora tengo que poner la matriz donde toca...
+                                        bytesImgTotal[puntoXInicioFila + x + R] = bytesImgFragmento[posicionActual + R];
+                                        bytesImgTotal[puntoXInicioFila + x + G] = bytesImgFragmento[posicionActual + G];
+                                        bytesImgTotal[puntoXInicioFila + x + B] = bytesImgFragmento[posicionActual + B];
+                                        if(argbMultiplicador==4)
+                                          bytesImgTotal[puntoXInicioFila + x + A] = bytesImgFragmento[posicionActual + A];
+                                        //problema con las imagenes con transparencias donde el pixel transparente se come el no transparente...
+                                    }
+                                    else if(bytesImgFragmento[posicionActual + A] != TRANSPARENTE)//si el pixel no es transparente 100% lo mezclo :)
+                                    {
+                                        //lo mezcla
+                                        byteR = bytesImgFragmento[posicionActual + R];
+                                        byteG = bytesImgFragmento[posicionActual + G];
+                                        byteB = bytesImgFragmento[posicionActual + B];
+                                        byteA = bytesImgFragmento[posicionActual + A];
+                                        colorMezclado=Image.MezclaPixels(bytesImgTotal[puntoXInicioFila + x + R], bytesImgTotal[puntoXInicioFila + x + G], bytesImgTotal[puntoXInicioFila + x + B], bytesImgTotal[puntoXInicioFila + x + A], byteR, byteG, byteB, byteA);
+                                        bytesImgTotal[puntoXInicioFila + x + R] = colorMezclado.R;
+                                        bytesImgTotal[puntoXInicioFila + x + G] = colorMezclado.G;
+                                        bytesImgTotal[puntoXInicioFila + x + B] = colorMezclado.B;
+                                        bytesImgTotal[puntoXInicioFila + x + A] = colorMezclado.A;
+                                    }
                                 }
                             }
                         }));
@@ -326,6 +353,26 @@ namespace Gabriel.Cat
             g = (byte)gInt;
             b = (byte)bInt;
         }
+        public static Color Mezclar(this Color pixel1, Color pixel2)
+        {
+            return MezclaPixels(pixel1.R, pixel1.G, pixel1.B, pixel1.A, pixel2.R, pixel2.G, pixel2.B, pixel2.A);
+        }
+        public static Color MezclaPixels(byte byteR1, byte byteG1, byte byteB1, byte byteA1, byte byteR2, byte byteG2, byte byteB2, byte byteA2)
+        {
+            int a, r, g, b;
+
+            a = byteA1+byteA2;
+            r = byteR1 + byteR2;
+            g = byteG1+byteG2;
+            b = byteB1+byteB2;
+
+            if (a > 255) a = 255;
+            if (r > 255) r = 255;
+            if (g > 255) g = 255;
+            if (b > 255) b = 255;
+
+            return Color.FromArgb(a,r,g,b);
+        }
 
 
         #endregion
@@ -407,6 +454,7 @@ namespace Gabriel.Cat
     }
     public class ImageBase
     {
+        public static readonly PixelFormat DefaultPixelFormat=PixelFormat.Format32bppArgb;
         Bitmap bmp;
         byte[,] matriuBmp;
         byte[] bmpArray;
@@ -415,7 +463,7 @@ namespace Gabriel.Cat
 
             if (bmp == null)
                 throw new NullReferenceException("La imagen no puede ser null");
-            this.bmp = bmp.Clone(new Rectangle(new Point(), bmp.Size), PixelFormat.Format32bppPArgb);//asi todos tienen el mismo PixelFormat :)
+            this.bmp = bmp.Clone(new Rectangle(new Point(), bmp.Size), DefaultPixelFormat);//asi todos tienen el mismo PixelFormat :)
 
         }
 
