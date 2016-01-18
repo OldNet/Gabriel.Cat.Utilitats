@@ -182,26 +182,28 @@ namespace Gabriel.Cat
                 }
                 imagen = new Bitmap(amplitudBitmapMax + (amplitudBitmapMin * -1), alturaBitmapMax + (alturaBitmapMin * -1), fragments[0].Image.PixelFormat);
                 saltoLinea = amplitudBitmapMax * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                imagen.TrataBytes((MetodoTratarBytePointer)((bytesImgTotal,lenghtImgTotal)=>{
+                imagen.TrataBytes((MetodoTratarBytePointer)((bytesImgTotal) =>
+                {
                     //pongo en el bitmap los fragmentos de forma ordenada
                     for (int i = fragments.Count - 1; i >= 0; i--)
                     {
 
                         puntoXInicioFila = (saltoLinea * (fragments[i].Location.Y + (alturaBitmapMin * -1))) + (fragments[i].Location.X + (amplitudBitmapMin * -1)) * ARGB;  //multiplico por 4 porque la amplitud de la tabla es en bytes no en Pixels por lo tanto Argb
-                        fragments[i].Image.TrataBytes((MetodoTratarBytePointer)((bytesImgFragmento, lenghtImgFragment) =>
+                        fragments[i].Image.TrataBytes((MetodoTratarBytePointer)((bytesImgFragmento) =>
                         {
-                           //pongo los fragmentos
-                           for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width*ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
+                            //pongo los fragmentos
+                            for (int y = 0, yFinal = fragments[i].Image.Height, xFinal = fragments[i].Image.Width * ARGB; y < yFinal; y++, puntoXInicioFila += saltoLinea)
                             {
 
                                 for (int x = 0; x < xFinal; x++)
                                 {
-                                   //ahora tengo que poner la matriz donde toca...
-                                   bytesImgTotal[puntoXInicioFila + x] = bytesImgFragmento[y * xFinal + x];
+                                    //ahora tengo que poner la matriz donde toca...
+                                    bytesImgTotal[puntoXInicioFila + x] = bytesImgFragmento[y * xFinal + x];
                                 }
                             }
                         }));
-                    } }));
+                    }
+                }));
 
             }
             return imagen;
@@ -230,47 +232,50 @@ namespace Gabriel.Cat
         }
         public static unsafe void ChangeColor(this Bitmap bmp, PixelColors color)
         {
-            bmp.TrataBytes((rgbArray,lenght) => { ICambiaColor(rgbArray, lenght, color); });
+            bmp.TrataBytes((rgbArray) => { ICambiaColor(rgbArray, bmp.IsArgb(), bmp.LengthBytes(), color); });
         }
 
-        private static unsafe void ICambiaColor(byte* rgbImg, int lenght, PixelColors color)
+        private static unsafe void ICambiaColor(byte* rgbImg, bool isArgb, int lenght, PixelColors color)
         {
 
             const int R = 0, G = 1, B = 2;
-            byte r, g, b;
-            for (int i = 0; i < lenght; i += 3)
+            byte byteR, byteG, byteB;
+            int incremento = 3;
+            if (isArgb) incremento++;//me salto el alfa
+            for (int i = 0; i < lenght; i += incremento)
             {
 
-                r = rgbImg[i + R];
-                g = rgbImg[i + G];
-                b = rgbImg[i + B];
 
+                byteR = rgbImg[i + R];
+                byteG = rgbImg[i + G];
+                byteB = rgbImg[i + B];
+                
                 switch (color)
                 {
                     case PixelColors.Sepia:
-                        IToSepia(ref r, ref g, ref b);
+                        IToSepia(ref byteR, ref byteG, ref byteB);
                         break;
                     case PixelColors.Inverted:
-                        ToInvertit(ref r, ref g, ref b);
+                        ToInvertit(ref byteR, ref byteG, ref byteB);
                         break;
                     case PixelColors.GrayScale:
-                        ToEscalaDeGrises(ref r, ref g, ref b);
+                        ToEscalaDeGrises(ref byteR, ref byteG, ref byteB);
                         break;
                     case PixelColors.Blue:
-                        ToAzul(ref r, ref g, ref b);
+                        ToAzul(ref byteR, ref byteG, ref byteB);
                         break;
                     case PixelColors.Red:
-                        ToRojo(ref r, ref g, ref b);
+                        ToRojo(ref byteR, ref byteG, ref byteB);
                         break;
                     case PixelColors.Green:
-                        ToVerde(ref r, ref g, ref b);
+                        ToVerde(ref byteR, ref byteG, ref byteB);
                         break;
 
 
                 }
-                rgbImg[i + R] = r;
-                rgbImg[i + G] = g;
-                rgbImg[i + B] = b;
+                rgbImg[i + R] = byteR;
+                rgbImg[i + G] = byteG;
+                rgbImg[i + B] = byteB;
 
             }
 
@@ -462,7 +467,7 @@ namespace Gabriel.Cat
         byte[] bmpArray;
         public ImageBase(Bitmap bmp)
         {
-         
+
             if (bmp == null)
                 throw new NullReferenceException("La imagen no puede ser null");
             this.bmp = bmp.Clone(new Rectangle(new Point(), bmp.Size), PixelFormat.Format32bppPArgb);//asi todos tienen el mismo PixelFormat :)

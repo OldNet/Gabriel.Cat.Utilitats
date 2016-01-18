@@ -18,12 +18,13 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.Drawing.Imaging;
 using System.Collections;
+using System.Runtime.ExceptionServices;
 
 namespace Gabriel.Cat.Extension
 {
 	public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
 	public delegate void MetodoTratarByteArray(byte[] byteArray);
-    public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray,int lenght);
+    public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray);
     public delegate bool ComprovaEventHanler<Tvalue>(Tvalue valorAComprovar);
 	public enum DimensionMatriz
 	{
@@ -1878,17 +1879,96 @@ namespace Gabriel.Cat.Extension
 		}
         public static unsafe void TrataBytes(this Bitmap bmp, MetodoTratarBytePointer metodo)
         {
-            const int RGB = 3;
+
             BitmapData bmpData = bmp.LockBits();
             // Get the address of the first line.
+            
             IntPtr ptr = bmpData.Scan0;
             if (metodo != null)
             {
-                metodo((byte*)ptr.ToPointer(), bmp.Height * bmp.Width * RGB);//se modifican los bytes :D
+                metodo((byte*)ptr.ToPointer());//se modifican los bytes :D
             }
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
 
+        }
+        public static int LengthBytes(this Bitmap bmp)
+        {
+            int multiplicadorPixel = bmp.IsArgb() ? 4 : 3;
+            return bmp.Height * bmp.Width * multiplicadorPixel;
+        }
+        public static bool IsArgb(this Bitmap bmp)
+        {
+            bool isArgb = false;
+            switch (bmp.PixelFormat)
+            {
+                case PixelFormat.Format16bppArgb1555:
+                case PixelFormat.Format32bppArgb:
+                case PixelFormat.Format32bppPArgb:
+                case PixelFormat.Format64bppArgb:
+                case PixelFormat.Format64bppPArgb:
+                    isArgb = true;
+                    break;
+            }
+            return isArgb;
+        }
+     /*   [HandleProcessCorruptedStateExceptions]
+        public static unsafe int LenghtPoint(this IntPtr point)
+        {
+        //por arreglar
+            int max = int.MaxValue;
+            int min=0;
+            int medioMaxMin;
+            int length;
+            byte* bytePoint = (byte*)point.ToPointer();
+            byte auxByte;
+            while(max!=min)
+            {
+                medioMaxMin = (max - min) / 2 + min;
+                try
+                {
+                    
+                    auxByte = bytePoint[medioMaxMin];
+                    if (min == medioMaxMin)
+                    {
+                        max = min;
+                    }
+                    else {
+                        min = medioMaxMin;
+                    }
+                }catch(System.AccessViolationException)
+                {
+                    max= medioMaxMin;
+                }
+            }
+            length = max;
+            return length;
+        }*/
+        [HandleProcessCorruptedStateExceptions]
+        public static unsafe int LenghtPoint(this IntPtr point)
+        {
+            //por optimizar
+            byte* bytePoint = (byte*)point.ToPointer();
+            byte auxByte;
+            int length = 1;
+            bool encontrado = false;
+            while (!encontrado)
+            {
+
+                try
+                {
+
+                    auxByte = bytePoint[length];
+                    length++;
+                }
+                catch (System.AccessViolationException)
+                {
+                    length--;
+                    encontrado = true;
+                   
+                }
+            }
+            return length;
         }
         public static void SetBytes(this Bitmap bmp, byte[] rgbValues)
 		{
