@@ -16,6 +16,10 @@ namespace Gabriel.Cat
         Sepia,
         Inverted
     }
+    public class Pixel
+    {
+        public const int R = 0, G = 1, B = 2, A = 3;
+    }
 
     public class Collage : IEnumerable<ImageFragment>
     {
@@ -159,7 +163,6 @@ namespace Gabriel.Cat
         {
             //funciona bien ;)
             //al usar punteros ahora va 3 veces mas rapido :) //aun se puede optimizar 4 veces mas osea un total de 12 veces mas rapi:D
-            const int R = 0, G = 1, B = 2, A = 3;
             const byte OPACO = 0xFF, TRANSPARENTE = 0x00;
             byte byteR, byteG, byteB, byteA;
             Color colorMezclado;
@@ -203,28 +206,28 @@ namespace Gabriel.Cat
                                 for (int x = 0; x < xFinal; x+=argbMultiplicador)
                                 {
                                     posicionActual =y * xFinal + x;
-                                    if (argbMultiplicador == 3||bytesImgFragmento[posicionActual + A] == OPACO)
+                                    if (argbMultiplicador == 3||bytesImgFragmento[posicionActual + Pixel.A] == OPACO)
                                     {
                                         //ahora tengo que poner la matriz donde toca...
-                                        bytesImgTotal[puntoXInicioFila + x + R] = bytesImgFragmento[posicionActual + R];
-                                        bytesImgTotal[puntoXInicioFila + x + G] = bytesImgFragmento[posicionActual + G];
-                                        bytesImgTotal[puntoXInicioFila + x + B] = bytesImgFragmento[posicionActual + B];
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.R] = bytesImgFragmento[posicionActual + Pixel.R];
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.G] = bytesImgFragmento[posicionActual + Pixel.G];
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.B] = bytesImgFragmento[posicionActual + Pixel.B];
                                         if(argbMultiplicador==4)
-                                          bytesImgTotal[puntoXInicioFila + x + A] = bytesImgFragmento[posicionActual + A];
+                                          bytesImgTotal[puntoXInicioFila + x + Pixel.A] = bytesImgFragmento[posicionActual + Pixel.A];
                                         //problema con las imagenes con transparencias donde el pixel transparente se come el no transparente...
                                     }
-                                    else if(bytesImgFragmento[posicionActual + A] != TRANSPARENTE)//si el pixel no es transparente 100% lo mezclo :)
+                                    else if(bytesImgFragmento[posicionActual + Pixel.A] != TRANSPARENTE)//si el pixel no es transparente 100% lo mezclo :)
                                     {
                                         //lo mezcla
-                                        byteR = bytesImgFragmento[posicionActual + R];
-                                        byteG = bytesImgFragmento[posicionActual + G];
-                                        byteB = bytesImgFragmento[posicionActual + B];
-                                        byteA = bytesImgFragmento[posicionActual + A];
-                                        colorMezclado=Image.MezclaPixels(bytesImgTotal[puntoXInicioFila + x + R], bytesImgTotal[puntoXInicioFila + x + G], bytesImgTotal[puntoXInicioFila + x + B], bytesImgTotal[puntoXInicioFila + x + A], byteR, byteG, byteB, byteA);
-                                        bytesImgTotal[puntoXInicioFila + x + R] = colorMezclado.R;
-                                        bytesImgTotal[puntoXInicioFila + x + G] = colorMezclado.G;
-                                        bytesImgTotal[puntoXInicioFila + x + B] = colorMezclado.B;
-                                        bytesImgTotal[puntoXInicioFila + x + A] = colorMezclado.A;
+                                        byteR = bytesImgFragmento[posicionActual + Pixel.R];
+                                        byteG = bytesImgFragmento[posicionActual + Pixel.G];
+                                        byteB = bytesImgFragmento[posicionActual + Pixel.B];
+                                        byteA = bytesImgFragmento[posicionActual + Pixel.A];
+                                        colorMezclado=Image.MezclaPixels(bytesImgTotal[puntoXInicioFila + x + Pixel.R], bytesImgTotal[puntoXInicioFila + x + Pixel.G], bytesImgTotal[puntoXInicioFila + x + Pixel.B], bytesImgTotal[puntoXInicioFila + x + Pixel.A], byteR, byteG, byteB, byteA);
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.R] = colorMezclado.R;
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.G] = colorMezclado.G;
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.B] = colorMezclado.B;
+                                        bytesImgTotal[puntoXInicioFila + x + Pixel.A] = colorMezclado.A;
                                     }
                                 }
                             }
@@ -273,38 +276,59 @@ namespace Gabriel.Cat
         }
         public static Color ToInverted(this Color pixel)
         {
-            return ToInverted(255 - pixel.R, 255 - pixel.G, 255 - pixel.B);
+            return ToInverted((byte)(255 - pixel.R), (byte)(255 - pixel.G), (byte)(255 - pixel.B));
         }
         public static Color ToSepia(this Color pixel)
         {
             return ToSepia(pixel.R, pixel.G, pixel.B);
         }
-        public static Color ToRed(int r, int g, int b)
+        public static Color Mezclar(this Color pixel1, Color pixel2)
+        {
+            return MezclaPixels(pixel1.R, pixel1.G, pixel1.B, pixel1.A, pixel2.R, pixel2.G, pixel2.B, pixel2.A);
+        }
+        public static Color MezclaPixels(byte byteR1, byte byteG1, byte byteB1, byte byteA1, byte byteR2, byte byteG2, byte byteB2, byte byteA2)
+        {
+            int a, r, g, b;
+
+            a = byteA1 + byteA2;
+            r = byteR1 + byteR2;
+            g = byteG1 + byteG2;
+            b = byteB1 + byteB2;
+
+            if (a > 255) a = 255;
+            if (r > 255) r = 255;
+            if (g > 255) g = 255;
+            if (b > 255) b = 255;
+
+            return Color.FromArgb(a, r, g, b);
+        }
+
+        public static Color ToRed(byte r, byte g, byte b)
         {
             return Color.FromArgb(0, 0, r);
         }
-        public static Color ToBlue(int r, int g, int b)
+        public static Color ToBlue(byte r, byte g, byte b)
         {
             return Color.FromArgb(b, 0, 0);
         }
-        public static Color ToGreen(int r, int g, int b)
+        public static Color ToGreen(byte r, byte g, byte b)
         {
             return Color.FromArgb(0, g, 0);
         }
-        public static Color ToGrayScale(int r, int g, int b)
+        public static Color ToGrayScale(byte r, byte g, byte b)
         {
             int v = Convert.ToInt32(0.2126 * r + 0.7152 * g + 0.0722 * b);
             return Color.FromArgb(v, v, v);
 
         }
 
-        public static Color ToInverted(int r, int g, int b)
+        public static Color ToInverted(byte r, byte g, byte b)
         {
             return Color.FromArgb(255 - r, 255 - g, 255 - b);
         }
-        public static Color ToSepia(int r, int g, int b)
+        public static Color ToSepia(byte r, byte g, byte b)
         {
-            byte rB = (byte)r, gB = (byte)g, bB = (byte)b;
+            byte rB = r, gB = g, bB = b;
             IToSepia(ref rB, ref gB, ref bB);
             return Color.FromArgb(rB, gB, bB);
         }
@@ -352,26 +376,6 @@ namespace Gabriel.Cat
             r = (byte)rInt;
             g = (byte)gInt;
             b = (byte)bInt;
-        }
-        public static Color Mezclar(this Color pixel1, Color pixel2)
-        {
-            return MezclaPixels(pixel1.R, pixel1.G, pixel1.B, pixel1.A, pixel2.R, pixel2.G, pixel2.B, pixel2.A);
-        }
-        public static Color MezclaPixels(byte byteR1, byte byteG1, byte byteB1, byte byteA1, byte byteR2, byte byteG2, byte byteB2, byte byteA2)
-        {
-            int a, r, g, b;
-
-            a = byteA1+byteA2;
-            r = byteR1 + byteR2;
-            g = byteG1+byteG2;
-            b = byteB1+byteB2;
-
-            if (a > 255) a = 255;
-            if (r > 255) r = 255;
-            if (g > 255) g = 255;
-            if (b > 255) b = 255;
-
-            return Color.FromArgb(a,r,g,b);
         }
 
 

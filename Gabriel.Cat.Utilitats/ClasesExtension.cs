@@ -812,7 +812,6 @@ namespace Gabriel.Cat.Extension
         private static unsafe void ICambiaColor(byte* rgbImg, bool isArgb, int lenght, PixelColors color)
         {
 
-            const int R = 0, G = 1, B = 2;
             byte byteR, byteG, byteB;
             int incremento = 3;
             if (isArgb) incremento++;//me salto el alfa
@@ -820,9 +819,9 @@ namespace Gabriel.Cat.Extension
             {
 
 
-                byteR = rgbImg[i + R];
-                byteG = rgbImg[i + G];
-                byteB = rgbImg[i + B];
+                byteR = rgbImg[i + Pixel.R];
+                byteG = rgbImg[i + Pixel.G];
+                byteB = rgbImg[i + Pixel.B];
 
                 switch (color)
                 {
@@ -847,9 +846,9 @@ namespace Gabriel.Cat.Extension
 
 
                 }
-                rgbImg[i + R] = byteR;
-                rgbImg[i + G] = byteG;
-                rgbImg[i + B] = byteB;
+                rgbImg[i + Pixel.R] = byteR;
+                rgbImg[i + Pixel.G] = byteG;
+                rgbImg[i + Pixel.B] = byteB;
 
             }
 
