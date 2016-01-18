@@ -617,6 +617,244 @@ namespace Gabriel.Cat.Extension
 
             return bmpResized;
         }
+      
+
+        public static APNG ToApng(this IEnumerable<Bitmap> fotogramas)
+        {
+            APNG pngAnimated = new APNG();
+            pngAnimated.Add(fotogramas);
+            return pngAnimated;
+        }
+        public static Stream ToStream(this Bitmap bmp)
+        {
+            return ToStream(bmp, System.Drawing.Imaging.ImageFormat.Png);
+        }
+        public static Stream ToStream(this Bitmap bmp, ImageFormat format)
+        {
+            Stream stream;
+            FileStream fsBitmap = null;
+            string path = Path.GetRandomFileName() + ".NoSeHaBorrado.PuedesBorrarlo";
+            try
+            {
+                bmp.Save(path, format);
+                fsBitmap = new FileStream(path, FileMode.Open);
+                stream = new MemoryStream(fsBitmap.GetAllBytes());
+            }
+            finally
+            {
+                if (fsBitmap != null)
+                    fsBitmap.Close();
+                File.Delete(path);
+            }
+            return stream;
+        }
+        public static Color[,] GetColorMatriu(this Bitmap bmp)
+        {
+            Color[,] matriz = new Color[bmp.Width, bmp.Height];
+            bmp.TrataBytes((arrayBytes) => {
+                ulong posicion = 0;
+                for (int y = 0, yFinal = bmp.Width; y < yFinal; y++)
+                    for (int x = 0, xFinal = bmp.Height; x < xFinal; x++, posicion += 4)
+                        matriz[x, y] = Color.FromArgb(arrayBytes[posicion], arrayBytes[posicion + 1], arrayBytes[posicion + 2], arrayBytes[posicion + 3]);
+
+            });
+            return matriz;
+        }
+        public static Bitmap GetBitmap(this Color[,] array)
+        {
+            Bitmap bmp = new Bitmap(array.GetLength(DimensionMatriz.X), array.GetLength(DimensionMatriz.Y));
+            bmp.TrataBytes((arrayBytes) => {
+                ulong posicion = 0;
+                for (ulong y = 0, yFinal = (ulong)array.GetLongLength((int)DimensionMatriz.Y); y < yFinal; y++)
+                    for (ulong x = 0, xFinal = (ulong)array.GetLongLength((int)DimensionMatriz.X); x < xFinal; x++, posicion += 4)
+                    {
+                        arrayBytes[posicion] = array[x, y].A;
+                        arrayBytes[posicion + 1] = array[x, y].R;
+                        arrayBytes[posicion + 2] = array[x, y].G;
+                        arrayBytes[posicion + 3] = array[x, y].B;
+                    }
+
+            });
+            return bmp;
+        }
+        public static byte[,] GetMatriuBytes(this Bitmap bmp)
+        {
+            byte[] bytesArray = bmp.GetBytes();
+            return bytesArray.ToMatriu(bmp.Height, DimensionMatriz.Y);
+        }
+        public static void SetMatriuBytes(this Bitmap bmp, byte[,] matriuBytes)
+        {
+            if (bmp.Height * bmp.Width * 3 != matriuBytes.GetLength(DimensionMatriz.Y) * matriuBytes.GetLength(DimensionMatriz.X))
+                throw new Exception("La matriz no tiene las medidas de la imagen");
+
+            bmp.TrataBytes((arrayBytes) => {
+                ulong posicion = 0;
+                for (ulong y = 0, yFinal = (ulong)arrayBytes.GetLongLength((int)DimensionMatriz.Y); y < yFinal; y++)
+                    for (ulong x = 0, xFinal = (ulong)arrayBytes.GetLongLength((int)DimensionMatriz.X); x < xFinal; x++)
+                    {
+                        arrayBytes[posicion++] = matriuBytes[x, y];
+                    }
+
+
+            });
+
+        }
+        public static byte[] GetBytes(this Bitmap bmp)
+        {
+            BitmapData bmpData = bmp.LockBits();
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+
+            byte[] rgbValues = new byte[bytes];
+
+            // Copy the RGB values into the array.
+            ptr.CopyTo(rgbValues);
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+            return rgbValues;
+        }
+
+        public static void TrataBytes(this Bitmap bmp, MetodoTratarByteArray metodo)
+        {
+            BitmapData bmpData = bmp.LockBits();
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+
+            byte[] rgbValues = new byte[bytes];
+
+            // Copy the RGB values into the array.
+            ptr.CopyTo(rgbValues);
+            if (metodo != null)
+            {
+                metodo(rgbValues);//se modifican los bytes :D
+                                  // Copy the RGB values back to the bitmap
+                rgbValues.CopyTo(ptr);
+            }
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+
+        }
+        public static unsafe void TrataBytes(this Bitmap bmp, MetodoTratarBytePointer metodo)
+        {
+
+            BitmapData bmpData = bmp.LockBits();
+            // Get the address of the first line.
+
+            IntPtr ptr = bmpData.Scan0;
+            if (metodo != null)
+            {
+                metodo((byte*)ptr.ToPointer());//se modifican los bytes :D
+            }
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+
+        }
+        public static int LengthBytes(this Bitmap bmp)
+        {
+            int multiplicadorPixel = bmp.IsArgb() ? 4 : 3;
+            return bmp.Height * bmp.Width * multiplicadorPixel;
+        }
+        public static bool IsArgb(this Bitmap bmp)
+        {
+            bool isArgb = false;
+            switch (bmp.PixelFormat)
+            {
+                case PixelFormat.Format16bppArgb1555:
+                case PixelFormat.Format32bppArgb:
+                case PixelFormat.Format32bppPArgb:
+                case PixelFormat.Format64bppArgb:
+                case PixelFormat.Format64bppPArgb:
+                    isArgb = true;
+                    break;
+            }
+            return isArgb;
+        }
+        public static void SetBytes(this Bitmap bmp, byte[] rgbValues)
+        {
+            BitmapData bmpData = bmp.LockBits();
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+            if (bytes != rgbValues.Length)
+                throw new Exception("La array de bytes no se corresponde a la imagen");
+
+            // Copy the RGB values back to the bitmap
+            rgbValues.CopyTo(ptr);
+
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+
+        }
+
+        public static BitmapData LockBits(this Bitmap bmp)
+        {
+            return bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+        }
+        public static Bitmap ChangeColorCopy(this Bitmap bmp, PixelColors color)
+        {
+            Bitmap bmpClon = bmp.Clone() as Bitmap;
+            ChangeColor(bmpClon, color);
+            return bmpClon;
+        }
+        public static unsafe void ChangeColor(this Bitmap bmp, PixelColors color)
+        {
+            bmp.TrataBytes((rgbArray) => { ICambiaColor(rgbArray, bmp.IsArgb(), bmp.LengthBytes(), color); });
+        }
+
+        private static unsafe void ICambiaColor(byte* rgbImg, bool isArgb, int lenght, PixelColors color)
+        {
+
+            const int R = 0, G = 1, B = 2;
+            byte byteR, byteG, byteB;
+            int incremento = 3;
+            if (isArgb) incremento++;//me salto el alfa
+            for (int i = 0; i < lenght; i += incremento)
+            {
+
+
+                byteR = rgbImg[i + R];
+                byteG = rgbImg[i + G];
+                byteB = rgbImg[i + B];
+
+                switch (color)
+                {
+                    case PixelColors.Sepia:
+                        Image.IToSepia(ref byteR, ref byteG, ref byteB);
+                        break;
+                    case PixelColors.Inverted:
+                        Image.ToInvertit(ref byteR, ref byteG, ref byteB);
+                        break;
+                    case PixelColors.GrayScale:
+                        Image.ToEscalaDeGrises(ref byteR, ref byteG, ref byteB);
+                        break;
+                    case PixelColors.Blue:
+                        Image.ToAzul(ref byteR, ref byteG, ref byteB);
+                        break;
+                    case PixelColors.Red:
+                        Image.ToRojo(ref byteR, ref byteG, ref byteB);
+                        break;
+                    case PixelColors.Green:
+                        Image.ToVerde(ref byteR, ref byteG, ref byteB);
+                        break;
+
+
+                }
+                rgbImg[i + R] = byteR;
+                rgbImg[i + G] = byteG;
+                rgbImg[i + B] = byteB;
+
+            }
+
+        }
+
         #endregion
         #region ColorMatrizExtension
         public static Bitmap ToBitmap(this Color[,] matrizColor)
@@ -625,7 +863,8 @@ namespace Gabriel.Cat.Extension
             byte[] bytesImg = bmp.GetBytes();
             int posicion = 0;
             for (int y = 0, yFinal = matrizColor.GetLength(DimensionMatriz.Y); y < yFinal; y++)
-                for (int x = 0, xFinal = matrizColor.GetLength(DimensionMatriz.X); x < xFinal; x++) {
+                for (int x = 0, xFinal = matrizColor.GetLength(DimensionMatriz.X); x < xFinal; x++)
+                {
                     bytesImg[posicion] = matrizColor[x, y].A;
                     bytesImg[posicion + 1] = matrizColor[x, y].R;
                     bytesImg[posicion + 2] = matrizColor[x, y].G;
@@ -641,7 +880,8 @@ namespace Gabriel.Cat.Extension
             byte[] bytesImg = bmp.GetBytes();
             int posicion = 0;
             for (int y = 0, yFinal = colorArray.GetLength(DimensionMatriz.Y); y < yFinal; y++)
-                for (int x = 0, xFinal = colorArray.GetLength(DimensionMatriz.X); x < xFinal; x++) {
+                for (int x = 0, xFinal = colorArray.GetLength(DimensionMatriz.X); x < xFinal; x++)
+                {
                     colorArray[x, y] = Color.FromArgb(bytesImg[posicion], bytesImg[posicion + 1], bytesImg[posicion + 2], bytesImg[posicion + 3]);
                     posicion += 4;
                 }
@@ -1760,190 +2000,21 @@ namespace Gabriel.Cat.Extension
             return Equals(obj1.SHA3(), obj2.SHA3());
         }
         #endregion
-        #region BitmapExtension
 
-        public static APNG ToApng(this IEnumerable<Bitmap> fotogramas)
+        #region Pointers
+        public static void CopyTo(this IntPtr ptr, byte[] destino)
         {
-            APNG pngAnimated = new APNG();
-            pngAnimated.Add(fotogramas);
-            return pngAnimated;
+            System.Runtime.InteropServices.Marshal.Copy(ptr, destino, 0, destino.Length);
         }
-        public static Stream ToStream(this Bitmap bmp)
+        public static void CopyTo(this byte[] source, IntPtr ptrDestino)
         {
-            return ToStream(bmp, System.Drawing.Imaging.ImageFormat.Png);
+            System.Runtime.InteropServices.Marshal.Copy(source, 0, ptrDestino, source.Length);
         }
-        public static Stream ToStream(this Bitmap bmp, ImageFormat format)
+        public static void Dispose(this IntPtr point)
         {
-            Stream stream;
-            FileStream fsBitmap = null;
-            string path = Path.GetRandomFileName() + ".NoSeHaBorrado.PuedesBorrarlo";
-            try {
-                bmp.Save(path, format);
-                fsBitmap = new FileStream(path, FileMode.Open);
-                stream = new MemoryStream(fsBitmap.GetAllBytes());
-            } finally {
-                if (fsBitmap != null)
-                    fsBitmap.Close();
-                File.Delete(path);
-            }
-            return stream;
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(point);
+           
         }
-        public static Color[,] GetColorMatriu(this Bitmap bmp)
-        {
-            Color[,] matriz = new Color[bmp.Width, bmp.Height];
-            bmp.TrataBytes((arrayBytes) => {
-                ulong posicion = 0;
-                for (int y = 0, yFinal = bmp.Width; y < yFinal; y++)
-                    for (int x = 0, xFinal = bmp.Height; x < xFinal; x++, posicion += 4)
-                        matriz[x, y] = Color.FromArgb(arrayBytes[posicion], arrayBytes[posicion + 1], arrayBytes[posicion + 2], arrayBytes[posicion + 3]);
-
-            });
-            return matriz;
-        }
-        public static Bitmap GetBitmap(this Color[,] array)
-        {
-            Bitmap bmp = new Bitmap(array.GetLength(DimensionMatriz.X), array.GetLength(DimensionMatriz.Y));
-            bmp.TrataBytes((arrayBytes) => {
-                ulong posicion = 0;
-                for (ulong y = 0, yFinal = (ulong)array.GetLongLength((int)DimensionMatriz.Y); y < yFinal; y++)
-                    for (ulong x = 0, xFinal = (ulong)array.GetLongLength((int)DimensionMatriz.X); x < xFinal; x++, posicion += 4) {
-                        arrayBytes[posicion] = array[x, y].A;
-                        arrayBytes[posicion + 1] = array[x, y].R;
-                        arrayBytes[posicion + 2] = array[x, y].G;
-                        arrayBytes[posicion + 3] = array[x, y].B;
-                    }
-
-            });
-            return bmp;
-        }
-        public static byte[,] GetMatriuBytes(this Bitmap bmp)
-        {
-            byte[] bytesArray = bmp.GetBytes();
-            return bytesArray.ToMatriu(bmp.Height, DimensionMatriz.Y);
-        }
-        public static void SetMatriuBytes(this Bitmap bmp, byte[,] matriuBytes)
-        {
-            if (bmp.Height * bmp.Width * 3 != matriuBytes.GetLength(DimensionMatriz.Y) * matriuBytes.GetLength(DimensionMatriz.X))
-                throw new Exception("La matriz no tiene las medidas de la imagen");
-
-            bmp.TrataBytes((arrayBytes) => {
-                ulong posicion = 0;
-                for (ulong y = 0, yFinal = (ulong)arrayBytes.GetLongLength((int)DimensionMatriz.Y); y < yFinal; y++)
-                    for (ulong x = 0, xFinal = (ulong)arrayBytes.GetLongLength((int)DimensionMatriz.X); x < xFinal; x++) {
-                        arrayBytes[posicion++] = matriuBytes[x, y];
-                    }
-
-
-            });
-
-        }
-        public static byte[] GetBytes(this Bitmap bmp)
-        {
-            BitmapData bmpData = bmp.LockBits();
-            // Get the address of the first line.
-            IntPtr ptr = bmpData.Scan0;
-
-            // Declare an array to hold the bytes of the bitmap.
-            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-
-            byte[] rgbValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            ptr.CopyTo(rgbValues);
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            return rgbValues;
-        }
-
-        public static void TrataBytes(this Bitmap bmp, MetodoTratarByteArray metodo)
-		{
-			BitmapData bmpData = bmp.LockBits();
-			// Get the address of the first line.
-			IntPtr ptr = bmpData.Scan0;
-
-			// Declare an array to hold the bytes of the bitmap.
-			int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-
-			byte[] rgbValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            ptr.CopyTo(rgbValues);
-			if (metodo != null) {
-				metodo(rgbValues);//se modifican los bytes :D
-                                  // Copy the RGB values back to the bitmap
-                rgbValues.CopyTo(ptr);
-			}
-			// Unlock the bits.
-			bmp.UnlockBits(bmpData);
-
-		}
-        public static unsafe void TrataBytes(this Bitmap bmp, MetodoTratarBytePointer metodo)
-        {
-
-            BitmapData bmpData = bmp.LockBits();
-            // Get the address of the first line.
-            
-            IntPtr ptr = bmpData.Scan0;
-            if (metodo != null)
-            {
-                metodo((byte*)ptr.ToPointer());//se modifican los bytes :D
-            }
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-
-        }
-        public static int LengthBytes(this Bitmap bmp)
-        {
-            int multiplicadorPixel = bmp.IsArgb() ? 4 : 3;
-            return bmp.Height * bmp.Width * multiplicadorPixel;
-        }
-        public static bool IsArgb(this Bitmap bmp)
-        {
-            bool isArgb = false;
-            switch (bmp.PixelFormat)
-            {
-                case PixelFormat.Format16bppArgb1555:
-                case PixelFormat.Format32bppArgb:
-                case PixelFormat.Format32bppPArgb:
-                case PixelFormat.Format64bppArgb:
-                case PixelFormat.Format64bppPArgb:
-                    isArgb = true;
-                    break;
-            }
-            return isArgb;
-        }
-     /*   [HandleProcessCorruptedStateExceptions]
-        public static unsafe int LenghtPoint(this IntPtr point)
-        {
-        //por arreglar
-            int max = int.MaxValue;
-            int min=0;
-            int medioMaxMin;
-            int length;
-            byte* bytePoint = (byte*)point.ToPointer();
-            byte auxByte;
-            while(max!=min)
-            {
-                medioMaxMin = (max - min) / 2 + min;
-                try
-                {
-                    
-                    auxByte = bytePoint[medioMaxMin];
-                    if (min == medioMaxMin)
-                    {
-                        max = min;
-                    }
-                    else {
-                        min = medioMaxMin;
-                    }
-                }catch(System.AccessViolationException)
-                {
-                    max= medioMaxMin;
-                }
-            }
-            length = max;
-            return length;
-        }*/
         [HandleProcessCorruptedStateExceptions]
         public static unsafe int LenghtPoint(this IntPtr point)
         {
@@ -1965,61 +2036,45 @@ namespace Gabriel.Cat.Extension
                 {
                     length--;
                     encontrado = true;
-                   
+
                 }
             }
             return length;
         }
-        public static void SetBytes(this Bitmap bmp, byte[] rgbValues)
-		{
-			BitmapData bmpData = bmp.LockBits();
-			// Get the address of the first line.
-			IntPtr ptr = bmpData.Scan0;
 
-			// Declare an array to hold the bytes of the bitmap.
-			int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-			if (bytes != rgbValues.Length)
-				throw new Exception("La array de bytes no se corresponde a la imagen");
+        /*   [HandleProcessCorruptedStateExceptions]
+      public static unsafe int LenghtPoint(this IntPtr point)
+      {
+      //por arreglar
+          int max = int.MaxValue;
+          int min=0;
+          int medioMaxMin;
+          int length;
+          byte* bytePoint = (byte*)point.ToPointer();
+          byte auxByte;
+          while(max!=min)
+          {
+              medioMaxMin = (max - min) / 2 + min;
+              try
+              {
 
-            // Copy the RGB values back to the bitmap
-            rgbValues.CopyTo(ptr);
+                  auxByte = bytePoint[medioMaxMin];
+                  if (min == medioMaxMin)
+                  {
+                      max = min;
+                  }
+                  else {
+                      min = medioMaxMin;
+                  }
+              }catch(System.AccessViolationException)
+              {
+                  max= medioMaxMin;
+              }
+          }
+          length = max;
+          return length;
+      }*/
 
-			// Unlock the bits.
-			bmp.UnlockBits(bmpData);
-
-		}
-
-        public static BitmapData LockBits(this Bitmap bmp)
-		{
-			return bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-		}
-        #endregion
-        #region Pointers
-        public static void CopyTo(this IntPtr ptr, byte[] destino)
-        {
-            System.Runtime.InteropServices.Marshal.Copy(ptr, destino, 0, destino.Length);
-        }
-        public static void CopyTo(this byte[] source, IntPtr ptrDestino)
-        {
-            System.Runtime.InteropServices.Marshal.Copy(source, 0, ptrDestino, source.Length);
-        }
-        public static void Dispose(this IntPtr point)
-        {
-            System.Runtime.InteropServices.Marshal.FreeHGlobal(point);
-           
-        }
-
-        /* no se si funciona bien...
-        public static IntPtr ToIntPtr(this Object obj)
-        {
-            return (IntPtr)System.Runtime.InteropServices.GCHandle.Alloc(obj);
-        }
-        public static Object ToObject(this IntPtr ptr)
-        {
-            return ((System.Runtime.InteropServices.GCHandle)ptr).Target;
-
-        }
-        */
 
         #endregion
         #region StreamExtension

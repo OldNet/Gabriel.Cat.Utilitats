@@ -224,62 +224,7 @@ namespace Gabriel.Cat
     public static class Image
     {
 
-        public static Bitmap ChangeColorCopy(this Bitmap bmp, PixelColors color)
-        {
-            Bitmap bmpClon = bmp.Clone() as Bitmap;
-            ChangeColor(bmpClon, color);
-            return bmpClon;
-        }
-        public static unsafe void ChangeColor(this Bitmap bmp, PixelColors color)
-        {
-            bmp.TrataBytes((rgbArray) => { ICambiaColor(rgbArray, bmp.IsArgb(), bmp.LengthBytes(), color); });
-        }
 
-        private static unsafe void ICambiaColor(byte* rgbImg, bool isArgb, int lenght, PixelColors color)
-        {
-
-            const int R = 0, G = 1, B = 2;
-            byte byteR, byteG, byteB;
-            int incremento = 3;
-            if (isArgb) incremento++;//me salto el alfa
-            for (int i = 0; i < lenght; i += incremento)
-            {
-
-
-                byteR = rgbImg[i + R];
-                byteG = rgbImg[i + G];
-                byteB = rgbImg[i + B];
-                
-                switch (color)
-                {
-                    case PixelColors.Sepia:
-                        IToSepia(ref byteR, ref byteG, ref byteB);
-                        break;
-                    case PixelColors.Inverted:
-                        ToInvertit(ref byteR, ref byteG, ref byteB);
-                        break;
-                    case PixelColors.GrayScale:
-                        ToEscalaDeGrises(ref byteR, ref byteG, ref byteB);
-                        break;
-                    case PixelColors.Blue:
-                        ToAzul(ref byteR, ref byteG, ref byteB);
-                        break;
-                    case PixelColors.Red:
-                        ToRojo(ref byteR, ref byteG, ref byteB);
-                        break;
-                    case PixelColors.Green:
-                        ToVerde(ref byteR, ref byteG, ref byteB);
-                        break;
-
-
-                }
-                rgbImg[i + R] = byteR;
-                rgbImg[i + G] = byteG;
-                rgbImg[i + B] = byteB;
-
-            }
-
-        }
         #region Pixels
         public static Color ToRed(this Color pixel)
         {
@@ -339,34 +284,34 @@ namespace Gabriel.Cat
 
         #region Optimizacion
 
-        static void ToRojo(ref byte r, ref byte g, ref byte b)
+       public  static void ToRojo(ref byte r, ref byte g, ref byte b)
         {
             g = 0;
             r = 0;
         }
-        static void ToAzul(ref byte r, ref byte g, ref byte b)
+        public static void ToAzul(ref byte r, ref byte g, ref byte b)
         {
             g = 0;
             b = 0;
         }
-        static void ToVerde(ref byte r, ref byte g, ref byte b)
+        public static void ToVerde(ref byte r, ref byte g, ref byte b)
         {
             r = 0;
             b = 0;
         }
-        static void ToInvertit(ref byte r, ref byte g, ref byte b)
+        public static void ToInvertit(ref byte r, ref byte g, ref byte b)
         {
             r = (byte)(255 - r);
             g = (byte)(255 - g);
             b = (byte)(255 - b);
         }
-        static void ToEscalaDeGrises(ref byte r, ref byte g, ref byte b)
+        public static void ToEscalaDeGrises(ref byte r, ref byte g, ref byte b)
         {
             b = (byte)Convert.ToInt32(0.2126 * r + 0.7152 * g + 0.0722 * b);
             g = b;
             r = g;
         }
-        static void IToSepia(ref byte r, ref byte g, ref byte b)
+        public static void IToSepia(ref byte r, ref byte g, ref byte b)
         {
             int rInt = Convert.ToInt32(r * 0.393 + g * 0.769 + b * 0.189);
             int gInt = Convert.ToInt32(r * 0.349 + g * 0.686 + b * 0.168);
