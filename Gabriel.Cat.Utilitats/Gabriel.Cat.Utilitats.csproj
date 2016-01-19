@@ -61,7 +61,6 @@
     <Compile Include="GeneradorInt.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="IClonable.cs" />
-    <Compile Include="Imagen.cs" />
     <Compile Include="ImagenConRuta.cs" />
     <Compile Include="ListaUnica.cs" />
     <Compile Include="Llista.cs" />
