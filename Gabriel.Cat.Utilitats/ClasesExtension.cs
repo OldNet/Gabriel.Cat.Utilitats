@@ -977,7 +977,14 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable
-
+        public static SortedList<T,T> ToSortedList<T>(this IEnumerable<T> list) where T :IComparable<T>
+        {
+            SortedList<T, T> sortedList = new SortedList<T, T>();
+            foreach (T obj in list)
+                if (!sortedList.ContainsKey(obj))
+                    sortedList.Add(obj, obj);
+            return sortedList;
+        }
         /// <summary>
         /// Ordena por elemetodo de orden indicado sin modificar la coleccion que se va a ordenar
         /// </summary>
