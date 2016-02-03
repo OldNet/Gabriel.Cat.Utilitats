@@ -47,9 +47,14 @@ namespace Gabriel.Cat.Extension
 		Inferior = -1,
 		Superior = 1
 	}
+    public enum Ordre
+    {
+        Consecutiu,
+        ConsecutiuIAlInreves
+    }
 
-	#region Comparar
-	public delegate int ComparadorEventHandler<T>(T x, T y);
+    #region Comparar
+    public delegate int ComparadorEventHandler<T>(T x, T y);
 	public class Comparador<T> : Comparer<T>
 	{
 		ComparadorEventHandler<T> comparador;
@@ -944,7 +949,35 @@ namespace Gabriel.Cat.Extension
             return longitud;
         }
         #endregion
+        #region T[]
+        public static T DameElementoActual<T>(this T[] llista, Ordre escogerKey, int contador)
+        {
+            T objSelected = default(T);
+            int posicio;
+            switch (escogerKey)
+            {
+                case Ordre.Consecutiu:
+                    objSelected = llista[contador % llista.Length];
+                    break;
+                case Ordre.ConsecutiuIAlInreves://repite el primero y el ultimo
+                    posicio = contador / llista.Length;
+                    if (posicio % 2 == 0)
+                    {
+                        //si esta bajando
+                        posicio = contador % llista.Length;
+                    }
+                    else {
+                        //esta subiendo
+                        posicio = llista.Length - (contador % llista.Length) - 1;
+                    }
+                    objSelected = llista[posicio];
+                    break;
+            }
+            return objSelected;
+        }
+        #endregion
         #region IEnumerable
+
         /// <summary>
         /// Ordena por elemetodo de orden indicado sin modificar la coleccion que se va a ordenar
         /// </summary>
@@ -2009,6 +2042,7 @@ namespace Gabriel.Cat.Extension
 		}
 		#endregion
 		#endregion
+
 	}
 }
 
