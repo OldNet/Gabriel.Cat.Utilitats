@@ -980,9 +980,9 @@ namespace Gabriel.Cat.Extension
         public static SortedList<T,T> ToSortedList<T>(this IEnumerable<T> list) where T :IComparable<T>
         {
             SortedList<T, T> sortedList = new SortedList<T, T>();
-            foreach (T obj in list)
-                if (!sortedList.ContainsKey(obj))
-                    sortedList.Add(obj, obj);
+            foreach (T element in list)
+                if (!sortedList.ContainsKey(element))
+                    sortedList.Add(element, element);
             return sortedList;
         }
         /// <summary>
