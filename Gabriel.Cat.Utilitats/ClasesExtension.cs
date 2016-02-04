@@ -624,42 +624,73 @@ namespace Gabriel.Cat.Extension
         }
 
         #endregion
+        #region Int
+        public static bool EsPrimero(this int num)
+        {
+            bool esPrimero = true;
+            for (int i = 2, f = Convert.ToInt32(Math.Sqrt(num)); i < f && esPrimero; i++)
+                esPrimero = num % i != 0;
+            return esPrimero;
+
+        }
+        public static int DamePrimeroCercano(this int num)
+        {
+            while (!num.EsPrimero())
+                num++;
+            return num;
+        }
+        #endregion
         #region Bitmap
         public static Bitmap RandomPixels(this Bitmap imgRandom)
+        {
+            const int MAXPRIMERO = 19;
+            return imgRandom.RandomPixels(Convert.ToInt32(imgRandom.Width % MAXPRIMERO));
+        }
+        public static Bitmap RandomPixels(this Bitmap imgRandom, int lineasLadoCuadradoPixel)
         {
             unsafe
             {
                 imgRandom.TrataBytes((MetodoTratarBytePointer)((bytesImg) =>
                 {
-                    const int PRIMERO = 13;//al ser un numero Primo no hay problemas 
+                    const int PRIMERODEFAULT = 13;//al ser un numero Primo no hay problemas 
+                    Color[] cuadrados;
+                    Color colorActual;
                     int a = 3, r = 0, g = 1, b = 2;
                     int lenght = imgRandom.LengthBytes();
                     int pixel = imgRandom.IsArgb() ? 4 : 3;
                     int pixelsLineasHechas;
                     int sumaX;
-                    byte byteRandomR = (byte)MiRandom.Next(byte.MaxValue);
-                    byte byteRandomG = (byte)MiRandom.Next(byte.MaxValue);
-                    byte byteRandomB = (byte)MiRandom.Next(byte.MaxValue);
-
+                    int numPixeles;
+                    int posicionCuadrado = 0;
+                    if (lineasLadoCuadradoPixel < 1)
+                        lineasLadoCuadradoPixel = PRIMERODEFAULT;
+                    else
+                        lineasLadoCuadradoPixel = lineasLadoCuadradoPixel.DamePrimeroCercano();
+                    numPixeles = imgRandom.Width / lineasLadoCuadradoPixel;
+                    numPixeles = numPixeles.DamePrimeroCercano();
+                    cuadrados = DamePixeles(numPixeles);
+                    colorActual = cuadrados[posicionCuadrado];
                     for (int y = 0, xMax = imgRandom.Width * pixel; y < imgRandom.Height; y++)
                     {
                         pixelsLineasHechas = y * xMax;
-                        if (y % PRIMERO == 0)
+                        if (y % numPixeles == 0)
                         {
-                            byteRandomR = (byte)MiRandom.Next(byte.MaxValue);
-                            byteRandomG = (byte)MiRandom.Next(byte.MaxValue);
-                            byteRandomB = (byte)MiRandom.Next(byte.MaxValue);
+                            cuadrados = DamePixeles(numPixeles);
                         }
                         for (int x = 0; x < xMax; x += pixel)
                         {
+                            if (x % numPixeles == 0)
+                            {
+                                colorActual = cuadrados[++posicionCuadrado % cuadrados.Length];
+                            }
                             sumaX = pixelsLineasHechas + x;
                             if (pixel == 4)
                             {
                                 bytesImg[sumaX + a] = byte.MaxValue;
                             }
-                            bytesImg[sumaX + r] = byteRandomR;
-                            bytesImg[sumaX + g] = byteRandomG;
-                            bytesImg[sumaX + b] = byteRandomB;
+                            bytesImg[sumaX + r] = colorActual.R;
+                            bytesImg[sumaX + g] = colorActual.G;
+                            bytesImg[sumaX + b] = colorActual.B;
                         }
                     }
                 })
@@ -667,6 +698,15 @@ namespace Gabriel.Cat.Extension
             }
             return imgRandom;
         }
+
+        private static Color[] DamePixeles(int numPixeles)
+        {
+            Color[] pixeles = new Color[numPixeles];
+            for (int i = 0; i < pixeles.Length; i++)
+                pixeles[i] = Color.FromArgb(MiRandom.Next());
+            return pixeles;
+        }
+
         public static byte[] GetBytes(this Bitmap bmp)
         {
             BitmapData bmpData = bmp.LockBits();
