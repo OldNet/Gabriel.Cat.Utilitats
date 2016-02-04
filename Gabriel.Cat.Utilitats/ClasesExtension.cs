@@ -644,9 +644,9 @@ namespace Gabriel.Cat.Extension
         public static Bitmap RandomPixels(this Bitmap imgRandom)
         {
             const int MAXPRIMERO = 19;
-            return imgRandom.RandomPixels(Convert.ToInt32(imgRandom.Width % MAXPRIMERO));
+            return imgRandom.RandomPixels(Convert.ToInt32(Math.Sqrt(imgRandom.Width) % MAXPRIMERO));
         }
-        public static Bitmap RandomPixels(this Bitmap imgRandom, int lineasLadoCuadradoPixel)
+        public static Bitmap RandomPixels(this Bitmap imgRandom, int cuadradosPorLinea)
         {
             unsafe
             {
@@ -662,20 +662,20 @@ namespace Gabriel.Cat.Extension
                     int sumaX;
                     int numPixeles;
                     int posicionCuadrado = 0;
-                    if (lineasLadoCuadradoPixel < 1)
-                        lineasLadoCuadradoPixel = PRIMERODEFAULT;
+                    if (cuadradosPorLinea < 1)
+                        cuadradosPorLinea = PRIMERODEFAULT;
                     else
-                        lineasLadoCuadradoPixel = lineasLadoCuadradoPixel.DamePrimeroCercano();
-                    numPixeles = imgRandom.Width / lineasLadoCuadradoPixel;
+                        cuadradosPorLinea = cuadradosPorLinea.DamePrimeroCercano();
+                    numPixeles = imgRandom.Width / cuadradosPorLinea;
                     numPixeles = numPixeles.DamePrimeroCercano();
-                    cuadrados = DamePixeles(numPixeles);
+                    cuadrados = DamePixeles(cuadradosPorLinea);
                     colorActual = cuadrados[posicionCuadrado];
                     for (int y = 0, xMax = imgRandom.Width * pixel; y < imgRandom.Height; y++)
                     {
                         pixelsLineasHechas = y * xMax;
                         if (y % numPixeles == 0)
                         {
-                            cuadrados = DamePixeles(numPixeles);
+                            cuadrados = DamePixeles(cuadradosPorLinea);
                         }
                         for (int x = 0; x < xMax; x += pixel)
                         {
