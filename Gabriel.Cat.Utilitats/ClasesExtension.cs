@@ -648,6 +648,7 @@ namespace Gabriel.Cat.Extension
         }
         public static Bitmap RandomPixels(this Bitmap imgRandom, int cuadradosPorLinea)
         {
+            //hay un bug y no lo veo... no hace cuadrados...
             unsafe
             {
                 imgRandom.TrataBytes((MetodoTratarBytePointer)((bytesImg) =>
