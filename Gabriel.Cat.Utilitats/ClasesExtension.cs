@@ -22,31 +22,31 @@ using System.Runtime.ExceptionServices;
 
 namespace Gabriel.Cat.Extension
 {
-	public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
-	public delegate void MetodoTratarByteArray(byte[] byteArray);
+    public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
+    public delegate void MetodoTratarByteArray(byte[] byteArray);
     public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray);
     public delegate bool ComprovaEventHanler<Tvalue>(Tvalue valorAComprovar);
-	public enum DimensionMatriz
-	{
-		Columna = 0,
-		Fila = 1,
-		Fondo = 2,
-		X = Columna,
-		Y = Fila,
-		Z = Fondo
+    public enum DimensionMatriz
+    {
+        Columna = 0,
+        Fila = 1,
+        Fondo = 2,
+        X = Columna,
+        Y = Fila,
+        Z = Fondo
 
-	}
-	public  enum Orden
-	{
-		QuickSort,
-		Bubble
-	}
-	public enum CompareTo
-	{
-		Iguales = 0,
-		Inferior = -1,
-		Superior = 1
-	}
+    }
+    public enum Orden
+    {
+        QuickSort,
+        Bubble
+    }
+    public enum CompareTo
+    {
+        Iguales = 0,
+        Inferior = -1,
+        Superior = 1
+    }
     public enum Ordre
     {
         Consecutiu,
@@ -55,57 +55,62 @@ namespace Gabriel.Cat.Extension
 
     #region Comparar
     public delegate int ComparadorEventHandler<T>(T x, T y);
-	public class Comparador<T> : Comparer<T>
-	{
-		ComparadorEventHandler<T> comparador;
-		public Comparador(ComparadorEventHandler<T> comparador)
-		{
-			this.comparador = comparador;
-		}
+    public class Comparador<T> : Comparer<T>
+    {
+        ComparadorEventHandler<T> comparador;
+        public Comparador(ComparadorEventHandler<T> comparador)
+        {
+            this.comparador = comparador;
+        }
 
-		public override int Compare(T x, T y)
-		{
-			return comparador(x, y);
-		}
-	}
-	#endregion
-	#region Serializar
-	public struct Propiedad
-	{
-		private string nombre;
-		private object objeto;
-		public Propiedad(string nombre, object obj)
-		{
-			this.nombre = nombre;
-			this.objeto = obj;
-		}
-		public Type Tipo {
-			get { return objeto.GetType(); }
-		}
+        public override int Compare(T x, T y)
+        {
+            return comparador(x, y);
+        }
+    }
+    #endregion
+    #region Serializar
+    public struct Propiedad
+    {
+        private string nombre;
+        private object objeto;
+        public Propiedad(string nombre, object obj)
+        {
+            this.nombre = nombre;
+            this.objeto = obj;
+        }
+        public Type Tipo
+        {
+            get { return objeto.GetType(); }
+        }
 
-		public string Nombre {
-			get {
-				return nombre;
-			}
+        public string Nombre
+        {
+            get
+            {
+                return nombre;
+            }
 
 
-		}
+        }
 
-		public object Objeto {
-			get {
-				return objeto;
-			}
+        public object Objeto
+        {
+            get
+            {
+                return objeto;
+            }
 
-		}
-	}
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-	public sealed class SerialitzeIgnoreAttribute : Attribute, IComparable<SerialitzeIgnoreAttribute>
-	{
-		public int CompareTo(SerialitzeIgnoreAttribute other)
-		{
-			return 0;
-		}
-	}
+        }
+    }
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    public sealed class SerialitzeIgnoreAttribute : Attribute, IComparable<SerialitzeIgnoreAttribute>
+    {
+        public int CompareTo(SerialitzeIgnoreAttribute other)
+        {
+            return 0;
+        }
+    }
     #endregion
     public static class Extension
     {
@@ -132,7 +137,8 @@ namespace Gabriel.Cat.Extension
         {
             #region NormalizarXml
             caracteresReservadosXml = new LlistaOrdenada<string, string>();
-            for (int i = 0; i < caracteresXmlReservados.Length; i++) {
+            for (int i = 0; i < caracteresXmlReservados.Length; i++)
+            {
                 caracteresReservadosXml.Afegir(caracteresXmlReservados[i], caracteresXmlSustitutos[i]);
                 caracteresReservadosXml.Afegir(caracteresXmlSustitutos[i], caracteresXmlReservados[i]);
             }
@@ -198,8 +204,10 @@ namespace Gabriel.Cat.Extension
         {
             TValue valorEncontrado = default(TValue);
             bool encontrado = false;
-            llista.WhileEach((valorAMirar) => {
-                if (valorAMirar.CompareTo(comparador) == 0) {
+            llista.WhileEach((valorAMirar) =>
+            {
+                if (valorAMirar.CompareTo(comparador) == 0)
+                {
                     valorEncontrado = valorAMirar;
                     encontrado = true;
                 }
@@ -236,10 +244,12 @@ namespace Gabriel.Cat.Extension
             List<KeyValuePair<DirectoryInfo, FileInfo[]>> carpetasConSusArchivos = new List<KeyValuePair<DirectoryInfo, FileInfo[]>>();
             DirectoryInfo[] subDirs;
             bool canRead = dir.CanRead();
-            if (canRead) {
+            if (canRead)
+            {
                 carpetasConSusArchivos.Add(new KeyValuePair<DirectoryInfo, FileInfo[]>(dir, dir.GetFiles()));
 
-                if (recursive) {
+                if (recursive)
+                {
                     subDirs = dir.SubDirectoris();
                     for (int i = 0; i < subDirs.Length; i++)
                         if (subDirs[i].CanRead())
@@ -308,19 +318,24 @@ namespace Gabriel.Cat.Extension
             if (recursivo)
                 dirs.AfegirMolts(dir.SubDirectoris());
 
-            for (int i = 0; i < dirs.Count && llista.Count != 0; i++) {
+            for (int i = 0; i < dirs.Count && llista.Count != 0; i++)
+            {
                 files = dirs[i].GetFiles();
-                for (int j = 0; j < files.Length && llista.Count != 0; j++) {
+                for (int j = 0; j < files.Length && llista.Count != 0; j++)
+                {
 
-                    if (isHash) {
+                    if (isHash)
+                    {
                         hashArchivo = files[j].Hash();
 
-                    } else {
+                    }
+                    else {
                         hashArchivo = files[j].Sha256();
 
                     }
 
-                    if (llista.Existeix(hashArchivo)) {
+                    if (llista.Existeix(hashArchivo))
+                    {
                         filesEncontrados.Afegir(files[j]);
                         llista.Elimina(hashArchivo);
 
@@ -346,7 +361,8 @@ namespace Gabriel.Cat.Extension
             List<FileInfo> files = new List<FileInfo>();
             string formatoTratado;
             if (dir.CanRead())
-                for (int i = 0; i < formatsAdmessos.Length; i++) {
+                for (int i = 0; i < formatsAdmessos.Length; i++)
+                {
                     formatoTratado = "*" + DameFormatoCorrectamente(formatsAdmessos[i]);
 
                     files.AddRange(dir.GetFiles(formatoTratado));
@@ -357,7 +373,8 @@ namespace Gabriel.Cat.Extension
         private static string DameFormatoCorrectamente(string formato)
         {
             string[] camposFormato;
-            if (formato.Contains('.')) {
+            if (formato.Contains('.'))
+            {
                 camposFormato = formato.Split('.');
                 formato = camposFormato[camposFormato.Length - 1];
             }
@@ -369,9 +386,11 @@ namespace Gabriel.Cat.Extension
         {
             Llista<FileInfo> files = new Llista<FileInfo>();
             DirectoryInfo[] subDirs;
-            if (dir.CanRead()) {
+            if (dir.CanRead())
+            {
                 files.AfegirMolts(dir.GetFiles(formatsAdmessos));
-                if (recursivo) {
+                if (recursivo)
+                {
                     subDirs = dir.SubDirectoris();
                     for (int i = 0; i < subDirs.Length; i++)
                         if (subDirs[i].CanRead())
@@ -393,9 +412,11 @@ namespace Gabriel.Cat.Extension
         {
             List<KeyValuePair<DirectoryInfo, FileInfo[]>> llistaArxiusPerCarpeta = new List<KeyValuePair<DirectoryInfo, FileInfo[]>>();
             DirectoryInfo[] subDirs;
-            if (dir.CanRead()) {
+            if (dir.CanRead())
+            {
                 llistaArxiusPerCarpeta.Add(new KeyValuePair<DirectoryInfo, FileInfo[]>(dir, dir.GetFiles(formatsAdmessos)));
-                if (recursive) {
+                if (recursive)
+                {
                     subDirs = dir.SubDirectoris();
                     for (int i = 0; i < subDirs.Length; i++)
                         if (subDirs[i].CanRead())
@@ -412,7 +433,8 @@ namespace Gabriel.Cat.Extension
         {
             List<DirectoryInfo> subDirectoris = new List<DirectoryInfo>();
             DirectoryInfo[] subDirs;
-            if (dirPare.CanRead()) {
+            if (dirPare.CanRead())
+            {
                 subDirs = dirPare.GetDirectories();
                 subDirectoris.AddRange(subDirs);
 
@@ -433,7 +455,8 @@ namespace Gabriel.Cat.Extension
         public static string HazSitio(this DirectoryInfo dir, string pathArchivo)
         {
             string direccionArchivoFinal = null;
-            if (File.Exists(pathArchivo)) {
+            if (File.Exists(pathArchivo))
+            {
 
                 FileInfo fitxerAFerLloc = new FileInfo(pathArchivo);
                 string hashFitxerAFerLloc = fitxerAFerLloc.Sha256();
@@ -442,10 +465,12 @@ namespace Gabriel.Cat.Extension
                 string nombreArchivo = Path.GetFileNameWithoutExtension(pathArchivo);
                 string extension = Path.GetExtension(pathArchivo);
                 direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + extension;
-                while (File.Exists(direccionArchivoFinal) && !encontradoPath) {
+                while (File.Exists(direccionArchivoFinal) && !encontradoPath)
+                {
                     //son iguales en nombre miro el hash
                     encontradoPath = new FileInfo(direccionArchivoFinal).SHA3Equals(hashFitxerAFerLloc);
-                    if (!encontradoPath) {
+                    if (!encontradoPath)
+                    {
                         //no son iguales en el hash
                         direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + "(" + contadorIguales + ")" + extension;
                         contadorIguales++;
@@ -471,19 +496,23 @@ namespace Gabriel.Cat.Extension
             string nombreArchivo;
             string extension;
             int contadorIguales = 1;
-            if (File.Exists(pathArchivo)) {
+            if (File.Exists(pathArchivo))
+            {
                 string hashArchivo = new FileInfo(pathArchivo).Sha256();
                 FileInfo[] archivos = dir.GetFiles();
-                for (int i = 0; i < archivos.Length && !encontrado; i++) {
+                for (int i = 0; i < archivos.Length && !encontrado; i++)
+                {
                     encontrado = archivos[i].SHA3Equals(hashArchivo);
                     if (encontrado)
                         direccionArchivoFinal = archivos[i].FullName;
                 }
-                if (!encontrado) {
+                if (!encontrado)
+                {
                     nombreArchivo = Path.GetFileNameWithoutExtension(pathArchivo);
                     extension = Path.GetExtension(pathArchivo);
                     direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + extension;
-                    while (File.Exists(direccionArchivoFinal)) {
+                    while (File.Exists(direccionArchivoFinal))
+                    {
                         direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + "(" + contadorIguales + ")" + extension;
                         contadorIguales++;
 
@@ -516,20 +545,24 @@ namespace Gabriel.Cat.Extension
             int contador;
             if (pathsArxius != null)
                 foreach (string path in pathsArxius)
-                    if (File.Exists(path)) {
+                    if (File.Exists(path))
+                    {
                         fitxer = new FileInfo(path);
                         if (!idArxiusPerCopiar.ContainsKey(fitxer.IdUnicoRapido()))
                             idArxiusPerCopiar.Add(fitxer.IdUnicoRapido(), fitxer);
                         else
                             archivosDuplicados.Afegir(fitxer);
                     }
-            foreach (var archiuACopiar in idArxiusPerCopiar) {//miro archivo a copiar uno a uno  para ver si se tiene que copiar o no :)
+            foreach (var archiuACopiar in idArxiusPerCopiar)
+            {//miro archivo a copiar uno a uno  para ver si se tiene que copiar o no :)
 
                 while (fitxersCarpeta.MoveNext() && !idArxiusPerCopiar.ContainsKey(fitxersCarpeta.Current.IdUnicoRapido()))
                     ;//mira archivo por archivo de la carpeta si su hash esta en la lista de archivos a copiar
-                if (idArxiusPerCopiar.ContainsKey(fitxersCarpeta.Current.IdUnicoRapido())) {
+                if (idArxiusPerCopiar.ContainsKey(fitxersCarpeta.Current.IdUnicoRapido()))
+                {
                     pathsFinals.Add(fitxersCarpeta.Current.FullName, fitxersCarpeta.Current.IdUnicoRapido(), fitxersCarpeta.Current);//si el arxivo esta en la carpeta pongo la ruta
-                } else {
+                }
+                else {
                     contador = 1;
                     direccioFinalArxiu = dir.FullName + Path.DirectorySeparatorChar + Path.GetFileName(archiuACopiar.Value.FullName);
                     while (File.Exists(direccioFinalArxiu))//mira que no coincida en nombre con ninguno
@@ -539,7 +572,8 @@ namespace Gabriel.Cat.Extension
                 }
             }
             llistaFinal.AfegirMolts(pathsFinals.Key1ValuePair());
-            for (int i = 0; i < archivosDuplicados.Count; i++) {
+            for (int i = 0; i < archivosDuplicados.Count; i++)
+            {
                 llistaFinal.Afegir(new KeyValuePair<string, FileInfo>(pathsFinals.ObtainValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
             }
             return llistaFinal.ToTaula();
@@ -555,13 +589,18 @@ namespace Gabriel.Cat.Extension
             bool canWrite = false;
             StreamWriter sw = null;
             string path = dir.FullName + Path.DirectorySeparatorChar + MiRandom.Next() + "Archivo.exTmp.SeTeniaDeHaberBorrado.SePuedeBorrar";
-            try {
+            try
+            {
                 sw = new StreamWriter(path, false);
                 sw.WriteLine("prueba");
                 canWrite = true;
 
-            } catch {
-            } finally {
+            }
+            catch
+            {
+            }
+            finally
+            {
                 if (sw != null)
                     sw.Close();
                 if (File.Exists(path))
@@ -573,10 +612,13 @@ namespace Gabriel.Cat.Extension
         public static bool CanRead(this DirectoryInfo dir)
         {
             bool puedeLeer = false;
-            try {
+            try
+            {
                 dir.GetDirectories();
                 puedeLeer = true;
-            } catch {
+            }
+            catch
+            {
             }
             return puedeLeer;
         }
@@ -589,9 +631,37 @@ namespace Gabriel.Cat.Extension
             {
                 imgRandom.TrataBytes((MetodoTratarBytePointer)((bytesImg) =>
                 {
+                    const int PRIMERO = 13;//al ser un numero Primo no hay problemas 
+                    int a = 3, r = 0, g = 1, b = 2;
                     int lenght = imgRandom.LengthBytes();
-                    for (int i = 0; i < lenght; i++)
-                        bytesImg[i] = (byte)MiRandom.Next(byte.MaxValue);
+                    int pixel = imgRandom.IsArgb() ? 4 : 3;
+                    int pixelsLineasHechas;
+                    int sumaX;
+                    byte byteRandomR = (byte)MiRandom.Next(byte.MaxValue);
+                    byte byteRandomG = (byte)MiRandom.Next(byte.MaxValue);
+                    byte byteRandomB = (byte)MiRandom.Next(byte.MaxValue);
+
+                    for (int y = 0, xMax = imgRandom.Width * pixel; y < imgRandom.Height; y++)
+                    {
+                        pixelsLineasHechas = y * xMax;
+                        if (y % PRIMERO == 0)
+                        {
+                            byteRandomR = (byte)MiRandom.Next(byte.MaxValue);
+                            byteRandomG = (byte)MiRandom.Next(byte.MaxValue);
+                            byteRandomB = (byte)MiRandom.Next(byte.MaxValue);
+                        }
+                        for (int x = 0; x < xMax; x += pixel)
+                        {
+                            sumaX = pixelsLineasHechas + x;
+                            if (pixel == 4)
+                            {
+                                bytesImg[sumaX + a] = byte.MaxValue;
+                            }
+                            bytesImg[sumaX + r] = byteRandomR;
+                            bytesImg[sumaX + g] = byteRandomG;
+                            bytesImg[sumaX + b] = byteRandomB;
+                        }
+                    }
                 })
                   );
             }
@@ -806,9 +876,12 @@ namespace Gabriel.Cat.Extension
         {
             Bitmap bmp = null;
             ShellThumbnail thub = new ShellThumbnail();
-            try {
+            try
+            {
                 bmp = thub.GetThumbnail(file.FullName, amplitud, altura);
-            } catch {
+            }
+            catch
+            {
                 bmp = file.Icono();
             }
             return bmp.Clone() as Bitmap;
@@ -829,13 +902,15 @@ namespace Gabriel.Cat.Extension
         }
         public static string Sha256(this FileInfo file)
         {
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 FileStream stream = file.GetStream();
                 string sha3 = stream.GetSha256Hash();
                 stream.Close();
                 return sha3;
 
-            } else
+            }
+            else
                 return null;
         }
         public static bool SHA3Equals(this FileInfo file, FileInfo file2)
@@ -853,13 +928,15 @@ namespace Gabriel.Cat.Extension
         /// <returns>devuelve null si el archivo no existe</returns>
         public static string Hash(this FileInfo file)
         {
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 FileStream stream = file.GetStream();
                 string hash = stream.GetMd5Hash();
                 stream.Close();
                 return hash;
 
-            } else
+            }
+            else
                 return null;
         }
         public static bool HashEquals(this FileInfo file, string hash)
@@ -874,12 +951,15 @@ namespace Gabriel.Cat.Extension
         {
             bool bEqual = false;
             int i;
-            if (tmpNewHash.Length == tmpHash.Length) {
+            if (tmpNewHash.Length == tmpHash.Length)
+            {
                 i = 0;
-                while ((i < tmpNewHash.Length) && (tmpNewHash[i] == tmpHash[i])) {
+                while ((i < tmpNewHash.Length) && (tmpNewHash[i] == tmpHash[i]))
+                {
                     i += 1;
                 }
-                if (i == tmpNewHash.Length) {
+                if (i == tmpNewHash.Length)
+                {
                     bEqual = true;
                 }
             }
@@ -890,7 +970,8 @@ namespace Gabriel.Cat.Extension
         {
             int i;
             StringBuilder sOutput = new StringBuilder(arrInput.Length);
-            for (i = 0; i < arrInput.Length - 1; i++) {
+            for (i = 0; i < arrInput.Length - 1; i++)
+            {
                 sOutput.Append(arrInput[i].ToString("X2"));
             }
             return sOutput.ToString();
@@ -923,7 +1004,8 @@ namespace Gabriel.Cat.Extension
         {
 
             Llista<Tvalue> filas = new Llista<Tvalue>();
-            if (fila <= matriu.GetLength(DimensionMatriz.Fila)) {
+            if (fila <= matriu.GetLength(DimensionMatriz.Fila))
+            {
                 for (int x = 0; x < matriu.GetLength(DimensionMatriz.Columna); x++)
                     filas.Afegir(matriu[x, fila]);
             }
@@ -932,7 +1014,8 @@ namespace Gabriel.Cat.Extension
         public static Tvalue[] Columna<Tvalue>(this Tvalue[,] matriu, int columna)
         {
             Llista<Tvalue> columnas = new Llista<Tvalue>();
-            if (columna <= matriu.GetLength(DimensionMatriz.Columna)) {
+            if (columna <= matriu.GetLength(DimensionMatriz.Columna))
+            {
                 for (int y = 0; y < matriu.GetLength(DimensionMatriz.Fila); y++)
                     columnas.Afegir(matriu[columna, y]);
             }
@@ -977,7 +1060,7 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable
-        public static SortedList<T,T> ToSortedList<T>(this IEnumerable<T> list) where T :IComparable<T>
+        public static SortedList<T, T> ToSortedList<T>(this IEnumerable<T> list) where T : IComparable<T>
         {
             SortedList<T, T> sortedList = new SortedList<T, T>();
             foreach (T element in list)
@@ -1004,7 +1087,8 @@ namespace Gabriel.Cat.Extension
         public static T[] Sort<T>(this T[] list, Orden orden) where T : IComparable
         {
             T[] listSorted = null;
-            switch (orden) {
+            switch (orden)
+            {
                 case Orden.QuickSort:
                     listSorted = list.SortByQuickSort();
                     break;
@@ -1032,16 +1116,20 @@ namespace Gabriel.Cat.Extension
             int i = left, j = right;
             IComparable pivot = elements[(left + right) / 2];
             IComparable tmp;
-            while (i <= j) {
-                while (elements[i].CompareTo(pivot) < 0) {
+            while (i <= j)
+            {
+                while (elements[i].CompareTo(pivot) < 0)
+                {
                     i++;
                 }
 
-                while (elements[j].CompareTo(pivot) > 0) {
+                while (elements[j].CompareTo(pivot) > 0)
+                {
                     j--;
                 }
 
-                if (i <= j) {
+                if (i <= j)
+                {
                     // Swap
                     tmp = elements[i];
                     elements[i] = elements[j];
@@ -1053,11 +1141,13 @@ namespace Gabriel.Cat.Extension
             }
 
             // Recursive calls
-            if (left < j) {
+            if (left < j)
+            {
                 ISortByQuickSort(elements, left, j);
             }
 
-            if (i < right) {
+            if (i < right)
+            {
                 ISortByQuickSort(elements, i, right);
             }
 
@@ -1078,10 +1168,13 @@ namespace Gabriel.Cat.Extension
             int numLength = listaParaOrdenar.Length;
 
             //sorting an array
-            for (int i = 1; (i <= (numLength - 1)) && flag; i++) {
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            {
                 flag = false;
-                for (int j = 0; j < (numLength - 1); j++) {
-                    if (listaParaOrdenar[j + 1].CompareTo(listaParaOrdenar[j]) == (int)CompareTo.Superior) {
+                for (int j = 0; j < (numLength - 1); j++)
+                {
+                    if (listaParaOrdenar[j + 1].CompareTo(listaParaOrdenar[j]) == (int)CompareTo.Superior)
+                    {
                         temp = listaParaOrdenar[j];
                         listaParaOrdenar[j] = listaParaOrdenar[j + 1];
                         listaParaOrdenar[j + 1] = temp;
@@ -1111,7 +1204,8 @@ namespace Gabriel.Cat.Extension
             const int INDICESINENCONTRAR = -1;
             int index = INDICESINENCONTRAR;
             int posicion = 0;
-            valores.WhileEach((valorAComparar) => {
+            valores.WhileEach((valorAComparar) =>
+            {
                 if (valor.CompareTo(valorAComparar) == (int)CompareTo.Iguales)
                     index = posicion;
                 posicion++;
@@ -1133,7 +1227,8 @@ namespace Gabriel.Cat.Extension
         public static bool Existe<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valor) where Tvalue : IComparable<Tvalue>
         {//por provar!!
             bool noExiste = false;
-            valors.WhileEach((valorAComparar) => {
+            valors.WhileEach((valorAComparar) =>
+            {
                 noExiste = valor.CompareTo(valorAComparar) != (int)CompareTo.Iguales;
                 return noExiste;
             });
@@ -1189,7 +1284,8 @@ namespace Gabriel.Cat.Extension
             int posicionAzar;
             Llista<Tvalue> llistaDesordenada = new Llista<Tvalue>();
 
-            for (int i = 0, total = llistaOrdenada.Count; i < total; i++) {
+            for (int i = 0, total = llistaOrdenada.Count; i < total; i++)
+            {
                 posicionAzar = MiRandom.Next(0, llistaOrdenada.Count);
                 llistaDesordenada.Afegir(llistaOrdenada[posicionAzar]);
                 llistaOrdenada.Elimina(posicionAzar);
@@ -1200,7 +1296,8 @@ namespace Gabriel.Cat.Extension
         public static byte[] CastingToByte(this object[] source)
         {
             byte[] bytes = new byte[source.Length];
-            for (int i = 0; i < source.Length; i++) {
+            for (int i = 0; i < source.Length; i++)
+            {
                 try
                 {
                     bytes[i] = (Convert.ToByte(source[i]));
@@ -1216,10 +1313,14 @@ namespace Gabriel.Cat.Extension
         public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting)
         {
             Llista<TResult> llista = new Llista<TResult>();
-            foreach (Object obj in source) {
-                try {
+            foreach (Object obj in source)
+            {
+                try
+                {
                     llista.Afegir((TResult)obj);//lo malo es cuando no es un int casting double
-                } catch {
+                }
+                catch
+                {
                     //mirar de poder convertir el valor en caso de que sea posible ...
                     if (conservarNoCompatiblesCasting)
                         llista.Afegir(default(TResult));
@@ -1239,20 +1340,24 @@ namespace Gabriel.Cat.Extension
         public static IEnumerable<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
         {
 
-            if (valorsATreure != null) {
+            if (valorsATreure != null)
+            {
 
                 Llista<Tvalue> llista = new Llista<Tvalue>(valors);
                 int compareTo = -1;
 
-                return llista.Filtra(valor => {
+                return llista.Filtra(valor =>
+                {
 
-                    valorsATreure.WhileEach((valorAComparar) => {
+                    valorsATreure.WhileEach((valorAComparar) =>
+                    {
                         compareTo = valor.CompareTo(valorAComparar);
                         return compareTo != (int)CompareTo.Iguales;
                     });
                     return compareTo != (int)CompareTo.Iguales;
                 });
-            } else
+            }
+            else
                 return valors;
 
         }
@@ -1264,21 +1369,25 @@ namespace Gabriel.Cat.Extension
         }
         public static IEnumerable<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents) where Tvalue : IComparable
         {
-            if (valorsNous != null) {
+            if (valorsNous != null)
+            {
                 Llista<Tvalue> llista = new Llista<Tvalue>(valors);
                 bool valorEnLista = true;
                 if (valorsNous != null)
-                    foreach (Tvalue valor in valorsNous) {
+                    foreach (Tvalue valor in valorsNous)
+                    {
                         if (noPosarValorsJaExistents)
                             valorEnLista = llista.Contains(valor);
                         if (!valorEnLista && noPosarValorsJaExistents)
                             llista.Afegir(valor);
-                        else if (!noPosarValorsJaExistents) {
+                        else if (!noPosarValorsJaExistents)
+                        {
                             llista.Afegir(valor);
                         }
                     }
                 return llista;
-            } else
+            }
+            else
                 return valors;
 
         }
@@ -1384,9 +1493,12 @@ namespace Gabriel.Cat.Extension
         {
             FileStream file = new FileStream(path, FileMode.Create);
             BinaryWriter bin = new BinaryWriter(file, encoding);
-            try {
+            try
+            {
                 bin.Write(array.ToTaula());
-            } finally {
+            }
+            finally
+            {
                 bin.Close();
                 file.Close();
             }
@@ -1420,13 +1532,17 @@ namespace Gabriel.Cat.Extension
             IEnumerator<string> enumerador;
             string peque;
             string grande;
-            if (textoAContener != null) {
+            if (textoAContener != null)
+            {
                 enumerador = valores.ObtieneEnumerador();
-                while (pos == POSICIONNOENCONTRADA && enumerador.MoveNext()) {
-                    if (textoAContener.Length < enumerador.Current.Length) {
+                while (pos == POSICIONNOENCONTRADA && enumerador.MoveNext())
+                {
+                    if (textoAContener.Length < enumerador.Current.Length)
+                    {
                         peque = textoAContener;
                         grande = enumerador.Current;
-                    } else {
+                    }
+                    else {
                         peque = enumerador.Current;
                         grande = textoAContener;
                     }
@@ -1478,7 +1594,8 @@ namespace Gabriel.Cat.Extension
             string[] ordenados = Contenidos(aComparar, acontenerLista).OrdenaPorLongitud(false).ToTaula();
             text aComprarAux;
             for (int i = 0; i < ordenados.Length; i++)
-                if (aCompararLow.Contains(ordenados[i].ToLower())) {
+                if (aCompararLow.Contains(ordenados[i].ToLower()))
+                {
                     aComprarAux = ((text)aCompararLow);
                     aComprarAux.Remove(ordenados[i].ToLower());
                     aCompararLow = aComprarAux;
@@ -1489,7 +1606,8 @@ namespace Gabriel.Cat.Extension
         public static IEnumerable<string> OrdenaPorLongitud(this IEnumerable<string> lista)
         {
             List<string> listaOrdenada = new List<string>(lista);
-            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2) {
+            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2)
+            {
                 return vString1.Length.CompareTo(vString2.Length);
             }));
             return listaOrdenada;
@@ -1498,7 +1616,8 @@ namespace Gabriel.Cat.Extension
         {
             List<string> listaOrdenada = new List<string>(lista);
             int compareTo;
-            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2) {
+            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2)
+            {
                 if (ordenAscendente)
                     compareTo = vString1.Length.CompareTo(vString2.Length);
                 else
@@ -1512,7 +1631,8 @@ namespace Gabriel.Cat.Extension
         public static string[] Ordena(this IEnumerable<string> valores)
         {
             List<string> llista = new List<string>(valores);
-            llista.Sort(new Comparador<string>((vString1, vString2) => {
+            llista.Sort(new Comparador<string>((vString1, vString2) =>
+            {
                 return string.Compare(vString1, vString2, StringComparison.CurrentCulture);
             }));
             return llista.ToArray();
@@ -1534,10 +1654,12 @@ namespace Gabriel.Cat.Extension
             string[] listaArray = lista.ToTaula();
             string aCompararLow;
             int contador;
-            for (int i = 0; i < listaArray.Length; i++) {
+            for (int i = 0; i < listaArray.Length; i++)
+            {
                 aCompararLow = listaArray[i].ToLower();
                 contador = 0;
-                for (int j = i; j < listaArray.Length; j++) {
+                for (int j = i; j < listaArray.Length; j++)
+                {
                     if (listaArray[j].ToLower().Contains(aCompararLow))
                         contador++;
                 }
@@ -1605,7 +1727,8 @@ namespace Gabriel.Cat.Extension
         public static Tipo ClonSuperficialConPropiedades<Tipo>(this Tipo obj, Tipo clonNew)
         {
             Propiedad[] propiedades = obj.Serialitze();
-            for (int i = 0; i < propiedades.Length; i++) {
+            for (int i = 0; i < propiedades.Length; i++)
+            {
                 if ((int)(clonNew.GetPropertyUsage(propiedades[i].Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
                     clonNew.SetProperty(propiedades[i].Nombre, propiedades[i].Objeto);
 
@@ -1627,10 +1750,13 @@ namespace Gabriel.Cat.Extension
         {
             Propiedad[] propiedades = obj.Serialitze();
             Object clonObjPropiedad;
-            for (int i = 0; i < propiedades.Length; i++) {
-                if (propiedades[i].Objeto is ICloneable) {
+            for (int i = 0; i < propiedades.Length; i++)
+            {
+                if (propiedades[i].Objeto is ICloneable)
+                {
                     clonObjPropiedad = ((ICloneable)propiedades[i].Objeto).Clone();
-                } else if (propiedades[i].Objeto is IClonable)
+                }
+                else if (propiedades[i].Objeto is IClonable)
                     clonObjPropiedad = ((IClonable)propiedades[i].Objeto).Clon();
                 else
                     clonObjPropiedad = propiedades[i].Objeto;
@@ -1684,7 +1810,8 @@ namespace Gabriel.Cat.Extension
             List<byte> bytes = new List<byte>(bytesEnum);
             byte byteHaciendose;
 
-            for (int bx = 0, cx = 0; bx < bytes.Count; ++bx, ++cx) {
+            for (int bx = 0, cx = 0; bx < bytes.Count; ++bx, ++cx)
+            {
                 byteHaciendose = ((byte)(bytes[bx] >> 4));
                 if (byteHaciendose > 9)
                     bytesHex.Add((char)(byteHaciendose - 10 + 'A'));
@@ -1705,12 +1832,16 @@ namespace Gabriel.Cat.Extension
                 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
             };
-            try {
-                for (int x = 0, i = 0; i < hexString.Length; i += 2, x += 1) {
+            try
+            {
+                for (int x = 0, i = 0; i < hexString.Length; i += 2, x += 1)
+                {
                     bytes[x] = (byte)(hexValue[Char.ToUpper(hexString[i + 0]) - '0'] << 4 |
                                       hexValue[Char.ToUpper(hexString[i + 1]) - '0']);
                 }
-            } catch {
+            }
+            catch
+            {
                 throw new Exception("La string no tiene el formato hex");
             }
 
@@ -1732,7 +1863,8 @@ namespace Gabriel.Cat.Extension
         public static byte ToByte(this bool[] bits)
         {
             byte byteBuild = new byte();
-            for (int i = 0; i < bits.Length; i++) {
+            for (int i = 0; i < bits.Length; i++)
+            {
                 if (bits[i])
                     byteBuild |= (byte)(1 << (7 - i));
 
@@ -1772,7 +1904,8 @@ namespace Gabriel.Cat.Extension
             Type tipo = typeof(T);
             PropertyInfo[] camposTipo = tipo.GetProperties();
             PropertyInfo campoTipo;
-            for (int i = 0; i < camposTipo.Length; i++) {
+            for (int i = 0; i < camposTipo.Length; i++)
+            {
                 campoTipo = camposTipo[i];
                 if (!campoTipo.GetCustomAttributes(false).Contains(new SerialitzeIgnoreAttribute()))// no tiene el atributo SerialitzeIgnore lo añade :)
                     campos.Afegir(new Propiedad(campoTipo.Name, campoTipo.GetValue(obj)));
@@ -1784,7 +1917,8 @@ namespace Gabriel.Cat.Extension
             Type tipo = typeof(T);
             PropertyInfo[] camposTipo = tipo.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
             PropertyInfo campoTipo;
-            for (int i = 0; i < camposTipo.Length; i++) {
+            for (int i = 0; i < camposTipo.Length; i++)
+            {
                 campoTipo = camposTipo[i];
                 campoTipo.SetValue(obj, info.GetValue(campoTipo.Name, campoTipo.PropertyType));
             }
@@ -1802,7 +1936,8 @@ namespace Gabriel.Cat.Extension
                     lista.Afegir(objPropiedad.Nombre, objPropiedad.Objeto);
                 else
                     lista[objPropiedad.Nombre] = objPropiedad.Objeto;
-            for (int i = 0; i < camposTipo.Length; i++) {
+            for (int i = 0; i < camposTipo.Length; i++)
+            {
                 campoTipo = camposTipo[i];
                 if (lista.Existeix(campoTipo.Name))
                     campoTipo.SetValue(obj, lista[campoTipo.Name]);
@@ -1918,7 +2053,7 @@ namespace Gabriel.Cat.Extension
         public static void Dispose(this IntPtr point)
         {
             System.Runtime.InteropServices.Marshal.FreeHGlobal(point);
-           
+
         }
         [HandleProcessCorruptedStateExceptions]
         public static unsafe int LenghtPoint(this IntPtr point)
@@ -1984,73 +2119,80 @@ namespace Gabriel.Cat.Extension
         #endregion
         #region StreamExtension
         public static byte[] Read(this Stream stream, int lenght)
-		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, uint lenght)
-		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, long lenght)
-		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, ulong lenght)
-		{
-			List<byte> bytes = new List<byte>();
-			for (ulong i = 0; i < lenght && !stream.EndOfStream(); i++)
-				bytes.Add((byte)stream.ReadByte());
-			return bytes.ToArray();
-		}
+        {
+            return stream.Read(Convert.ToUInt64(lenght));
+        }
+        public static byte[] Read(this Stream stream, uint lenght)
+        {
+            return stream.Read(Convert.ToUInt64(lenght));
+        }
+        public static byte[] Read(this Stream stream, long lenght)
+        {
+            return stream.Read(Convert.ToUInt64(lenght));
+        }
+        public static byte[] Read(this Stream stream, ulong lenght)
+        {
+            List<byte> bytes = new List<byte>();
+            for (ulong i = 0; i < lenght && !stream.EndOfStream(); i++)
+                bytes.Add((byte)stream.ReadByte());
+            return bytes.ToArray();
+        }
 
-		public static String GetMd5Hash(this Stream fs)
-		{
-			return getHash(fs, new MD5CryptoServiceProvider());
-		}
+        public static String GetMd5Hash(this Stream fs)
+        {
+            return getHash(fs, new MD5CryptoServiceProvider());
+        }
 
-		public static String GetSha1Hash(this Stream fs)
-		{
-			return getHash(fs, new SHA1Managed());
-		}
+        public static String GetSha1Hash(this Stream fs)
+        {
+            return getHash(fs, new SHA1Managed());
+        }
 
-		public static String GetSha256Hash(this Stream fs)
-		{
-			return getHash(fs, new SHA256Managed());
-		}
+        public static String GetSha256Hash(this Stream fs)
+        {
+            return getHash(fs, new SHA256Managed());
+        }
 
-		private static String getHash(Stream fs, HashAlgorithm hash)
-		{
-			Int64 currentPos = fs.Position;
-			string hashCalculated = null;
-			StringBuilder sb;
-			byte[] hashBytes;
-			try {
-				fs.Seek(0, SeekOrigin.Begin);
-				sb = new StringBuilder();
-				hashBytes = hash.ComputeHash(fs);
-				for (int i = 0; i < hashBytes.Length; i++) {
-					sb.Append(hashBytes[i].ToString("X2"));
-				}
-				hashCalculated = sb.ToString();
-			} finally {
-				try {
-					fs.Seek(currentPos, SeekOrigin.Begin);
-				} catch {
-				}
-			}
-			return hashCalculated;
-		}
-		#endregion
-		#region TypeExtension
-		public static bool IsNullableType(this Type type)
-		{
-			return type.IsGenericType
-				&& type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
-		}
-		#endregion
-		#endregion
+        private static String getHash(Stream fs, HashAlgorithm hash)
+        {
+            Int64 currentPos = fs.Position;
+            string hashCalculated = null;
+            StringBuilder sb;
+            byte[] hashBytes;
+            try
+            {
+                fs.Seek(0, SeekOrigin.Begin);
+                sb = new StringBuilder();
+                hashBytes = hash.ComputeHash(fs);
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                hashCalculated = sb.ToString();
+            }
+            finally
+            {
+                try
+                {
+                    fs.Seek(currentPos, SeekOrigin.Begin);
+                }
+                catch
+                {
+                }
+            }
+            return hashCalculated;
+        }
+        #endregion
+        #region TypeExtension
+        public static bool IsNullableType(this Type type)
+        {
+            return type.IsGenericType
+                && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+        }
+        #endregion
+        #endregion
 
-	}
+    }
 }
 
 
