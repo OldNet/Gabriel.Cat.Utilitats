@@ -30,6 +30,10 @@ namespace Gabriel.Cat
             return equals;
 		}
 		#region metodes
+        public void Append(text tString)
+        {
+            this.tString.Append(tString.tString);
+        }
 		public string[] Split(char caracterSplit)
 		{
 			string text = ToString();
@@ -198,7 +202,7 @@ namespace Gabriel.Cat
 		#endregion
 		#region Operadors
 
-		public static text operator +(text text1, text text2)
+		public static text operator &(text text1, text text2)
 		{
             //esta hecho para evitar el StringBuilder y su incomodo Append
             if (text2 != null)
@@ -208,15 +212,32 @@ namespace Gabriel.Cat
 
 		}
 
-		public static text operator +(text text1, object text2)
+		public static text operator &(text text1, object text2)
 		{
             if (text2 != null)
                 text1.tString.Append(text2.ToString());
 
             return text1;
         }
+        public static text operator +(text text1, text text2)
+        {
+            //se tiene que crear porque sino en una suma con muchos text se modificarian...y luego habrian problemas...
+            text tResult = "";
+            if (text1 != null)
+                tResult.tString.Append(text1.tString);
+                if (text2 != null)
+                tResult.tString.Append(text2.tString);
 
-		public static bool operator ==(text text1, text text2)
+            return tResult;
+
+        }
+
+        public static text operator +(text text1, object text2)
+        {
+            text tRigth =text2!=null? text2.ToString():null;
+            return text1+tRigth;
+        }
+        public static bool operator ==(text text1, text text2)
 		{
             return Equals(text1, text2);
 		}
