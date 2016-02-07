@@ -200,25 +200,20 @@ namespace Gabriel.Cat
 
 		public static text operator +(text text1, text text2)
 		{
-            text textResult = "";
-            if (text1 != null)
-                textResult.tString.Append(text1.tString);
+            //esta hecho para evitar el StringBuilder y su incomodo Append
             if (text2 != null)
-                textResult.tString.Append(text2.tString);
+                text1.tString.Append(text2.tString);
 
-			return textResult;
+			return text1;
 
 		}
 
 		public static text operator +(text text1, object text2)
 		{
-            text textResult = "";
-            if (text1 != null)
-                textResult.tString.Append(text1.tString);
             if (text2 != null)
-                textResult.tString.Append(text2.ToString());
+                text1.tString.Append(text2.ToString());
 
-            return textResult;
+            return text1;
         }
 
 		public static bool operator ==(text text1, text text2)
