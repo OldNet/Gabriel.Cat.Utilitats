@@ -7,7 +7,7 @@ using System.Text;
 namespace Gabriel.Cat
 {
 	/// <summary>
-	/// Clase tipus que serveix per millorar String...
+	/// Clase tipus que serveix per millorar String al utilitzar StringBuilder :)
 	/// </summary>
 	public  class text : IEnumerable<char>,IComparable,IComparable<text>,IClauUnicaPerObjecte
 	{
@@ -204,6 +204,7 @@ namespace Gabriel.Cat
 
 		public static text operator &(text text1, text text2)
 		{
+            //((text)"")&variables;//al poner el centinela no se modifica ninguna variable text :) y el resultado de la expresion es una variable text
             //esta hecho para evitar el StringBuilder y su incomodo Append
             if (text2 != null)
                 text1.tString.Append(text2.tString);
@@ -214,10 +215,7 @@ namespace Gabriel.Cat
 
 		public static text operator &(text text1, object text2)
 		{
-            if (text2 != null)
-                text1.tString.Append(text2.ToString());
-
-            return text1;
+            return text1&(text2 as text);
         }
         public static text operator +(text text1, text text2)
         {

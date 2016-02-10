@@ -76,15 +76,6 @@
     <Compile Include="Temporizador.cs" />
     <Compile Include="text.cs" />
     <Compile Include="TwoKeysList.cs" />
-    <Compile Include="Xsd\AtributoXsd.cs" />
-    <Compile Include="Xsd\DocumentoXsd.cs" />
-    <Compile Include="Xsd\ElementoXsd.cs" />
-    <Compile Include="Xsd\IDeclaracionesXsd.cs" />
-    <Compile Include="Xsd\Restricciones.cs" />
-    <Compile Include="Xsd\RestriccionXsd.cs" />
-    <Compile Include="Xsd\TipoComplejoXsd.cs" />
-    <Compile Include="Xsd\TiposBaseXsd.cs" />
-    <Compile Include="Xsd\TipoSimpleXsd.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
