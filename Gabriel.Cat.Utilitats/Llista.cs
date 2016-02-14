@@ -9,6 +9,7 @@
 using Gabriel.Cat.Extension;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Gabriel.Cat
@@ -119,6 +120,7 @@ namespace Gabriel.Cat
         public bool Existeix(TValue value)
         {
             bool existeix = false;
+
             try
             {
                 semafor.WaitOne();
@@ -131,7 +133,28 @@ namespace Gabriel.Cat
             finally
             {
                 semafor.Release();
-                esperando=false;
+                esperando = false;
+            }
+            return existeix;
+
+        }
+        public bool Existeix(IComparable value)
+        {
+            bool existeix = false;
+   
+            try
+            {
+                semafor.WaitOne();
+                esperando = true;
+                if (llistaOrdenada != null)
+                    existeix = llistaOrdenada.Existeix(value);
+                else
+                    existeix = llista.Contains(value);
+            }
+            finally
+            {
+                semafor.Release();
+                esperando = false;
             }
             return existeix;
 
