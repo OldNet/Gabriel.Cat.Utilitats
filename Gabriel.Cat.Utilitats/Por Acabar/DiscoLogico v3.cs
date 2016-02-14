@@ -44,7 +44,7 @@ namespace Gabriel.Cat.Utilitats.New
         DateTime lastWrite;
         DateTime lastUpDateSubDirsList;
         DateTime lastUpDateFilesList;
-        private DiscoLogico(DirectoryInfo dir)//es privado porque asi solo se usa el metodo de clase para obtener un objeto valido :) y me ahorro controlarlos...
+        private DiscoLogico(DirectoryInfo dir)//es privado porque asi solo se usa el metodo de clase para obtener un objeto valido :) y me ahorro controlarlos...y evito duplicados :)
         {
             //no quito directorios que ya no existen...o si?? o pongo un mecanismo para quitarlo de la lista con un temporizador....
             //que este pendiente aparte y que no lo contemple desde aqui.
@@ -69,6 +69,27 @@ namespace Gabriel.Cat.Utilitats.New
                 return actividad;
             }
         }
+        /// <summary>
+        /// Si la ruta existe esta activo
+        /// </summary>
+        public bool Activo
+        {
+            get{ return dir.Exists; } 
+        }
+
+        public DirectoryInfo Directorio
+        { get { return dir; } }
+
+        public long NivelMinimoFocoActivo { get; private set; }
+
+        public DirectoryInfo[] TotalSubDirs()
+        {
+            return totalSubDirs.ValuesToArray();
+        }
+        public FileInfo[] TotalFiles()
+        {
+            return totalDirFiles.ValuesToArray();
+        }
         public void ActualizaLists()
         {
             if (dir.Exists)
@@ -82,13 +103,16 @@ namespace Gabriel.Cat.Utilitats.New
                 }
             }
         }
-
         public void ActualizaSubDirsList()
         {
 
-
+            const int MAXPROCESS = 5;
             DirectoryInfo[] subDirs;
             DiscoLogico discoAux;
+
+            Llista<Tiket<DiscoLogico>> tiketsHaciendose = new Llista<Tiket<DiscoLogico>>();
+            List<Tiket<DiscoLogico>> tiketsPendientes = new List<Tiket<DiscoLogico>>();
+
             if (dir.Exists && dir.CanRead() && lastUpDateSubDirsList != dir.LastWriteTime)
             {
                 lastUpDateSubDirsList = dir.LastWriteTime;
@@ -123,14 +147,33 @@ namespace Gabriel.Cat.Utilitats.New
             }
             for (int i = 0; i < this.subDirs.Count; i++)
             {
-                //Si es no es un foco activo lo hago sino lo omito
+
                 //si es un foco activo se mira solo
                 //si deja de ser un foco activo deja de mirarse solo
                 //si es un foco omitido se evitara 
                 //para hacer la actividad se deja como pendiente en ThreadPool y ya se hara cuando toque...asi no gasta muchos recursos y se controla
-                //si esta desactivado se mira si tiene mucha actividad manualmente si tiene se activa :D
-                this.subDirs[i].ActualizaSubDirsList();
+               
+                if (!discosFocoActivoForzado.Existeix(this.subDirs[i].dir.FullName) && !discosFocoDesactivadoForzado.Existeix(this.subDirs[i].dir.FullName)) //Si es no es un foco activo lo hago sino lo omito
+                {
+                    if (this.subDirs[i].Actividad > NivelMinimoFocoActivo)
+                        this.subDirs[i].ActivarFocoActivo(); //si esta desactivado se mira si tiene mucha actividad manualmente, si tiene se activa :D
+                    else
+                     tiketsPendientes.Add(new Tiket<DiscoLogico>((disco) => { disco.subDirs[i].ActualizaSubDirsList(); }, this));
+                }
             }
+            for (int i = 0; i < tiketsPendientes.Count; i++)
+            {
+                while (tiketsHaciendose.Count == MAXPROCESS)System.Threading.Thread.Sleep(100);
+                tiketsHaciendose.Afegir(tiketsPendientes[i]);
+                tiketsPendientes[i].FaenaHecha += (tiket, args) => { tiketsHaciendose.Elimina(tiket); };
+                tiketsPendientes[i].HazFaena();
+            }
+            while (tiketsHaciendose.Count != 0) System.Threading.Thread.Sleep(100);
+        }
+
+        private void ActivarFocoActivo()
+        {
+            throw new NotImplementedException();
         }
 
         public void ActualizaArchivosList()

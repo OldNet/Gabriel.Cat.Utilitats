@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
@@ -341,6 +342,7 @@ namespace Gabriel.Cat
 		}
 
 	}
+    public delegate void TiketEventHandler<Trabajo>(Tiket<Trabajo> tiket,EventArgs args);
 	public class Tiket<TipoTrabajo> : IComparable<Tiket<TipoTrabajo>>, IClauUnicaPerObjecte
 	{
 		public enum PrioridadEnum
@@ -371,7 +373,9 @@ namespace Gabriel.Cat
 		EstadoFaenaEnum estadoFaena;
 		Semaphore esperaTreballFet;
 		System.Timers.Timer dejeDeEsperar;
-		public event EventHandler FaenaHecha;
+        private Task taskHaciendoSeEnClase;
+
+        public event TiketEventHandler<TipoTrabajo> FaenaHecha;
 		public event ExceptionOnTiket<TipoTrabajo> ExcepcionDuranteLaEjecucion;
 		public Tiket(TrabajaEventHandler metodo)
 			: this(null, default(TipoTrabajo))
@@ -474,15 +478,31 @@ namespace Gabriel.Cat
 				FaenaHecha(this, new EventArgs());
 
 		}
-		public void HazFaena()
+		public async Task HazFaenaAsync()
 		{
-			if (MetodoConParametros != null)
-				MetodoConParametros(trabajo);
-			else if (MetodoSinParametros != null)
-				MetodoSinParametros();
+            EstadoFaena = EstadoFaenaEnum.Haciendose;
+            try {
+                if (MetodoConParametros != null)
+                    MetodoConParametros(trabajo);
+                else if (MetodoSinParametros != null)
+                    MetodoSinParametros();
+                EstadoFaena = EstadoFaenaEnum.Acabado;
+                if (FaenaHecha != null)
+                    FaenaHecha(this, new EventArgs());
+               
+            }
+            catch { EstadoFaena = EstadoFaenaEnum.AbortadaPorExcepcionNoControlada; }
+            finally { DejarDeEsperar(); }
+           
 		}
-		#region IClauUnicaPerObjecte implementation
-		public IComparable Clau()
+        public void HazFaena()
+        {
+            taskHaciendoSeEnClase = HazFaenaAsync();
+            taskHaciendoSeEnClase.Wait();
+            taskHaciendoSeEnClase = null;
+        }
+        #region IClauUnicaPerObjecte implementation
+        public IComparable Clau()
 		{
 			return idUnico;
 		}
@@ -507,15 +527,16 @@ namespace Gabriel.Cat
 		/// </summary>
 		public void Esperar()
 		{
-			if (!DentroPool && !EstadoFaena.Equals(EstadoFaenaEnum.Acabado))
+			if (!DentroPool && !EstadoFaena.Equals(EstadoFaenaEnum.Acabado)||taskHaciendoSeEnClase!=null)
 				throw new Exception("El proceso no esta asociado MiPool");
 			if (!EstadoFaena.Equals(EstadoFaenaEnum.Acabado)) {
 				try {
 					FaenaHecha += AcabaDeEsperar;
 					esperaTreballFet.WaitOne();
-					FaenaHecha -= AcabaDeEsperar;
+
 				} catch {
 				}
+                finally { FaenaHecha -= AcabaDeEsperar; }
 			}
 		}
 
