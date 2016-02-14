@@ -1477,8 +1477,13 @@ namespace Gabriel.Cat.Extension
         #region IEnumerable<T[]>
         public static bool Contains<T>(this IEnumerable<T> list,IComparable objToFind)
         {
+            return !list.Busca(objToFind).Equals(default(T));
+        }
+        public static T Busca<T>(this IEnumerable<T> list, IComparable objToFind)
+        {
             bool contenida = false;
             object objToFindCasting = objToFind;
+            T valueTrobat = default(T);
             try
             {
                 bool isIComparable = list.ElementAt(0) is IComparable;
@@ -1488,11 +1493,13 @@ namespace Gabriel.Cat.Extension
                         contenida = (objToCompare as IComparable).CompareTo(objToFind) == (int)CompareTo.Iguales;
                     else
                         contenida = (object)objToCompare == objToFindCasting;
+                    if (contenida)
+                        valueTrobat = objToCompare;
                     return !contenida;
                 });
             }
             catch { }
-            return contenida;
+            return valueTrobat;
         }
         public static T[,] ToMatriu<T>(this IEnumerable<T[]> listaTablas)
         {

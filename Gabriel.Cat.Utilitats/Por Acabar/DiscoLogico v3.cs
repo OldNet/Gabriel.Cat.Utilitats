@@ -12,7 +12,7 @@ namespace Gabriel.Cat.Utilitats.New
     /// <summary>
     /// En desarrollo, se trata de optimizar el encontrar archivos y directorios nuevos y perdidos
     /// </summary>
-    public class DiscoLogico : IComparable, IComparable<DiscoLogico>
+    public class DiscoLogico : IComparable, IComparable<DiscoLogico>,IComparable<string>
     {
         //si estan como focos activos se comprovaran automaticamente cada X tiempo -> los focos activos comprovaran sus subDirs que no esten como focos activos de forma secuencial asi ahorra recursos.
         //poder cargar y guardar en xml toda la informacion.
@@ -27,8 +27,17 @@ namespace Gabriel.Cat.Utilitats.New
         static LlistaOrdenada<string, DiscoLogico> discosFocoActivoForzado;//los discos logicos C:// D:// etc estan aqui :D a no ser que esten desactivados por la fuerza...
         static LlistaOrdenada<string, DiscoLogico> discosFocoDesactivadoForzado;
         static LlistaOrdenada<string, DiscoLogico> discosPendientesDeColocar;
-        static DiscoLogico todosLosDiscos;
+        static Llista<DiscoLogico> todosLosDiscos;
         #endregion
+        static DiscoLogico()
+        {
+            NivelMinimoFocoActivo = 100000;//es una variable propiedad juntas...cosas del c# 5
+            discosFocoActivoForzado = new LlistaOrdenada<string, DiscoLogico>();
+            discosFocoDesactivadoForzado = new LlistaOrdenada<string, DiscoLogico>();
+            discosOmitidos = new LlistaOrdenada<string, string>();
+            discosPendientesDeColocar = new LlistaOrdenada<string, DiscoLogico>();
+            todosLosDiscos = new Llista<DiscoLogico>();
+        }
         #region Class Propiedades
         #endregion
         #region Objeto
@@ -80,7 +89,7 @@ namespace Gabriel.Cat.Utilitats.New
         public DirectoryInfo Directorio
         { get { return dir; } }
 
-        public long NivelMinimoFocoActivo { get; private set; }
+        public static long NivelMinimoFocoActivo { get;  set; }
 
         public DirectoryInfo[] TotalSubDirs()
         {
@@ -256,7 +265,7 @@ namespace Gabriel.Cat.Utilitats.New
         #region CompareTo
         public int CompareTo(object obj)
         {
-            return CompareTo(obj as DiscoLogico);
+             return CompareTo(obj as DiscoLogico);
         }
 
         public int CompareTo(DiscoLogico other)
@@ -264,13 +273,17 @@ namespace Gabriel.Cat.Utilitats.New
             int compareTo;
             if (other != null)
             {
-                compareTo = dirFullName.CompareTo(other.dirFullName);
+                compareTo = CompareTo(other.dirFullName);
             }
             else
             {
                 compareTo = -1;
             }
             return compareTo;
+        }
+        public int CompareTo(string pathOther)
+        {
+          return dirFullName.CompareTo(pathOther);
         }
         #endregion
         #endregion
@@ -288,13 +301,13 @@ namespace Gabriel.Cat.Utilitats.New
             if (!Directory.Exists(path))
                 throw new Exception("No se puede encontrar porque no existe el directorio");
             string[] carpetasPath = path.Split(Path.AltDirectorySeparatorChar);
-            DiscoLogico discoEncontrado = discosPendientesDeColocar[path], auxParent = todosLosDiscos;
+            DiscoLogico discoEncontrado = discosPendientesDeColocar[path], auxParent;
             text pathAux;
             bool dejarDeBuscar;
             if (discoEncontrado == null)
             {
                 pathAux = carpetasPath[0];
-                auxParent = auxParent.subDirsSorted[pathAux];
+                auxParent = todosLosDiscos.Busca(pathAux);
                 dejarDeBuscar = auxParent == null;//si no esta la raiz dejo de intentarlo
                 for (int i = 1; discoEncontrado == null && !dejarDeBuscar && carpetasPath.Length > i; i++)
                 {

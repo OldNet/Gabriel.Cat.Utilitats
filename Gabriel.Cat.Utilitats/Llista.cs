@@ -260,7 +260,6 @@ namespace Gabriel.Cat
                 }
             }
         }
-
         public void Push(TValue valor)
         {
             try
