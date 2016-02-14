@@ -53,16 +53,19 @@ namespace Gabriel.Cat.Utilitats.New
         DateTime lastWrite;
         DateTime lastUpDateSubDirsList;
         DateTime lastUpDateFilesList;
-        private DiscoLogico(DirectoryInfo dir)//es privado porque asi solo se usa el metodo de clase para obtener un objeto valido :) y me ahorro controlarlos...y evito duplicados :)
+        private DiscoLogico(DiscoLogico parent,DirectoryInfo dir)//es privado porque asi solo se usa el metodo de clase para obtener un objeto valido :) y me ahorro controlarlos...y evito duplicados :)
         {
-            //no quito directorios que ya no existen...o si?? o pongo un mecanismo para quitarlo de la lista con un temporizador....
+            //falta que se autocontrole si esta activo...
+            //no quito directorios que ya no existen...o si?? o pongo un mecanismo para quitarlo de la lista con un temporizador....usar DirectorioPerdido :)
             //que este pendiente aparte y que no lo contemple desde aqui.
+            this.parent = parent;
             this.dir = dir;
             dirFullName = dir.FullName;
             subDirs = new Llista<DiscoLogico>();
             dirFiles = new LlistaOrdenada<string, FileInfo>();
             subDirsSorted = new LlistaOrdenada<string, DiscoLogico>();
             totalDirFiles = new LlistaOrdenada<string, FileInfo>();
+            totalSubDirs = new LlistaOrdenada<string, DirectoryInfo>();
             ActualizaLists();//hacerlo async
         }
         public long Actividad
@@ -139,11 +142,12 @@ namespace Gabriel.Cat.Utilitats.New
                                 {
                                     DirectorioEncontrado(this, new IOArgs(subDirs[i].FullName, true, i, subDirs.Length));
                                 }
-                                discoAux = new DiscoLogico(subDirs[i]);
+                                discoAux = new DiscoLogico(this,subDirs[i]);
                             }
                             else
                             {
                                 discoAux = discosPendientesDeColocar[subDirs[i].FullName];
+                                discoAux.parent = this;
                                 discosPendientesDeColocar.Elimina(subDirs[i].FullName);
                             }
                             AñadeSubdirAlTotal(subDirs[i]);
@@ -290,11 +294,17 @@ namespace Gabriel.Cat.Utilitats.New
         #region Class Metodos
         public static FileInfo[] GetAllFiles()
         {
-            return todosLosDiscos.totalDirFiles.ValuesToArray();
+            Llista<FileInfo> files = new Llista<FileInfo>();
+            for (int i = 0; i < todosLosDiscos.Count; i++)
+                files.AfegirMolts(todosLosDiscos[i].totalDirFiles.ValuesToArray());
+            return files.ToArray();
         }
         public static DirectoryInfo[] GetAllDirs()
         {
-            return todosLosDiscos.totalSubDirs.ValuesToArray();
+            Llista<DirectoryInfo> dirs = new Llista<DirectoryInfo>();
+            for (int i = 0; i < todosLosDiscos.Count; i++)
+                dirs.AfegirMolts(todosLosDiscos[i].totalSubDirs.ValuesToArray());
+            return dirs.ToArray();
         }
         public static DiscoLogico GetDiscoLogico(string path)
         {
@@ -330,7 +340,7 @@ namespace Gabriel.Cat.Utilitats.New
 
                 if (discoEncontrado == null)
                 {
-                    discosPendientesDeColocar.Afegir(path, new DiscoLogico(new DirectoryInfo(path)));
+                    discosPendientesDeColocar.Afegir(path, new DiscoLogico(null,new DirectoryInfo(path)));
                     discoEncontrado = discosPendientesDeColocar[path];
                 }
             }
