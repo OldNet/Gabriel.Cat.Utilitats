@@ -10,7 +10,7 @@ namespace Gabriel.Cat.Utilitats.New
 
     public delegate void ObjetoIOEventHandler(DiscoLogico disco, IOArgs archivo);
     /// <summary>
-    /// En desarrollo, se trata de optimizar el encontrar archivos y directorios nuevos y perdidos
+    /// En desarrollo aun no operativa, se trata de optimizar el encontrar archivos y directorios nuevos y perdidos
     /// </summary>
     public class DiscoLogico : IComparable, IComparable<DiscoLogico>,IComparable<string>
     {
