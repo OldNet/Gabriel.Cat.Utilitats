@@ -47,6 +47,15 @@ namespace Gabriel.Cat
             foreach (KeyValuePair<Tkey, TValue> un in llista)
 				AfegirORemplaçar(un.Key, un.Value);
 		}
+        public void CanviClau(Tkey keyAnt,Tkey keyNew)
+        {
+            if (!Existeix(keyAnt))
+                throw new Exception("no existeix la clau a remplaçar");
+            if (Existeix(keyNew))
+                throw new Exception("ja s'utilitza la clau");
+            Afegir(keyNew, this[keyAnt]);
+            Elimina(keyAnt);
+        }
 		public bool Elimina(Tkey key)
 		{
 			bool fet;
