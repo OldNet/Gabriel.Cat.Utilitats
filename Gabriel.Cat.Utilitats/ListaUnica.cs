@@ -18,7 +18,6 @@ namespace Gabriel.Cat
 	/// </summary>
 	public class ListaUnica<T>:IEnumerable<T>
         where T:IClauUnicaPerObjecte
-
 	{
 		LlistaOrdenada<IComparable,T> list;
 

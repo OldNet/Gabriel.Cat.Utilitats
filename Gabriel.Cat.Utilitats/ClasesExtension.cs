@@ -114,6 +114,14 @@ namespace Gabriel.Cat.Extension
     #endregion
     public static class Extension
     {
+        #region IClauUnicaPerObjecte
+        public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T :IClauUnicaPerObjecte
+        {
+            ListaUnica<T> lista = new ListaUnica<T>();
+            lista.Añadir(enumeracion);
+            return lista;
+        }
+            #endregion
         #region Cosas necesarias pero de clase
         #region NormalizarXml
         //voy ha escapar caracteres no permitidos
