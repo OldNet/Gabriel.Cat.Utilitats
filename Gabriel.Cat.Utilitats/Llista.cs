@@ -132,8 +132,14 @@ namespace Gabriel.Cat
             }
             finally
             {
-                semafor.Release();
-                esperando = false;
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    esperando = false;
+                }
             }
             return existeix;
 
@@ -153,8 +159,14 @@ namespace Gabriel.Cat
             }
             finally
             {
-                semafor.Release();
-                esperando = false;
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    esperando = false;
+                }
             }
             return existeix;
 
@@ -169,8 +181,14 @@ namespace Gabriel.Cat
             }
             finally
             {
-                semafor.Release();
-                esperando=false;
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    esperando = false;
+                }
             }
         }
         public void Ordena(IComparer<TValue> comparador)
@@ -183,8 +201,14 @@ namespace Gabriel.Cat
             }
             finally
             {
-                semafor.Release();
-                esperando=false;
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    esperando = false;
+                }
             }
         }
         public void Desordena()
@@ -238,8 +262,14 @@ namespace Gabriel.Cat
                 }
                 finally
                 {
-                    semafor.Release();
-                    esperando=false;
+                    try
+                    {
+                        semafor.Release();
+                    }
+                    finally
+                    {
+                        esperando = false;
+                    }
                 }
                 return value;
 
@@ -255,8 +285,14 @@ namespace Gabriel.Cat
                 }
                 finally
                 {
-                    semafor.Release();
-                    esperando=false;
+                    try
+                    {
+                        semafor.Release();
+                    }
+                    finally
+                    {
+                        esperando = false;
+                    }
                 }
             }
         }
