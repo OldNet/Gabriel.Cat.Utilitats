@@ -33,7 +33,11 @@ namespace Gabriel.Cat
 		}
 		public void Add(Tkey1 key1, Tkey2 key2, Tvalue value)
 		{
-			llista1.Afegir(key1, value);
+            if (llista1.Existeix(key1))
+                throw new Exception("Esta duplicada la clave1 para el valor");
+            if (llista2.Existeix(key2))
+                throw new Exception("Esta duplicada la clave2 para el valor");
+            llista1.Afegir(key1, value);
 			llista2.Afegir(key2, value);
 			llistaClau1.Afegir(key1, key2);
 			llistaClau2.Afegir(key2, key1);
@@ -135,9 +139,13 @@ namespace Gabriel.Cat
 		{
 			return llista2.ToArray();
 		}
-		public KeyValuePair<Tkey1,Tkey2>[] KeysToArray()
+		public TwoKeys<Tkey1,Tkey2>[] KeysToArray()
 		{
-			return llistaClau1.ToArray();
+            KeyValuePair<Tkey1, Tkey2>[] keys= llistaClau1.ToArray();
+            TwoKeys<Tkey1, Tkey2>[] twoKeys = new TwoKeys<Tkey1, Tkey2>[keys.Length];
+            for (int i = 0; i < keys.Length; i++)
+                twoKeys[i] = new TwoKeys<Tkey1, Tkey2>(keys[i].Key, keys[i].Value);
+            return twoKeys;
 		}
 		public bool ContainsKey1(Tkey1 key1)
 		{

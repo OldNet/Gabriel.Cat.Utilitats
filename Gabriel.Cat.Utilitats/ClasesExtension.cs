@@ -780,7 +780,7 @@ namespace Gabriel.Cat.Extension
             {
                 if (fsBitmap != null)
                     fsBitmap.Close();
-                File.Delete(path);
+               File.Delete(path);
             }
             return stream;
         }
