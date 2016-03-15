@@ -19,43 +19,50 @@ namespace Gabriel.Cat
 	public class ListaUnica<T>:IEnumerable<T>
         where T:IClauUnicaPerObjecte
 	{
-		LlistaOrdenada<IComparable,T> list;
-
+		LlistaOrdenada<IComparable,T> listaOrdenada;
+        Llista<T> lista;
         public ListaUnica()
 		{
-			list=new LlistaOrdenada<IComparable, T>();
+			listaOrdenada=new LlistaOrdenada<IComparable, T>();
+            lista = new Llista<T>();
 		}
 
         public int Count
         {
-            get { return list.Count; }
+            get { return listaOrdenada.Count; }
+        }
+        public T this[int pos]
+        {
+            get { return lista[pos]; }
+            set { lista[pos] = value; }
         }
         public T this[IComparable key]
         {
             get {
-                return list[key];
+                return listaOrdenada[key];
             }
         }
         public void Vaciar()
         {
-            list.Buida();
+            listaOrdenada.Buida();
+            lista.Buida();
         }
         #region Existe
         public bool Existe(T obj)
 		{
-			return list.Existeix(obj.Clau());
+			return listaOrdenada.Existeix(obj.Clau());
 		}
 		public bool Existe(IComparable key)
 		{
-			return list.Existeix(key);
+			return listaOrdenada.Existeix(key);
 		}
 		public bool ExisteObjeto(T obj)
 		{
-			return list.Existeix(obj.Clau());
+			return listaOrdenada.Existeix(obj.Clau());
 		}
 		public bool ExisteClave(IComparable key)
 		{
-			return list.Existeix(key);
+			return listaOrdenada.Existeix(key);
 		}
 		#endregion
 		#region Elimina
@@ -71,6 +78,7 @@ namespace Gabriel.Cat
 		}
 		public bool Elimina(T obj)
 		{
+            lista.Elimina(obj);
 			return Elimina(obj.Clau());
 		}
 		public bool[] Elimina(IEnumerable<IComparable> objs)
@@ -85,7 +93,7 @@ namespace Gabriel.Cat
 		}
 		public bool Elimina(IComparable key)
 		{
-			return list.Elimina(key);
+			return listaOrdenada.Elimina(key);
 		}
 		public bool[] EliminaObjeto(IEnumerable<T> objs)
 		{
@@ -119,10 +127,12 @@ namespace Gabriel.Cat
 		#region Añadir
 		public void Añadir(T obj)
 		{
-			if(list.Existeix(obj.Clau()))
-			   throw new ArgumentException("Ya existe en la lista");
-			else
-				list.Afegir(obj.Clau(),obj);
+            if (listaOrdenada.Existeix(obj.Clau()))
+                throw new ArgumentException("Ya existe en la lista");
+            else {
+                listaOrdenada.Afegir(obj.Clau(), obj);
+                lista.Afegir(obj);
+            }
 		}
 		public void Añadir(IEnumerable<T> listObj)
 		{
@@ -134,7 +144,7 @@ namespace Gabriel.Cat
 
         public IEnumerator<T> GetEnumerator()
         {
-            return list.ValuesToArray().ObtieneEnumerador();
+            return lista.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
