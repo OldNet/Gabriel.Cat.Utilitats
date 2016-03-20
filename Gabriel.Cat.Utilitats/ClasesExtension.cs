@@ -1842,13 +1842,6 @@ namespace Gabriel.Cat.Extension
             return clonNew;
         }
         #endregion
-        #region MemoriStreamExtension
-        public static void Write(this MemoryStream stream, IEnumerable<Byte> arrayEnum)
-        {
-            byte[] array = arrayEnum.ToTaula();
-            stream.Write(array, 0, array.Length);
-        }
-        #endregion
         #region Stream
         public static byte[] GetAllBytes(this Stream str)
         {
@@ -1858,6 +1851,17 @@ namespace Gabriel.Cat.Extension
             str.Read(bytes, 0, bytes.Length);
             str.Position = position;
             return bytes;
+        }
+       public static void Write(this Stream str,string datos)
+        {
+            byte[] dades = Serializar.GetBytes(datos);
+            str.Write(dades);
+        }
+        public static void Write(this Stream str, byte[] datos)
+        {
+            if (datos == null)
+                throw new NullReferenceException();
+            str.Write(datos, 0, datos.Length);
         }
         #endregion
         #region Extensiones de Internet y mias
