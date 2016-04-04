@@ -767,21 +767,8 @@ namespace Gabriel.Cat.Extension
         }
         public static Stream ToStream(this Bitmap bmp, ImageFormat format)
         {
-            Stream stream;
-            FileStream fsBitmap = null;
-            string path = Path.GetRandomFileName() + ".NoSeHaBorrado.PuedesBorrarlo";
-            try
-            {
-                bmp.Save(path, format);
-                fsBitmap = new FileStream(path, FileMode.Open);
-                stream = new MemoryStream(fsBitmap.GetAllBytes());
-            }
-            finally
-            {
-                if (fsBitmap != null)
-                    fsBitmap.Close();
-               File.Delete(path);
-            }
+            MemoryStream stream=new MemoryStream();
+            bmp.Save(stream, format);
             return stream;
         }
 
