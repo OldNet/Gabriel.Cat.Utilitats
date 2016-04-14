@@ -13,8 +13,8 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Description of IClonable.
 	/// </summary>
-	public interface IClonable
+	public interface IClonable<T>
 	{
-		dynamic Clon();
+		T Clon();
 	}
 }

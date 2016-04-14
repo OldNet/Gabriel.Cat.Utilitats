@@ -15,7 +15,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Description of Chunks.
 	/// </summary>
-	public class Chunk:IClonable
+	public class Chunk:IClonable<Chunk>
 	{
 		class CRC
 		{
@@ -281,7 +281,7 @@ namespace Gabriel.Cat
 
 		#region IClonable implementation
 
-		public dynamic Clon()
+		public Chunk Clon()
 		{
 			return new Chunk() {
 				chunkCRC = chunkCRC.Clone() as byte[],

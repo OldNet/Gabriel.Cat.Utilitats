@@ -235,6 +235,13 @@ namespace Gabriel.Cat.Extension
 			return vector;
 
 		}
+        /// <summary>
+        /// Recorre la matriz usando el vector como guia y acaba cuando llega al final o captura una excepcion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="matriz"></param>
+        /// <param name="vector"></param>
+        /// <param name="metodoTratarObjeto"></param>
 		public static void Recorrer<T>(this T[,] matriz, Vector vector, TrataObjeto<T> metodoTratarObjeto)
 		{
 			ContinuaTratandoObjeto<T> continua = (obj) =>
@@ -249,6 +256,13 @@ namespace Gabriel.Cat.Extension
 			};
 			matriz.Recorrer(vector, continua);
 		}
+        /// <summary>
+        /// Recorre la matriz guiandose por el vector para cuando acaba o el valor de ContinuaTratando.Continua es false
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="matriz"></param>
+        /// <param name="vector"></param>
+        /// <param name="metodoTratarObjeto"></param>
 		public static void Recorrer<T>(this T[,] matriz, Vector vector, ContinuaTratandoObjeto<T> metodoTratarObjeto)
 		{
 			if (vector == null || metodoTratarObjeto == null)
@@ -263,8 +277,7 @@ namespace Gabriel.Cat.Extension
 				throw new ArgumentOutOfRangeException("El vector esta fuera de la matriz");
 			}
 
-			int posX = vector.InicioX;
-			int posY = vector.InicioY;
+            Vector vectorAux = vector.ClonProfundoConPropiedades();
 			Sentido sentidoX, sentidoY, sentido;
 			ContinuaTratando<T> continuaObj = new ContinuaTratando<T>() { Continua = true };
 			//miro las direcciones
@@ -290,48 +303,52 @@ namespace Gabriel.Cat.Extension
 				{
 
 					//tratoElObj
-					continuaObj = metodoTratarObjeto(matriz[posX, posY]);
-					matriz[posX, posY] = continuaObj.Objeto;
+					continuaObj = metodoTratarObjeto(matriz[vectorAux.InicioX, vectorAux.InicioY]);
+                    matriz[vectorAux.InicioX, vectorAux.InicioY] = continuaObj.Objeto;
 					//muevo
 					//depende del sentido suma o resta a uno o a otro...
 					switch (sentido)
 					{
-							case Sentido.Arriba: posY--; break;
-							case Sentido.Abajo: posY++; break;
-							case Sentido.Derecha: posX++; break;
-							case Sentido.Izquierda: posY--; break;
+							case Sentido.Arriba: vectorAux.InicioY--; break;
+							case Sentido.Abajo: vectorAux.InicioY++; break;
+							case Sentido.Derecha: vectorAux.InicioX++; break;
+							case Sentido.Izquierda: vectorAux.InicioY--; break;
 							//va en diagonal
 						case Sentido.DiagonalDerechaAbajo:
-							if (posX == posY)
+							if (vectorAux.InicioX == vectorAux.InicioY)
 							{
-								posX++; posY++;
+								vectorAux.InicioX++; vectorAux.InicioY++;
 							}
 							else
 							{
 								//depende del angulo
+                                //menos45->X++
+                                //45->diagonal
+                                //mas45->Y++????????
+
 							} break;
 						case Sentido.DiagonalDerechaArriba:
-							if (posX == posY)
+							if (vectorAux.InicioX == vectorAux.InicioY)
 							{
-								posX++; posY--;
+								vectorAux.InicioX++; vectorAux.InicioY--;
 							}
 							else
 							{
 								//depende del angulo
 							} break;
 						case Sentido.DiagonalIzquierdaAbajo:
-							if (posX == posY)
+							if (vectorAux.InicioX == vectorAux.InicioY)
 							{
-								posX--; posY++;
+								vectorAux.InicioX--; vectorAux.InicioY++;
 							}
 							else
 							{
 								//depende del angulo
 							} break;
 						case Sentido.DiagonalIzquierdaArriba:
-							if (posX == posY)
+							if (vectorAux.InicioX == vectorAux.InicioY)
 							{
-								posX--; posY--;
+								vectorAux.InicioX--; vectorAux.InicioY--;
 							}
 							else
 							{
@@ -339,13 +356,13 @@ namespace Gabriel.Cat.Extension
 							} break;
 					}
 					if (continuaObj.Continua)
-						continuaObj.Continua = posX != vector.FinX && posY != vector.FinY;
+						continuaObj.Continua = vectorAux.InicioX != vector.FinX && vectorAux.InicioY != vector.FinY;
 
 				} while (continuaObj.Continua);
-				matriz[posX, posY] = metodoTratarObjeto(matriz[posX, posY]).Objeto;
+                matriz[vectorAux.FinX, vectorAux.FinY] = metodoTratarObjeto(matriz[vectorAux.FinX,vectorAux.FinY]).Objeto;
 			}
 
-		}
+		
 	}
 	#endregion
 	#region IClauUnicaPerObjecte
@@ -1455,7 +1472,7 @@ namespace Gabriel.Cat.Extension
 		return listaParaOrdenar;
 
 	}
-	public static IEnumerable<T> Clon<T>(this IEnumerable<T> listaHaClonar) where T : IClonable
+	public static IEnumerable<T> Clon<T>(this IEnumerable<T> listaHaClonar) where T : IClonable<T>
 	{
 		List<T> clones = new List<T>();
 		foreach (T item in listaHaClonar)
@@ -2052,8 +2069,8 @@ namespace Gabriel.Cat.Extension
 			{
 				clonObjPropiedad = ((ICloneable)propiedades[i].Objeto).Clone();
 			}
-			else if (propiedades[i].Objeto is IClonable)
-				clonObjPropiedad = ((IClonable)propiedades[i].Objeto).Clon();
+			else if (propiedades[i].Objeto is IClonable<Tipo>)
+                clonObjPropiedad = ((IClonable<Tipo>)propiedades[i].Objeto).Clon();
 			else
 				clonObjPropiedad = propiedades[i].Objeto;
 			if ((int)(clonNew.GetPropertyUsage(propiedades[i].Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
