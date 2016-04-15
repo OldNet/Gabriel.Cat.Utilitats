@@ -65,6 +65,7 @@
     <Compile Include="ListaUnica.cs" />
     <Compile Include="Llista.cs" />
     <Compile Include="LlistaOrdenada.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="MiPool.cs" />
     <Compile Include="MiRandom.cs" />
     <Compile Include="Pila.cs" />
