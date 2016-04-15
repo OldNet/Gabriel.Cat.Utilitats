@@ -7,11 +7,12 @@
     <ProjectGuid>{6FDF9BB1-AE07-4820-BEEE-A2F52CFBE770}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gabriel.Cat.Utilitats</RootNamespace>
+    <RootNamespace>Gabriel.Cat</RootNamespace>
     <AssemblyName>Gabriel.Cat.Utilitats</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NoWin32Manifest>False</NoWin32Manifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

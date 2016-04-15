@@ -8,7 +8,7 @@
  */
 using System;
 
-namespace Gabriel.Cat.Utilitats
+namespace Gabriel.Cat
 {
 	public delegate void LogEventHandler(string message,int idMessage);
 	/// <summary>
