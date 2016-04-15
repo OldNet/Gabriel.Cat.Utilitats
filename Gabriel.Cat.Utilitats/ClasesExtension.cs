@@ -33,18 +33,7 @@ namespace Gabriel.Cat.Extension
 		public bool Continua;
 		public T Objeto;
 	}
-	public enum Sentido
-	{
-		Centro = 1,
-		Izquierda = 2,
-		Derecha = 4,
-		Abajo = 8,
-		Arriba = 16,
-		DiagonalIzquierdaAbajo = Izquierda + Abajo,
-		DiagonalIzquierdaArriba = Izquierda + Arriba,
-		DiagonalDerechaAbajo = Derecha + Abajo,
-		DiagonalDerechaArriba = Derecha + Arriba
-	}
+
 	public enum DimensionMatriz
 	{
 		Columna = 0,
@@ -278,26 +267,11 @@ namespace Gabriel.Cat.Extension
 			}
 
             Vector vectorAux = vector.ClonProfundoConPropiedades();
-			Sentido sentidoX, sentidoY, sentido;
+			
 			ContinuaTratando<T> continuaObj = new ContinuaTratando<T>() { Continua = true };
 			//miro las direcciones
-			if (vector.FinX == vector.InicioX)
-				sentidoX = Sentido.Centro;
-			else
-				sentidoX = vector.FinX > vector.InicioX ? Sentido.Derecha : Sentido.Izquierda;
 
-			if (vector.FinY == vector.InicioY)
-				sentidoY = Sentido.Centro;
-			else
-				sentidoY = vector.FinY > vector.InicioY ? Sentido.Arriba : Sentido.Abajo;
-			//miro el sentido
-			if (sentidoX == Sentido.Centro)
-				sentido = sentidoY;
-			else if (sentidoY == Sentido.Centro)
-				sentido = sentidoX;
-			else
-				sentido = (Sentido)(int)sentidoX + (int)sentidoY;
-			if (sentido != Sentido.Centro)//si se mueve :D
+			if (vectorAux.Sentido != Sentido.Centro)//si se mueve :D
 			{
 				do
 				{
@@ -307,7 +281,7 @@ namespace Gabriel.Cat.Extension
                     matriz[vectorAux.InicioX, vectorAux.InicioY] = continuaObj.Objeto;
 					//muevo
 					//depende del sentido suma o resta a uno o a otro...
-					switch (sentido)
+					switch (vectorAux.Sentido)
 					{
 							case Sentido.Arriba: vectorAux.InicioY--; break;
 							case Sentido.Abajo: vectorAux.InicioY++; break;
@@ -315,7 +289,7 @@ namespace Gabriel.Cat.Extension
 							case Sentido.Izquierda: vectorAux.InicioY--; break;
 							//va en diagonal
 						case Sentido.DiagonalDerechaAbajo:
-							if (vectorAux.InicioX == vectorAux.InicioY)
+							if (vectorAux.DiagonalPura)
 							{
 								vectorAux.InicioX++; vectorAux.InicioY++;
 							}
@@ -328,7 +302,7 @@ namespace Gabriel.Cat.Extension
 
 							} break;
 						case Sentido.DiagonalDerechaArriba:
-							if (vectorAux.InicioX == vectorAux.InicioY)
+                            if (vectorAux.DiagonalPura)
 							{
 								vectorAux.InicioX++; vectorAux.InicioY--;
 							}
@@ -337,7 +311,7 @@ namespace Gabriel.Cat.Extension
 								//depende del angulo
 							} break;
 						case Sentido.DiagonalIzquierdaAbajo:
-							if (vectorAux.InicioX == vectorAux.InicioY)
+                            if (vectorAux.DiagonalPura)
 							{
 								vectorAux.InicioX--; vectorAux.InicioY++;
 							}
@@ -346,7 +320,7 @@ namespace Gabriel.Cat.Extension
 								//depende del angulo
 							} break;
 						case Sentido.DiagonalIzquierdaArriba:
-							if (vectorAux.InicioX == vectorAux.InicioY)
+                            if (vectorAux.DiagonalPura)
 							{
 								vectorAux.InicioX--; vectorAux.InicioY--;
 							}

@@ -6,13 +6,25 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
+    public enum Sentido
+    {
+        Centro = 1,
+        Izquierda = 2,
+        Derecha = 4,
+        Abajo = 8,
+        Arriba = 16,
+        DiagonalIzquierdaAbajo = Izquierda + Abajo,
+        DiagonalIzquierdaArriba = Izquierda + Arriba,
+        DiagonalDerechaAbajo = Derecha + Abajo,
+        DiagonalDerechaArriba = Derecha + Arriba
+    }
     public class Vector
     {
-        public int InicioX { get; set; }
-        public int InicioY { get; set; }
-
-        public int FinX { get; set; }
-        public int FinY { get; set; }
+        int inicioX;
+        int inicioY;
+        Sentido sentido;
+        int finX;
+        int finY;
         public Vector()
             : this(0, 0, 0, 0)
         {
@@ -26,6 +38,27 @@ namespace Gabriel.Cat
             FinX = finX;
             FinY = finY;
         }
+
+        public int InicioY
+        {
+            get { return inicioY; }
+            set { inicioY = value; CalculaSentido(); }
+        }
+        public int InicioX
+        {
+            get { return inicioX; }
+            set { inicioX = value; CalculaSentido(); }
+        }
+        public int FinY
+        {
+            get { return finY; }
+            set { finY = value; CalculaSentido(); }
+        }
+        public int FinX
+        {
+            get { return finX; }
+            set { finX = value; CalculaSentido(); }
+        }
         public double Longitud
         {
 
@@ -34,6 +67,44 @@ namespace Gabriel.Cat
                 return Math.Sqrt(Math.Pow(FinX - InicioX, 2) + Math.Pow(FinY - InicioY, 2));
 
             }
+        }
+        public Sentido Sentido
+        {
+            get
+            {
+                return sentido;
+            }
+        }
+        /// <summary>
+        /// Si la distancia entre el inicio y el fin de cada componente es el mismo entonces es pura
+        /// </summary>
+        public bool DiagonalPura
+        {
+            get
+            {
+                return Math.Abs(InicioX - FinX) ==Math.Abs( InicioY - FinY);
+            }
+        }
+        private void CalculaSentido()
+        {
+
+            Sentido sentidoX, sentidoY;
+            if (FinX == InicioX)
+                sentidoX = Sentido.Centro;
+            else
+                sentidoX = FinX > InicioX ? Sentido.Derecha : Sentido.Izquierda;
+
+            if (FinY == InicioY)
+                sentidoY = Sentido.Centro;
+            else
+                sentidoY = FinY > InicioY ? Sentido.Arriba : Sentido.Abajo;
+            //miro el sentido
+            if (sentidoX == Sentido.Centro)
+                sentido = sentidoY;
+            else if (sentidoY == Sentido.Centro)
+                sentido = sentidoX;
+            else
+                sentido = (Sentido)(int)sentidoX + (int)sentidoY;
         }
         public void CalculaFin(int alfa, double longitudVector)
         {
