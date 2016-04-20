@@ -1294,7 +1294,37 @@ namespace Gabriel.Cat.Extension
 	}
 	#endregion
 	#region T[]
-	public static T DameElementoActual<T>(this T[] llista, Ordre escogerKey, int contador)
+        public static int IndexOf<T>(this T[] array,T[] arrayAContener) where T:IComparable
+        {
+            return array.IndexOf(0, arrayAContener);
+        }
+        public static int IndexOf<T>(this T[] array,int inicio, T[] arrayAContener) where T : IComparable
+        {
+            int indexOf = -1;
+            int indexOfAux = -1;
+            if (array.Length > arrayAContener.Length)
+            {
+                for (int i = inicio, j = 0; i < array.Length && indexOf == -1; i++)
+                {
+                    if (array[i].CompareTo(arrayAContener[j]) != (int)CompareTo.Iguales)
+                    {
+                        indexOfAux = -1;
+                        j = 0;
+                    }
+                    else if (indexOfAux == -1)
+                    {
+                        indexOfAux = i;
+                        j = 1;
+                    }
+                    else if (i - indexOfAux == arrayAContener.Length - 1)
+                        indexOf = indexOfAux;
+                    else j++;
+
+                }
+            }
+            return indexOf;
+        }
+        public static T DameElementoActual<T>(this T[] llista, Ordre escogerKey, int contador)
 	{
 		T objSelected = default(T);
 		int posicio;
