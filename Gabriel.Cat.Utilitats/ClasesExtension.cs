@@ -1808,6 +1808,8 @@ namespace Gabriel.Cat.Extension
 	}
 	public static void Save(this IEnumerable<Byte> array, string path, Encoding encoding)
 	{
+        if(File.Exists(path))
+          File.Delete(path);
 		FileStream file = new FileStream(path, FileMode.Create);
 		BinaryWriter bin = new BinaryWriter(file, encoding);
 		try
