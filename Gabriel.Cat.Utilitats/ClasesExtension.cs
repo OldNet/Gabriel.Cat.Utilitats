@@ -1292,6 +1292,14 @@ namespace Gabriel.Cat.Extension
 		int longitud = matriu.GetLength((int)dimension);
 		return longitud;
 	}
+        public static T[] ToTaula<T>(this T[,] matriu)
+        {
+            T[] tabla = new T[matriu.GetLength(DimensionMatriz.X) * matriu.GetLength(DimensionMatriz.Y)];
+            for (int i = 0, y = 0, yFin = matriu.GetLength(DimensionMatriz.Y), xFin = matriu.GetLength(DimensionMatriz.X); y < yFin; y++)
+                for (int x = 0; x < xFin; x++, i++)
+                    tabla[i] = matriu[x, y];
+            return tabla;
+        }
 	#endregion
 	#region T[]
         public static int IndexOf<T>(this T[] array,T[] arrayAContener) where T:IComparable
