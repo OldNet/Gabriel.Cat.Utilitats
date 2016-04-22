@@ -223,10 +223,7 @@ namespace Gabriel.Cat
             return result;
         }
         #endregion
-        public static implicit operator string(Hex numero)
-        {
-            return numero.numberHex;
-        }
+
         public static implicit operator Hex(string numero)
         {
             return new Hex(numero);
@@ -235,6 +232,15 @@ namespace Gabriel.Cat
         {
             return new Hex(QuitaCerosInutiles(numero.ToString("X2")));
         }
+        public static implicit operator Hex(byte numero)
+        {
+            return (int)numero;
+        }
+        public static implicit operator Hex(uint numero)
+        {
+            return (Hex)Convert.ToInt64(numero);
+        }
+
         public static implicit operator Hex(long numero)
         {
             return new Hex(QuitaCerosInutiles(numero.ToString("X4")));
@@ -248,10 +254,21 @@ namespace Gabriel.Cat
                 num = "0";
             return num;
         }
-
+        public static implicit operator string(Hex numero)
+        {
+            return numero.numberHex;
+        }
         public static implicit operator int(Hex numero)
         {
             return Convert.ToInt32((string)numero.numberHex, 16);
+        }
+        public static implicit operator uint(Hex numero)
+        {
+            return Convert.ToUInt32((long)numero);
+        }
+        public static implicit operator byte(Hex numero)
+        {
+            return Convert.ToByte((int)numero);
         }
         public static implicit operator long(Hex numero)
         {
