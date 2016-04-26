@@ -338,9 +338,30 @@ namespace Gabriel.Cat.Extension
 
 		
 	}
-	#endregion
-	#region IClauUnicaPerObjecte
-	public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T :IClauUnicaPerObjecte
+        #endregion
+        #region IComparable
+        /// <summary>
+        /// Mira en la lista IEnumerable si contiene exactamente todos los elementos de la otra lista
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="listToContain">lista a tener dentro de la otra</param>
+        /// <returns></returns>
+        public static bool Contains<T>(this IEnumerable<T> list,IEnumerable<T> listToContain) where T:IComparable
+        {
+            if (listToContain == null)
+                throw new ArgumentNullException("La lista ha contener no puede ser null!!");
+            bool contains = true;
+            listToContain.WhileEach((elementToContain) =>
+                {
+                    contains = list.Contains(elementToContain);
+                    return contains;
+                });
+            return contains;
+        }
+        #endregion
+        #region IClauUnicaPerObjecte
+        public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T :IClauUnicaPerObjecte
 	{
 		ListaUnica<T> lista = new ListaUnica<T>();
 		lista.Añadir(enumeracion);
