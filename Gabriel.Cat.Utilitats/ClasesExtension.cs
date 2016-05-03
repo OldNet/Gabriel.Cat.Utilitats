@@ -1388,13 +1388,21 @@ namespace Gabriel.Cat.Extension
 				sortedList.Add(element, element);
 		return sortedList;
 	}
-	/// <summary>
-	/// Ordena por elemetodo de orden indicado sin modificar la coleccion que se va a ordenar
-	/// </summary>
-	/// <param name="list"></param>
-	/// <param name="orden"></param>
-	/// <returns>devuelve una array ordenada</returns>
-	public static T[] Sort<T>(this IEnumerable<T> list, Orden orden) where T : IComparable
+        public static LlistaOrdenada<T, T> ToLlistaOrdenada<T>(this IEnumerable<T> list) where T : IComparable<T>
+        {
+            LlistaOrdenada<T, T> llistaOrdenada = new LlistaOrdenada<T, T>();
+            foreach (T element in list)
+                if (!llistaOrdenada.Existeix(element))
+                    llistaOrdenada.Afegir(element, element);
+            return llistaOrdenada;
+        }
+        /// <summary>
+        /// Ordena por elemetodo de orden indicado sin modificar la coleccion que se va a ordenar
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="orden"></param>
+        /// <returns>devuelve una array ordenada</returns>
+        public static T[] Sort<T>(this IEnumerable<T> list, Orden orden) where T : IComparable
 	{
 		return list.ToArray().Sort(orden);
 	}
