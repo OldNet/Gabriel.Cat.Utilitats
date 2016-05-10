@@ -1484,7 +1484,7 @@ namespace Gabriel.Cat.Extension
 	}
 	public static T[] SortByBubble<T>(this IEnumerable<T> list) where T : IComparable
 	{
-		return SortByQuickSort(list.ToArray());
+		return SortByBubble(list.ToArray());
 
 	}
 	public static T[] SortByBubble<T>(this T[] listaParaOrdenar) where T : IComparable
@@ -2124,136 +2124,7 @@ namespace Gabriel.Cat.Extension
 	}
         #endregion
         #region Stream
-        //codigo sacado de internet de Wichu adaptado por mi
-        public static byte[] ReadUncompressLZ77(this Stream stream, bool lanzarExcepcion=true)
-        {
-            UInt32 num7 = default(UInt32);
-            UInt32 num2, num5, num4, num, num6;
-            byte[] array = new byte[0];
-            bool acabadoPorError = false;
-            bool acabado = false;
-            byte num3;
-            int num8;
-            ulong num10;
-            ulong i;
-            if ((stream.ReadByte() != 0x10))
-            {
-                if (lanzarExcepcion)
-                {
-                    throw new Exception("Data is not LZ77 compressed!");
-                }
-                acabadoPorError = true;
-            }
-            if (!acabadoPorError)
-            {
-                num6 =Convert.ToUInt32(stream.ReadByte());
-                num6 = Convert.ToUInt32((num6 + (stream.ReadByte() << 8)));
-                num6 = Convert.ToUInt32((num6 + (stream.ReadByte() << 0x10)));
-                if ((num6 > 0x2404))
-                {
-                    if (lanzarExcepcion)
-                    {
-                        throw new Exception("Invalid LZ77 offset");
-                    }
-                    acabadoPorError = true;
-                }
-                if (!acabadoPorError)
-                {
-                    array = new byte[num6];
-                    while ((num7 < num6) && !acabado)
-                    {
-                        num3 = Convert.ToByte(stream.ReadByte());
-                        num8 = 0;
-                        do
-                        {
-                            if (((num3 & 0x80) > 0))
-                            {
-                                num2 = Convert.ToUInt32(stream.ReadByte());
-                                num5 = Convert.ToUInt32(stream.ReadByte());
-                                num4 = Convert.ToUInt32(((((num2 << 8) + num5) & 0xfff) + Convert.ToUInt64(1)));
-                                num = Convert.ToUInt32((Convert.ToUInt64(3) + ((num2 >> 4) & 15)));
-                                if ((num4 > num7))
-                                {
-                                    acabado = true;
-                                }
-                                if (!acabado)
-                                {
-                                    num10 = (num - 1);
-                                    i = 0;
-                                    while ((i <= num10) && !acabado)
-                                    {
-                                        if (((num7 + i) >= num6))
-                                        {
-                                            acabado = true;
-                                        }
-                                        if (!acabado)
-                                        {
-                                            array[Convert.ToInt32((num7 + i))] = array[Convert.ToInt32(((num7 - num4) + (i % Convert.ToUInt64(num4))))];
-                                            i = (i + 1);
-                                        }
-                                    }
-                                    acabado = false;
-                                    num7 = (num7 + num);
-                                }
-                            }
-                            else
-                            {
-                                array[num7] = Convert.ToByte(stream.ReadByte());
 
-                                num7 = (num7 + 1);
-                            }
-                            if (!acabado)
-                            {
-                                if (num7 >= num6)
-                                {
-                                    acabado = true;
-                                }
-                                else
-                                {
-                                    num3 = Convert.ToByte((num3 << 1));
-                                    num8 += 1;
-                                }
-                            }
-
-                        } while ((num8 <= 7) && !acabado);
-                    }
-                }
-            }
-            return array;
-        }
-        //codigo sacado de internet de Wichu adaptado por mi
-        /// <summary>
-        /// Obtener la longitud Lz77Uncompressed
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="lanzarExcepcion"></param>
-        /// <returns>devuelve -1 si no esta comprimido con LZ77</returns>
-        public static int GetLz77UncompressedLength(this Stream stream,bool lanzarExcepcion=false)
-        {
-            int lz77UncompressedLenght = 0;
-            bool error = false;
-            if ((stream.ReadByte() != 0x10))
-            {
-                if (lanzarExcepcion)
-                    throw new Exception("Data is not LZ77 compressed!");
-                else lz77UncompressedLenght = -1;
-            }
-            if (!error)
-            {
-                lz77UncompressedLenght = stream.ReadByte() + (stream.ReadByte() << 8);
-                lz77UncompressedLenght+= stream.ReadByte() << 0x10;
-            }
-            return lz77UncompressedLenght;
-        }
-        public static byte[] GetAllBytes(this Stream str)
-	{
-		byte[] bytes = new byte[str.Length];
-		long position = str.Position;
-		str.Position = 0;
-		str.Read(bytes, 0, bytes.Length);
-		str.Position = position;
-		return bytes;
-	}
 	public static void Write(this Stream str,string datos)
 	{
 		byte[] dades = Serializar.GetBytes(datos);
@@ -2265,11 +2136,20 @@ namespace Gabriel.Cat.Extension
 			throw new NullReferenceException();
 		str.Write(datos, 0, datos.Length);
 	}
-	#endregion
-	#region Extensiones de Internet y mias
-	#region SerializeExtension
-	//por probar!!
-	public static bool EndOfStream(this Stream str)
+        public static byte[] GetAllBytes(this Stream str)
+        {
+            byte[] bytes = new byte[str.Length];
+            long position = str.Position;
+            str.Position = 0;
+            str.Read(bytes, 0, bytes.Length);
+            str.Position = position;
+            return bytes;
+        }
+        #endregion
+        #region Extensiones de Internet y mias
+        #region SerializeExtension
+        //por probar!!
+        public static bool EndOfStream(this Stream str)
 	{
 		return str.Position == str.Length;
 	}
@@ -2672,101 +2552,7 @@ namespace Gabriel.Cat.Extension
 	}
         #endregion
         #region string
-        //codigo sacado de internet de Wichu adaptado por mi
-        public static int[] CompressLz77(this byte[] data)
-        {
-            byte item = 0;
-            int num4 = 0;
-            int position = 0;
-            int count;
-            int i;
-            int length = data.Length;
-            List<int> list3 = new List<int>();
-            List<int> list = new List<int>();
-            bool acabado = false;
-            list.Add(0x10);
-            list.Add((length & 0xff));
-            list.Add(((length >> 8) & 0xff));
-            list.Add(((length >> 0x10) & 0xff));
-            while ((position < length)&&!acabado)
-            {
-                
-                list3.Clear();
-                
-                do
-                {
-                    int[] numArray = data.Lz77Search(position);
-                    if ((numArray[0] > 2))
-                    {
-                        list3.Add(((((numArray[0] - 3) & 15) << 4) | (((numArray[1] - 1) >> 8) & 15)));
-                        list3.Add(((numArray[1] - 1) & 0xff));
-                        position = (position + numArray[0]);
-                        item = Convert.ToByte((item | (Convert.ToInt32(1) << (7 - num4))));
-                    }
-                    else
-                    {
-                        if ((numArray[0] < 0))
-                        {
-                            acabado = true;
-                        }
-                        list3.Add(data[position]);
-                        position += 1;
-                    }
-                    num4 += 1;
-                } while ((num4 <= 7)&&!acabado);
 
-                list.Add(item);
-                 count = list.Count;
-                 i = 1;
-                while ((i <= count))
-                {
-                    list.Add(list[i]);
-                    i += 1;
-                }
-            }
-            return list.ToArray();
-        }
-        //codigo sacado de internet de Wichu adaptado por mi
-        public static string CompressLz77String(this string stringOri)
-        {
-            int length = 1;
-            UInt32 num3 =Convert.ToUInt32(stringOri.Length);
-            string str2 = char.ConvertFromUtf32(16) + (char)Convert.ToInt32(num3 & 0xff) + (char)Convert.ToInt32((num3 >> 8) & 0xff) + (char)Convert.ToInt32((num3 >> 0x10) & 0xff);
-            while ((length <= num3))
-            {
-                byte charCode = 0;
-                string str3 = "";
-                int num5 = 0;
-                do
-                {
-                    if ((length > num3))
-                    {
-                        break; // TODO: might not be correct. Was : Exit Do
-                    }
-                    int num6 = 0x12;
-                    int num4 = Left(stringOri, length).IndexOf(Mid(stringOri, length, num6));
-                    if (((num4 > 0) & ((length + num6) <= num3)))
-                    {
-                        num4 = (length - num4);
-                        str3 = str3 + ((char)(((num6 - 3) & 15) << 4) + ((num4 - 1) >> 8) & 15) + (char)((num4 - 1) & 0xff);
-                        length = (length + num6);
-                        charCode = Convert.ToByte((charCode | (Convert.ToInt32(1) << (7 - num5))));
-                    }
-                    else
-                    {
-                        str3 = (str3 + Mid(stringOri, length, 1));
-                        length += 1;
-                    }
-                    num5 += 1;
-                } while ((num5 <= 7));
-                str2 = (str2 +(char)charCode + str3);
-            }
-            while (((str2.Length % 4) > 0))
-            {
-                str2 = (str2 + char.ConvertFromUtf32(0));
-            }
-            return str2;
-        }
         public static string Right(this string param, int length)
         {
 
@@ -2801,85 +2587,8 @@ namespace Gabriel.Cat.Extension
             string result = param.Substring(startIndex);
             return result;
         }
-        #endregion 
-        //codigo sacado de internet de Wichu y adaptado por mi
-        public static int[] Lz77Search(this byte[] data, int position)
-        {
-            int length = data.Length;
-            int num4 = 0x1000, num6, i;
-            int[] numArray2 = new int[2];
-            List<int> list = new List<int>();
-            byte left = 0; int j = 0;
-            bool acabado = false;
-            if (((position < 3) | ((length - position) < 3)))
-            {
-                numArray2[0] = 0;
-                numArray2[1] = 0;
-                acabado = true;
-            }
-            else if ((position >= length))
-            {
-                numArray2[0] = -1;
-                numArray2[1] = 0;
-                acabado = true;
-            }
-            if (!acabado)
-            {
-                if ((num4 > position))
-                {
-                    num4 = position;
-                }
-                num6 = (num4 - 1);
-                i = 0;
-                while ((i <= num6))
-                {
-                    if ((data[((position - i) - 1)] == data[position]))
-                    {
-                        list.Add(i + 1);
-                    }
-                    i += 1;
-                }
-                if (list.Count == 0)
-                {
-                    numArray2[0] = 0;
-                    numArray2[1] = 0;
-                    acabado = true;
-                }
-                if (!acabado)
-                {
-                    while ((left < 0x12))
-                    {
-                        left = Convert.ToByte((left + 1));
-
-                        for (j = 0; j <= list.Count - 1 && !acabado; j++)
-                        {
-                            if (((position + left) >= data.Length))
-                            {
-                                acabado = true;
-                            }
-                            else if (data[(position + left)] != data[Convert.ToInt32((position - list[(j + 1)]) + (left % list[j + 1]))])
-                            {
-                                if ((list.Count > 1))
-                                {
-                                    list.Remove(Convert.ToInt32((j + 1)));
-                                    j -= 1;
-                                }
-                                else
-                                {
-                                    acabado = true;
-                                }
-                            }
-
-                        }
-
-                    }
-
-                    numArray2[0] = left;
-                    numArray2[1] = Convert.ToInt32(list[1]);
-                } 
-            }
-            return numArray2;
-        }
+        #endregion
+       
         #endregion
 
     }
