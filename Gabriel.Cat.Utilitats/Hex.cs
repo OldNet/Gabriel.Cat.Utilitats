@@ -236,6 +236,13 @@ namespace Gabriel.Cat
         {
             return (int)numero;
         }
+        public static explicit operator Hex(byte[] numero)
+        {
+            string numHex = "";
+            for (int i = 0; i < numero.Length; i++)
+                numHex += ((Hex)numero[i]).Number.PadLeft(2,'0');
+            return (Hex)numHex;
+        }
         public static implicit operator Hex(uint numero)
         {
             return (Hex)Convert.ToInt64(numero);
