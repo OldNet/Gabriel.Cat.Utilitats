@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitmapPointerLocated.cs" />
     <Compile Include="Clases de Internet\Apng\APNG.cs" />
     <Compile Include="Clases de Internet\Apng\Chunks.cs" />
     <Compile Include="Clases de Internet\Apng\CRC.cs" />
