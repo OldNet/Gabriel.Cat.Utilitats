@@ -32,6 +32,7 @@ namespace Gabriel.Cat
 		public const string BITMAPASSEMBLYNAME = "System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 		public const string UINTASSEMBLYNAME = "System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
         public const string POINTASSEMBLYNAME = "System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+        public const string COLORASSEMBLYNAME = "System.Drawing.Color, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";//por mirar
         //mis clases
         public const string POINTZASSEMBLYNAME = "Gabriel.Cat.PointZ, Gabriel.Cat.Utilitats, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";//mientras no le cambie esta info sera valida...
         //se añade la constante en la lista :D
@@ -52,7 +53,8 @@ namespace Gabriel.Cat
 			UINTASSEMBLYNAME,
 			BYTEASSEMBLYNAME,
             POINTASSEMBLYNAME,
-            POINTZASSEMBLYNAME
+            POINTZASSEMBLYNAME,
+            COLORASSEMBLYNAME
 		};
 		#endregion
 		//Si se añaden mas se tiene que dar de alta aqui :D y en el metodo ToTipoAceptado y GetBytes(TipoAceptado,Object)
@@ -74,7 +76,8 @@ namespace Gabriel.Cat
 			String,
 			Bitmap,
             Point,
-            PointZ
+            PointZ,
+            Color
 		}
 
 
@@ -147,6 +150,8 @@ namespace Gabriel.Cat
 						break;
                     case TiposAceptados.Null:
                         bytes = new byte[] { 0x00 };break;
+                    case TiposAceptados.Color:
+                        bytes = GetBytes((Color)objTipoAceptado);break;
 				}
 			} catch {
 				throw new Exception("El objeto no es del tipo indicado como parametro");
@@ -216,8 +221,15 @@ namespace Gabriel.Cat
                 case Serializar.POINTZASSEMBLYNAME:
                     tipo = TiposAceptados.PointZ;
                     break;
+                case Serializar.COLORASSEMBLYNAME:
+                    tipo = TiposAceptados.Color;
+                    break;
             }
             return tipo;
+        }
+        public static byte[] GetBytes(Color color)
+        {
+            return new byte[] {color.A,color.R,color.G,color.B };
         }
         public static byte[] GetBytes(Point point)
         {
@@ -351,6 +363,8 @@ namespace Gabriel.Cat
 				case TiposAceptados.Bitmap:
 					obj=ToBitmap(ms.Read(ToLong(ms.Read(8))));
 					break;
+                case TiposAceptados.Color:
+                    obj = ToColor(ms.Read(4));break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
@@ -385,6 +399,12 @@ namespace Gabriel.Cat
             return (T)ToTipoAceptado(tipo,bytesTipo);
         }
         #region Desserializar Medida Fija
+        public static Color ToColor(byte[] bytesObj)
+        {
+            if (bytesObj.Length != 4)
+                throw new ArgumentException("Un color consta de 4 bytes ARGB");
+            return Color.FromArgb(bytesObj[0], bytesObj[1], bytesObj[2], bytesObj[3]);
+        }
         public static PointZ ToPointZ(byte[] bytesObj)
         {
             return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubArray(8)));
