@@ -13,15 +13,15 @@ namespace Gabriel.Cat
     {
        Llista<KeyValuePair<Bitmap, int>> frames;
         bool animarCiclicamente;
+        bool mostrarPrimerFrameAlAcabar;
         int index;
         Thread hiloAnimacion;
-
-
-
         public event BitmapAnimatedFrameChangedEventHanlder FrameChanged;
         public BitmapAnimated(IEnumerable<Bitmap> bmps,params int[] delays)
         {
             int i=0;
+            mostrarPrimerFrameAlAcabar = true;
+            animarCiclicamente = true;
             frames = new Llista<KeyValuePair<Bitmap, int>>();
             if (bmps != null)
                     foreach (Bitmap bmp in bmps)
@@ -53,6 +53,20 @@ namespace Gabriel.Cat
         {
             get { return frames[ActualFrameIndex].Key; }
         }
+
+        public bool MostrarPrimerFrameAlAcabar
+        {
+            get
+            {
+                return mostrarPrimerFrameAlAcabar;
+            }
+
+            set
+            {
+                mostrarPrimerFrameAlAcabar = value;
+            }
+        }
+
         public KeyValuePair<Bitmap,int> this[int index]
         {
             get { return frames[index]; }
@@ -74,12 +88,17 @@ namespace Gabriel.Cat
             if (hiloAnimacion != null && hiloAnimacion.IsAlive)
                 hiloAnimacion.Abort();
             hiloAnimacion = new Thread(() => {
-                while (animarCiclicamente)
+                do
                 {
-                    FrameChanged(this, frames[ActualFrameIndex].Key);
-                    Thread.Sleep(frames[ActualFrameIndex].Value);
-                    ActualFrameIndex++;
-                }
+                    for (int i = 0; i < frames.Count; i++)
+                    {
+                        FrameChanged(this, frames[ActualFrameIndex].Key);
+                        Thread.Sleep(frames[ActualFrameIndex].Value);
+                        ActualFrameIndex++;
+                    }
+                } while (animarCiclicamente);
+                if (MostrarPrimerFrameAlAcabar)
+                  FrameChanged(this, frames[0].Key);
 
 
             });
