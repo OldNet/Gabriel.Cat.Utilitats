@@ -893,25 +893,15 @@ namespace Gabriel.Cat.Extension
 			num++;
 		return num;
 	}
-	#endregion
-	#region Bitmap
-     public static Bitmap ToAnimatedBitmap(this IEnumerable<Bitmap> bmpsToAnimate,bool repetirSiempre)
+        #endregion
+        #region Bitmap
+        public static BitmapAnimated ToAnimatedBitmap(this IEnumerable<Bitmap> bmpsToAnimate, bool repetirSiempre = true)
         {
-            string outPutName = Path.GetRandomFileName();
-            Gif.Components.AnimatedGifEncoder animatedEncoder = new Gif.Components.AnimatedGifEncoder();
-            FileStream str = new FileStream(outPutName, FileMode.Create);
-            Bitmap bmp;
-            animatedEncoder.SetDelay(repetirSiempre ? 0 : -1);
-            foreach (Bitmap bmpFrame in bmpsToAnimate)
-                animatedEncoder.AddFrame(bmpFrame);
-            animatedEncoder.Finish();
-            animatedEncoder.Start(str);
-            str.Close();
-            str = new FileStream(outPutName, FileMode.Open);
-            bmp= new Bitmap(str).Clone() as Bitmap;
-            str.Close();
-            File.Delete(outPutName);
-            return bmp;
+            return bmpsToAnimate.ToAnimatedBitmap(repetirSiempre, 500);
+        }
+        public static BitmapAnimated ToAnimatedBitmap(this IEnumerable<Bitmap> bmpsToAnimate, bool repetirSiempre=true,params int[] delay)
+        {
+            return new BitmapAnimated(bmpsToAnimate, delay) { AnimarCiclicamente = repetirSiempre };
         }
 	public static Bitmap RandomPixels(this Bitmap imgRandom)
 	{

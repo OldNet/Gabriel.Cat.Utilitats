@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
+
     public class BitmapPointerLocated
     {
         Bitmap imagen;
