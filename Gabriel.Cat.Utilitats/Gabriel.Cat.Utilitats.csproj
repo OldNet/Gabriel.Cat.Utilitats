@@ -51,6 +51,10 @@
     <Compile Include="Clases de Internet\Apng\Chunks.cs" />
     <Compile Include="Clases de Internet\Apng\CRC.cs" />
     <Compile Include="Clases de Internet\Apng\PNG.cs" />
+    <Compile Include="Clases de Internet\Gif\AnimatedGifEncoder.cs" />
+    <Compile Include="Clases de Internet\Gif\GifDecoder.cs" />
+    <Compile Include="Clases de Internet\Gif\LZWEncoder.cs" />
+    <Compile Include="Clases de Internet\Gif\NeuQuant.cs" />
     <Compile Include="Clases de Internet\Miniaturas.cs" />
     <Compile Include="Clases de Internet\Sha3\HMACSHA3.cs" />
     <Compile Include="Clases de Internet\Sha3\SHA3.cs" />
