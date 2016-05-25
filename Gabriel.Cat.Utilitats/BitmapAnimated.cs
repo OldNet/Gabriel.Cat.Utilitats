@@ -15,11 +15,13 @@ namespace Gabriel.Cat
         bool animarCiclicamente;
         bool mostrarPrimerFrameAlAcabar;
         int index;
+        int numeroDeRepeticionesFijas;
         Thread hiloAnimacion;
         public event BitmapAnimatedFrameChangedEventHanlder FrameChanged;
         public BitmapAnimated(IEnumerable<Bitmap> bmps,params int[] delays)
         {
             int i=0;
+            numeroDeRepeticionesFijas = 1;
             mostrarPrimerFrameAlAcabar = true;
             animarCiclicamente = true;
             frames = new Llista<KeyValuePair<Bitmap, int>>();
@@ -67,14 +69,36 @@ namespace Gabriel.Cat
             }
         }
 
+        public int NumeroDeRepeticionesFijas
+        {
+            get
+            {
+                return numeroDeRepeticionesFijas;
+            }
+
+            set
+            {
+                numeroDeRepeticionesFijas = value;
+            }
+        }
+
         public KeyValuePair<Bitmap,int> this[int index]
         {
             get { return frames[index]; }
         }
-        public void AddFrame(Bitmap bmp,int delay)
+        public void AddFrame(Bitmap bmp,int delay=500,int posicion=-1)
         {
-            frames.Afegir(new KeyValuePair<Bitmap, int>(bmp, delay));
-        }
+            if (bmp == null || delay < 0)
+                throw new ArgumentException();
+
+            KeyValuePair<Bitmap, int> frame = new KeyValuePair<Bitmap, int>(bmp, delay);
+
+            if (posicion < 0 || posicion > frames.Count)
+                frames.Afegir(frame);
+            else
+                frames.InserirEn(posicion, frame);
+         }
+       
         public void RemoveFrame(int index)
         {
             if (frames.Count < index + 1)
@@ -88,6 +112,7 @@ namespace Gabriel.Cat
             if (hiloAnimacion != null && hiloAnimacion.IsAlive)
                 hiloAnimacion.Abort();
             hiloAnimacion = new Thread(() => {
+                int numeroDeRepeticiones = 0;
                 do
                 {
                     for (int i = 0; i < frames.Count; i++)
@@ -96,7 +121,8 @@ namespace Gabriel.Cat
                         Thread.Sleep(frames[ActualFrameIndex].Value);
                         ActualFrameIndex++;
                     }
-                } while (animarCiclicamente);
+                    numeroDeRepeticiones++;
+                } while (numeroDeRepeticiones<numeroDeRepeticionesFijas||animarCiclicamente);
                 if (MostrarPrimerFrameAlAcabar)
                   FrameChanged(this, frames[0].Key);
 

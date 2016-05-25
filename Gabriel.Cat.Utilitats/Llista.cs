@@ -296,19 +296,29 @@ namespace Gabriel.Cat
                 }
             }
         }
-        public void Push(TValue valor)
+        public void InserirEn(int posicio, TValue valor)
         {
             try
             {
                 semafor.WaitOne();
                 esperando = true;
-                llista.Insert(0, valor);
+                llista.Insert(posicio, valor);
             }
             finally
             {
-                semafor.Release();
-                esperando = false;
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    esperando = false;
+                }
             }
+        }
+        public void Push(TValue valor)
+        {
+            InserirEn(0, valor);
         }
 
         public TValue Peek()
