@@ -1015,11 +1015,11 @@ namespace Gabriel.Cat.Extension
 		pngAnimated.Add(fotogramas);
 		return pngAnimated;
 	}
-	public static Stream ToStream(this Bitmap bmp)
+	public static MemoryStream ToStream(this Bitmap bmp)
 	{
-		return ToStream(bmp, System.Drawing.Imaging.ImageFormat.Png);
+		return ToStream(bmp, bmp.RawFormat);
 	}
-	public static Stream ToStream(this Bitmap bmp, ImageFormat format)
+	public static MemoryStream ToStream(this Bitmap bmp, ImageFormat format)
 	{
 		MemoryStream stream=new MemoryStream();
 		bmp.Save(stream, format);
