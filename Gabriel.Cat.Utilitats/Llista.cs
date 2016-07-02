@@ -24,6 +24,7 @@ namespace Gabriel.Cat
         Semaphore semafor;
         bool esperando = false;
         LlistaOrdenada<IComparable, TValue> llistaOrdenada;//sirve para facilitar el encontrar los valores para que sea lo mas ágil posible
+        public event EventHandler Updated;
         public Llista()
         {
             llista = new List<TValue>();
@@ -52,6 +53,8 @@ namespace Gabriel.Cat
             {
                 semafor.Release();
                 esperando=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
             }
         }
         public void AfegirMolts(IEnumerable<TValue> values)
@@ -76,6 +79,8 @@ namespace Gabriel.Cat
             {
                 semafor.Release();
                 esperando=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
             }
         }
         public void Elimina(TValue value)
@@ -93,12 +98,38 @@ namespace Gabriel.Cat
             {
                 semafor.Release();
                 esperando=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
             }
         }
         public void Elimina(IEnumerable<TValue> values)
         {
-            foreach (TValue value in values)
-                Elimina(value);
+
+            try
+            {
+                semafor.WaitOne();
+                esperando = true;
+                if (llistaOrdenada != null)
+                {
+                    foreach (TValue value in values)
+                    {
+                        llistaOrdenada.Elimina((value as IClauUnicaPerObjecte).Clau());
+                        llista.Remove(value);
+                    }
+                    }
+                else
+                {
+                    foreach (TValue value in values)
+                        llista.Remove(value);
+                }
+            }
+            finally
+            {
+                semafor.Release();
+                esperando = false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+            }
         }
         public void Elimina(int pos)
         {
@@ -115,6 +146,8 @@ namespace Gabriel.Cat
             {
                 semafor.Release();
                 esperando=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
             }
         }
         public bool Existeix(TValue value)

@@ -2613,7 +2613,12 @@ namespace Gabriel.Cat.Extension
         #endregion
 
         #endregion
-
+        #region TimeSpan
+        public static string ToHoursMinutesSeconds(this TimeSpan time)
+        {
+            return time.Hours + ":" + time.Minutes + ":" + time.Seconds;
+        }
+        #endregion
     }
 }
 
