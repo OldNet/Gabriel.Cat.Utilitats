@@ -96,7 +96,7 @@ namespace Gabriel.Cat
 
 			// Verify the chunk type is as expected
 			if (ChunkType != expectedType)
-				throw new ArgumentException(
+				throw new FormatException(
 					String.Format("Specified chunk type is not {0} as expected", expectedType));
 
 			// Parse the chunk's data
@@ -123,14 +123,14 @@ namespace Gabriel.Cat
 		/// </summary>
 		public byte[] ChunkBytes {
 			get {
-				byte[] ba = new byte[chunkLength.Length +
+				byte[] chunkBytes = new byte[chunkLength.Length +
 				                     chunkType.Length + chunkData.Length +
 				                     chunkCRC.Length];
-				chunkLength.CopyTo(ba, 0);
-				chunkType.CopyTo(ba, chunkLength.Length);
-				chunkData.CopyTo(ba, chunkLength.Length + chunkType.Length);
-				chunkCRC.CopyTo(ba, chunkLength.Length + chunkType.Length + chunkData.Length);
-				return ba;
+				chunkLength.CopyTo(chunkBytes, 0);
+				chunkType.CopyTo(chunkBytes, chunkLength.Length);
+				chunkData.CopyTo(chunkBytes, chunkLength.Length + chunkType.Length);
+				chunkCRC.CopyTo(chunkBytes, chunkLength.Length + chunkType.Length + chunkData.Length);
+				return chunkBytes;
 			}
 		}
 
@@ -238,7 +238,7 @@ namespace Gabriel.Cat
 				                            ChunkCRC, calculatedCRC));
 				sb.AppendLine(String.Format("This occurred while parsing the chunk at position {0} (0x{1:X8}) in the stream.",
 				                            chunkStart, chunkStart));
-				throw new ApplicationException(sb.ToString());
+				throw new FormatException(sb.ToString());
 			}
 		}
 		public override string ToString()
@@ -249,9 +249,11 @@ namespace Gabriel.Cat
 		{
 			Chunk other = obj as Chunk;
 			bool iguales = other != null;
-			if (other != null) {
-				byte[] data = ChunkBytes;
-				byte[] dataOther = other.ChunkBytes;
+            byte[] data, dataOther;
+
+            if (iguales) {
+				data = ChunkBytes;
+			    dataOther = other.ChunkBytes;
 				if (data.Length != dataOther.Length)
 					iguales = false;
 				for (int i = 0; i < data.Length && iguales; i++)
@@ -261,11 +263,7 @@ namespace Gabriel.Cat
 			
 			return iguales;
 		}
-		public	static Chunk ReadChunk(Stream stream)
-		{
-			return ReadChunk(stream, false);
-		}
-		public	static Chunk ReadChunk(Stream stream, bool closeStreamIfThrowException)
+		public	static Chunk ReadChunk(Stream stream, bool closeStreamIfThrowException=false)
 		{
 			Chunk chunk;
 			chunk = new Chunk();
@@ -700,8 +698,8 @@ namespace Gabriel.Cat
 			dataBytes.AfegirMolts(Serializar.GetBytes(OffsetY));
 			dataBytes.AfegirMolts(Serializar.GetBytes(DelayNum));
 			dataBytes.AfegirMolts(Serializar.GetBytes(DelayDen));
-			dataBytes.AfegirMolts(Serializar.GetBytes((byte)DisposeOP));
-			dataBytes.AfegirMolts(Serializar.GetBytes((byte)BlendOP));
+			dataBytes.Afegir((byte)DisposeOP);
+			dataBytes.Afegir((byte)BlendOP);
 			ChunkData = dataBytes.ToTaula();
 		}
 
@@ -710,6 +708,9 @@ namespace Gabriel.Cat
 		}
 		protected override void ParseData(byte[] chunkData)
 		{
+            if (chunkData != null && chunkData.Length < 26)
+                throw new ArgumentException();
+
 			int offset = 0;
 			sequenceNumber = Utils.ParseUint(chunkData, 4, ref offset);
 			width = Utils.ParseUint(chunkData, 4, ref offset);
@@ -872,7 +873,7 @@ namespace Gabriel.Cat
 			}
 			set {
 				if (value.Length > 80)
-					throw new Exception("Metadata key no puede superar los 80 caracteres");
+					throw new ArgumentException("Metadata key no puede superar los 80 caracteres");
 				keyword = value;
 				UpdateData();
 			}
@@ -914,9 +915,13 @@ namespace Gabriel.Cat
 				}
 				Information = Serializar.ToString(System.Text.ASCIIEncoding.Convert(System.Text.Encoding.GetEncoding(1252), Encoding.ASCII, bytesAConvertir.ToTaula()));
 			} else
-				throw new Exception("Error al parsear los datos...no tiene la forma de tEXt");
+				throw new ChunkFormatException();
 		}
 	}
+    public class ChunkFormatException : Exception
+    {
+
+    }
 	public class zTXtChunk:Chunk
 	{
 		public const byte COMPRESION = (byte)0;
@@ -942,7 +947,7 @@ namespace Gabriel.Cat
 			}
 			set {
 				if (value.Length > 80)
-					throw new Exception("Metadata key no puede superar los 80 caracteres");
+					throw new ArgumentException("Metadata key no puede superar los 80 caracteres");
 				keyword = value;
 				UpdateData();
 			}
@@ -980,15 +985,15 @@ namespace Gabriel.Cat
 				keyword = Serializar.ToString(bytesAConvertir.ToTaula());
 				bytesAConvertir.Buida();
 				posicion++;//paso el Null byte
-				if (COMPRESION != chunkData[posicion++])//leo la compresion
-					throw new Exception("Error al parsear los datos...no tiene la forma de zTXt");
+                if (COMPRESION != chunkData[posicion++])//leo la compresion
+                    throw new ChunkFormatException();
 				while (chunkData.LongLength > posicion) {
 					bytesAConvertir.Afegir(chunkData[posicion++]);
 				}
 				encodingSource = System.Text.Encoding.GetEncoding(1252);//es la unica usada...
 				Information = Serializar.ToString(System.Text.ASCIIEncoding.Convert(encodingSource, Encoding.ASCII, bytesAConvertir.ToTaula()));
 			} else
-				throw new Exception("Error al parsear los datos...no tiene la forma de zTXt");
+				throw new ChunkFormatException();
 		}
 	}
 	public class tIMEChunk:Chunk
@@ -1031,10 +1036,12 @@ namespace Gabriel.Cat
 		}
 		protected override void ParseData(byte[] chunkData)
 		{
+            if (chunkData.Length != 7)
+                throw new ArgumentException();
 			fecha = new DateTime((int)Serializar.ToShort(new byte[] {
 			                                             	chunkData[1],
 			                                             	chunkData[0]
-			                                             }), (int)ChunkData.SubArray(2, 1)[0], (int)ChunkData.SubArray(3, 1)[0], (int)ChunkData.SubArray(4, 1)[0], (int)ChunkData.SubArray(5, 1)[0], (int)ChunkData.SubArray(6, 1)[0]).ToLocalTime();
+			                                             }), (int)chunkData[2], (int)chunkData[3], (int)chunkData[4], (int)chunkData[5], (int)chunkData[6]).ToLocalTime();
 
 		}
 	}
