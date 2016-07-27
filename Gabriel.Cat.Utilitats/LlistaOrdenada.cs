@@ -19,7 +19,10 @@ namespace Gabriel.Cat
 	public class LlistaOrdenada<Tkey,TValue>:IEnumerable<KeyValuePair<Tkey,TValue>>
 	{
 		SortedList<Tkey,TValue> llista;
-		public LlistaOrdenada()
+        public event EventHandler Updated;
+        public event EventHandler Added;
+        public event EventHandler Removed;
+        public LlistaOrdenada()
 		{
 			llista = new SortedList<Tkey,TValue>();
 
@@ -40,6 +43,10 @@ namespace Gabriel.Cat
             finally
             {
                 Monitor.Exit(llista);
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Added != null)
+                    Added(this, new EventArgs());
             }
 		}
 		public void  AfegirMolts(IEnumerable<KeyValuePair<Tkey,TValue>> llista)
@@ -69,6 +76,10 @@ namespace Gabriel.Cat
             finally
             {
                 Monitor.Exit(llista);
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
             }
 			return fet;
 		}
@@ -91,6 +102,10 @@ namespace Gabriel.Cat
             finally
             {
                 Monitor.Exit(llista);
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
             }
 		}
 		public void AfegirORemplaçar(Tkey clau, TValue nouValor)
@@ -101,11 +116,18 @@ namespace Gabriel.Cat
                 if (llista.ContainsKey(clau))
                     llista[clau] = nouValor;
                 else
+                {
                     llista.Add(clau, nouValor);
-            }
+                    if (Added != null)
+                        Added(this, new EventArgs());
+                }
+                }
             finally
             {
                 Monitor.Exit(llista);
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+
             }
 		}
 		public int Count
@@ -152,6 +174,8 @@ namespace Gabriel.Cat
                 finally
                 {
                     Monitor.Exit(llista);
+                    if (Updated != null)
+                        Updated(this, new EventArgs());
                 }
 		
 			}

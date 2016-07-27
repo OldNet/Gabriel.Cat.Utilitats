@@ -24,7 +24,12 @@ namespace Gabriel.Cat
         Semaphore semafor;
         bool esperando = false;
         LlistaOrdenada<IComparable, TValue> llistaOrdenada;//sirve para facilitar el encontrar los valores para que sea lo mas ágil posible
+        /// <summary>
+        /// Ocurre cuando la lista es modificada ya sea en el numero de elementos o en el orden
+        /// </summary>
         public event EventHandler Updated;
+        public event EventHandler Added;
+        public event EventHandler Removed;
         public Llista()
         {
             llista = new List<TValue>();
@@ -55,6 +60,8 @@ namespace Gabriel.Cat
                 esperando=false;
                 if (Updated != null)
                     Updated(this, new EventArgs());
+                if (Added != null)
+                    Added(this, new EventArgs());
             }
         }
         public void AfegirMolts(IEnumerable<TValue> values)
@@ -81,6 +88,8 @@ namespace Gabriel.Cat
                 esperando=false;
                 if (Updated != null)
                     Updated(this, new EventArgs());
+                if (Added != null)
+                    Added(this, new EventArgs());
             }
         }
         public void Elimina(TValue value)
@@ -100,6 +109,9 @@ namespace Gabriel.Cat
                 esperando=false;
                 if (Updated != null)
                     Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
+
             }
         }
         public void Elimina(IEnumerable<TValue> values)
@@ -129,6 +141,8 @@ namespace Gabriel.Cat
                 esperando = false;
                 if (Updated != null)
                     Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
             }
         }
         public void Elimina(int pos)
@@ -148,6 +162,8 @@ namespace Gabriel.Cat
                 esperando=false;
                 if (Updated != null)
                     Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
             }
         }
         public bool Existeix(TValue value)
@@ -221,6 +237,8 @@ namespace Gabriel.Cat
                 finally
                 {
                     esperando = false;
+                    if (Updated != null)
+                        Updated(this, new EventArgs());
                 }
             }
         }
@@ -241,18 +259,28 @@ namespace Gabriel.Cat
                 finally
                 {
                     esperando = false;
+                    if (Updated != null)
+                        Updated(this, new EventArgs());
                 }
             }
         }
         public void Desordena()
         {
-            semafor.WaitOne(); 
-            esperando = true;
-            IEnumerable<TValue> desorden = llista.Desordena();
-            this.llista.Clear();
-            this.llista.AddRange(desorden);
-            semafor.Release();
-            esperando=false;
+            try
+            {
+                semafor.WaitOne();
+                esperando = true;
+                IEnumerable<TValue> desorden = llista.Desordena();
+                this.llista.Clear();
+                this.llista.AddRange(desorden);
+            }
+            finally
+            {
+                semafor.Release();
+                esperando = false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+            }
         }
 
         public int Count
@@ -277,6 +305,10 @@ namespace Gabriel.Cat
             esperando=false;
             if (llistaOrdenada != null)
                 llistaOrdenada.Buida();
+            if (Updated != null)
+                Updated(this, new EventArgs());
+            if (Removed != null)
+                Removed(this, new EventArgs());
         }
         public TValue this[int pos]
         {
@@ -302,6 +334,7 @@ namespace Gabriel.Cat
                     finally
                     {
                         esperando = false;
+
                     }
                 }
                 return value;
@@ -325,6 +358,8 @@ namespace Gabriel.Cat
                     finally
                     {
                         esperando = false;
+                        if (Updated != null)
+                            Updated(this, new EventArgs());
                     }
                 }
             }
@@ -346,6 +381,10 @@ namespace Gabriel.Cat
                 finally
                 {
                     esperando = false;
+                    if (Updated != null)
+                        Updated(this, new EventArgs());
+                    if (Added != null)
+                        Added(this, new EventArgs());
                 }
             }
         }
