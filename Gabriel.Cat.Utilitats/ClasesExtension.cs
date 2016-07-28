@@ -25,7 +25,7 @@ namespace Gabriel.Cat.Extension
     public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
     public delegate void MetodoTratarByteArray(byte[] byteArray);
     public unsafe delegate void MetodoTratarBytePointer(byte* prtByteArray);
-    public delegate bool ComprovaEventHanler<Tvalue>(Tvalue valorAComprovar);
+    public delegate bool ComprovaEventHandler<Tvalue>(Tvalue valorAComprovar);
     public delegate T TrataObjeto<T>(T objHaTratar);
     public delegate ContinuaTratando<T> ContinuaTratandoObjeto<T>(T objHaTratar);
     public struct ContinuaTratando<T>
@@ -1616,7 +1616,7 @@ namespace Gabriel.Cat.Extension
 
         }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
-        public static IEnumerable<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHanler<Tvalue> comprovador)
+        public static IEnumerable<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
             if (comprovador == null)
                 throw new ArgumentNullException("El metodo para realizar la comparacion no puede ser null");
@@ -1835,6 +1835,28 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable KeyValuePair
+        public static IEnumerable<TKey> FiltraKeys<TKey,TValue>(this IEnumerable<KeyValuePair<TKey,TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovador)
+        {
+            return FiltraKeysOrValues(pairs, metodoComprovador, null).Cast<TKey>();
+        }
+        public static IEnumerable<TValue> FiltraValues<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TValue> metodoComprovador)
+        {
+            return FiltraKeysOrValues(pairs, null, metodoComprovador).Cast<TValue>();
+        }
+         static IEnumerable FiltraKeysOrValues<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovadorKeys,ComprovaEventHandler<TValue> metodoComprovarValues)
+        {
+            if (metodoComprovadorKeys == null&&metodoComprovarValues==null)
+                throw new ArgumentNullException();
+            List<Object> filtro = new List<object>();
+            foreach (KeyValuePair<TKey, TValue> pair in pairs)
+            {
+                if (metodoComprovadorKeys != null && metodoComprovadorKeys(pair.Key))
+                    filtro.Add(pair.Key);
+                else if (metodoComprovarValues != null && metodoComprovarValues(pair.Value))
+                    filtro.Add(pair.Value);
+            }
+            return filtro;
+        }
         public static IEnumerable<Tvalue> GetValues<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             List<Tvalue> llista = new List<Tvalue>();
