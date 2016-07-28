@@ -30,6 +30,12 @@ namespace Gabriel.Cat
         public event EventHandler Updated;
         public event EventHandler Added;
         public event EventHandler Removed;
+        ConfirmacionEventHandler<Llista<TValue>,TValue> AntesDeAñadir;
+        ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> AntesDeAñadirMuchos;
+        ConfirmacionEventHandler<Llista<TValue>,TValue> AntesDeBorrar;
+        ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> AntesDeBorrarMuchos;
+        ConfirmacionEventHandler<Llista<TValue>> AntesDeVaciar;
+        ConfirmacionEventHandler<Llista<TValue>> AntesDeActualizar;
         public Llista()
         {
             llista = new List<TValue>();
@@ -37,15 +43,28 @@ namespace Gabriel.Cat
                 llistaOrdenada = new LlistaOrdenada<IComparable, TValue>();
             semafor = new Semaphore(1, 1);
         }
+        public Llista(ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntedDeAñadir, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeAñadirMuchos, ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntesDeBorrar, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeBorrarMuchos, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeActualizar, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeVaciar) : this()
+        {
+            AntesDeActualizar = metodoAntesDeActualizar;
+            AntesDeAñadir = metodoAntedDeAñadir;
+            AntesDeAñadirMuchos = metodoAntesDeAñadirMuchos;
+            AntesDeBorrar = metodoAntesDeBorrar;
+            AntesDeBorrarMuchos = metodoAntesDeBorrarMuchos;
+            AntesDeVaciar = metodoAntesDeVaciar;
+        }
         public Llista(IEnumerable<TValue> valors)
             : this()
+        {
+            AfegirMolts(valors);
+        }
+        public Llista(IEnumerable<TValue> valors,ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntedDeAñadir, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeAñadirMuchos, ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntesDeBorrar, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeBorrarMuchos, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeActualizar, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeVaciar):this(metodoAntedDeAñadir,metodoAntesDeAñadirMuchos,metodoAntesDeBorrar,metodoAntesDeBorrarMuchos,metodoAntesDeActualizar,metodoAntesDeVaciar)
         {
             AfegirMolts(valors);
         }
         public void Afegir(TValue value)
         {
 
-
+            if(AntesDeAñadir==null||AntesDeAñadir(this,value))
             try
             {
                 semafor.WaitOne();
@@ -66,8 +85,8 @@ namespace Gabriel.Cat
         }
         public void AfegirMolts(IEnumerable<TValue> values)
         {
-
-            try
+            if (AntesDeAñadirMuchos == null || AntesDeAñadirMuchos(this, values))
+                try
             {
                 semafor.WaitOne();
                 esperando = true;
@@ -94,8 +113,8 @@ namespace Gabriel.Cat
         }
         public void Elimina(TValue value)
         {
-
-            try
+            if (AntesDeBorrar == null || AntesDeBorrar(this, value))
+                try
             {
                 semafor.WaitOne();
                 esperando = true;
@@ -116,7 +135,7 @@ namespace Gabriel.Cat
         }
         public void Elimina(IEnumerable<TValue> values)
         {
-
+            if (AntesDeBorrarMuchos == null || AntesDeBorrarMuchos(this, values))
             try
             {
                 semafor.WaitOne();
@@ -147,8 +166,8 @@ namespace Gabriel.Cat
         }
         public void Elimina(int pos)
         {
-
-            try
+            if (AntesDeBorrar == null || AntesDeBorrar(this,this[pos]))
+                try
             {
                 semafor.WaitOne();
                 esperando = true;
@@ -222,29 +241,12 @@ namespace Gabriel.Cat
         }
         public void Ordena()
         {
-            try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                llista.Sort();
-            }
-            finally
-            {
-                try
-                {
-                    semafor.Release();
-                }
-                finally
-                {
-                    esperando = false;
-                    if (Updated != null)
-                        Updated(this, new EventArgs());
-                }
-            }
+            Ordena(Comparer<TValue>.Default);//por mirar si funciona
         }
         public void Ordena(IComparer<TValue> comparador)
         {
-            try
+            if (AntesDeActualizar == null || AntesDeActualizar(this))
+                try
             {
                 semafor.WaitOne(); 
                 esperando = true;
@@ -266,6 +268,7 @@ namespace Gabriel.Cat
         }
         public void Desordena()
         {
+            if (AntesDeActualizar == null || AntesDeActualizar(this))
             try
             {
                 semafor.WaitOne();
@@ -298,17 +301,20 @@ namespace Gabriel.Cat
         }
         public void Buida()
         {
-            semafor.WaitOne();
-            esperando = true;
-            llista.Clear();
-            semafor.Release();
-            esperando=false;
-            if (llistaOrdenada != null)
-                llistaOrdenada.Buida();
-            if (Updated != null)
-                Updated(this, new EventArgs());
-            if (Removed != null)
-                Removed(this, new EventArgs());
+            if (AntesDeVaciar == null || AntesDeVaciar(this))
+            {
+                semafor.WaitOne();
+                esperando = true;
+                llista.Clear();
+                semafor.Release();
+                esperando = false;
+                if (llistaOrdenada != null)
+                    llistaOrdenada.Buida();
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
+            }
         }
         public TValue this[int pos]
         {
@@ -343,6 +349,7 @@ namespace Gabriel.Cat
             set
             {
 
+                if(AntesDeActualizar==null||AntesDeActualizar(this))
                 try
                 {
                     semafor.WaitOne();
@@ -366,6 +373,7 @@ namespace Gabriel.Cat
         }
         public void InserirEn(int posicio, TValue valor)
         {
+            if(AntesDeAñadir==null||AntesDeAñadir(this,valor))
             try
             {
                 semafor.WaitOne();
