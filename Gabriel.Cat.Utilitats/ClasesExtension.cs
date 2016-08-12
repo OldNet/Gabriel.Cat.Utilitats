@@ -706,41 +706,39 @@ namespace Gabriel.Cat.Extension
         }
         /*Por mirar, revisar que sea optimo y necesario y este bien escrito ;) */
         /// <summary>
-        /// Copia el archivo si no esta en la carpeta (mira el nombre y si esta compara el Hash del archivo)
+        /// Copia el archivo si no esta en la carpeta (mira el nombre)
         /// </summary>
         /// <param name="dir"></param>
         /// <param name="pathArchivo">direccion del archivo en memoria</param>
         /// <returns>devuelve la ruta final del archivo en caso de no existir el archivo devuelve null</returns>
-        public static string HazSitio(this DirectoryInfo dir, string pathArchivo)
+        public static string HazSitio(this DirectoryInfo dir, string pathArchivoHaCopiar)
         {
             string direccionArchivoFinal = null;
-            if (File.Exists(pathArchivo))
+            if (File.Exists(pathArchivoHaCopiar))
             {
 
-                FileInfo fitxerAFerLloc = new FileInfo(pathArchivo);
-                string hashFitxerAFerLloc = fitxerAFerLloc.Sha256();
-                int contadorIguales = 1;
-                bool encontradoPath = false;
-                string nombreArchivo = Path.GetFileNameWithoutExtension(pathArchivo);
-                string extension = Path.GetExtension(pathArchivo);
-                direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + extension;
-                while (File.Exists(direccionArchivoFinal) && !encontradoPath)
-                {
-                    //son iguales en nombre miro el hash
-                    encontradoPath = new FileInfo(direccionArchivoFinal).SHA3Equals(hashFitxerAFerLloc);
-                    if (!encontradoPath)
-                    {
-                        //no son iguales en el hash
-                        direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + "(" + contadorIguales + ")" + extension;
-                        contadorIguales++;
-                    }
-                }
-                if (!File.Exists(direccionArchivoFinal))
-                    File.Copy(pathArchivo, direccionArchivoFinal);
+            	direccionArchivoFinal=dir.DamePathSinUsar(pathArchivoHaCopiar);
+            	File.Copy(pathArchivoHaCopiar,direccionArchivoFinal);
 
             }
 
             return direccionArchivoFinal;
+        }
+        public static string DamePathSinUsar(this DirectoryInfo dir,string pathArchivoHaCopiar)
+        {
+                        FileInfo fitxerAFerLloc = new FileInfo(pathArchivoHaCopiar);
+
+                int contadorIguales = 1;
+                bool encontradoPath = false;
+                string nombreArchivo = Path.GetFileNameWithoutExtension(pathArchivoHaCopiar);
+                string extension = Path.GetExtension(pathArchivoHaCopiar);
+                string direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + extension;
+                while (File.Exists(direccionArchivoFinal) )
+                {
+                        direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + "(" + contadorIguales + ")" + extension;
+                        contadorIguales++;         
+                }
+                return direccionArchivoFinal;
         }
         /// <summary>
         /// Copia el archivo si no esta en el directorio compara el hash de cada archivo de la carpeta.
