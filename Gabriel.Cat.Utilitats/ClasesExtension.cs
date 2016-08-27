@@ -2413,6 +2413,17 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region ByteArrayExtension
+        public static void Invertir(this byte[] array)
+        {
+        	//por testear!!
+        	byte aux;
+        	for(int i=0,f=array.Length/2,j=array.Length-1;i<f;i++,j--)
+        	{
+        		aux=array[i];
+        		array[i]=array[j];
+        		array[j]=aux;
+        	}
+        }
         public static string Hash(this byte[] obj)
         {
             MemoryStream ms = new MemoryStream(obj);
