@@ -2413,6 +2413,36 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region ByteArrayExtension
+        public static long IndexByte(this byte[] array, byte byteAEcontrar)
+        { return IndexByte(array,0,byteAEcontrar); }
+        public static long IndexByte(this byte[] array, long offsetInicio, byte byteAEcontrar)
+        {
+            const long NOENCONTRADO = -1;
+            long indexOf = NOENCONTRADO;
+            unsafe {
+                fixed(byte* prtArray=array)
+                    for (long i = offsetInicio; i < array.Length && indexOf == NOENCONTRADO; i++)
+                    if (prtArray[i] == byteAEcontrar)
+                        indexOf = i;
+            }
+            return indexOf;
+        }
+        public static byte[] SubArray(this byte[] array, long cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static byte[] SubArray(this byte[] array, long inicio , long cantidad)
+        {
+            if (cantidad + inicio > array.Length) throw new ArgumentOutOfRangeException();
+            byte[] subArray = new byte[cantidad];
+            unsafe {
+                fixed(byte* ptrArray=array)
+                    fixed(byte* prtSubArray=subArray)
+                       for (long i = inicio, j = 0; j < cantidad; j++, i++)
+                            prtSubArray[j] = ptrArray[i];
+            }
+            return subArray;
+        }
         public static void Invertir(this byte[] array)
         {
         	//por testear!!
