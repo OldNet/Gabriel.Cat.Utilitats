@@ -13,7 +13,7 @@ namespace Gabriel.Cat
     {
        Llista<KeyValuePair<Bitmap, int>> frames;
         bool animarCiclicamente;
-        bool mostrarPrimerFrameAlAcabar;
+        int frameAlAcabar;
         int index;
         int numeroDeRepeticionesFijas;
         Thread hiloAnimacion;
@@ -22,7 +22,7 @@ namespace Gabriel.Cat
         {
             int i=0;
             numeroDeRepeticionesFijas = 1;
-            mostrarPrimerFrameAlAcabar = true;
+            frameAlAcabar = 0;
             animarCiclicamente = true;
             frames = new Llista<KeyValuePair<Bitmap, int>>();
             if (bmps != null)
@@ -46,6 +46,11 @@ namespace Gabriel.Cat
                 animarCiclicamente = value;
             }
         }
+        public int FrameAlAcabar
+        {
+          get { return frameAlAcabar; }
+            set { frameAlAcabar = Math.Abs(value) % frames.Count; }
+        }
         public int ActualFrameIndex
         {
             get { return this.index; }
@@ -60,12 +65,14 @@ namespace Gabriel.Cat
         {
             get
             {
-                return mostrarPrimerFrameAlAcabar;
+                return frameAlAcabar==0;
             }
 
             set
             {
-                mostrarPrimerFrameAlAcabar = value;
+                if (value)
+                    frameAlAcabar = 0;
+                else frameAlAcabar = frames.Count - 1;
             }
         }
 
@@ -123,8 +130,8 @@ namespace Gabriel.Cat
                     }
                     numeroDeRepeticiones++;
                 } while (numeroDeRepeticiones<numeroDeRepeticionesFijas||animarCiclicamente);
-                if (MostrarPrimerFrameAlAcabar)
-                  FrameChanged(this, frames[0].Key);
+                
+                  FrameChanged(this, frames[frameAlAcabar].Key);
 
 
             });
