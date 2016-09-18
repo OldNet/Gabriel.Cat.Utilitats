@@ -2438,9 +2438,9 @@ namespace Gabriel.Cat.Extension
             unsafe {
                 fixed(byte* ptrArray = array)
                 {
-                    fixed (byte* prtSubArray = subArray)
+                    fixed (byte* ptrSubArray = subArray)
                     {
-                        byte* ptArray = ptrArray, ptSubArray = ptrArray;
+                        byte* ptArray = ptrArray, ptSubArray = ptrSubArray;
                         ptArray += inicio;
                         for (long  j = 0; j < cantidad; j++)
                         {
@@ -2465,17 +2465,23 @@ namespace Gabriel.Cat.Extension
             int espacioTotal = 0;
             for (int i = 0; i < arraysToAdd.Length; i++)
                 espacioTotal += arraysToAdd[i].Length;
-            bytesResult = new byte[espacioTotal];
+            bytesResult = new byte[espacioTotal+array.Length];
             unsafe
             {
-                fixed(byte* ptrArrayResult=bytesResult)
+                fixed(byte* ptrArrayResult=bytesResult,ptrArray=array)
                 {
-                    byte* ptArrayResult = ptrArrayResult, ptArrayToAdd;
-                    for(int i=0;i<arraysToAdd.Length;i++)
+                    byte* ptArrayResult = ptrArrayResult,ptArray=ptrArray, ptArrayToAdd;
+                    for (int i = 0; i < array.Length; i++)//pongo los datos de la primera array
+                    {
+                        *ptArrayResult = *ptArray;
+                        ptArray++;
+                        ptArrayResult++;
+                    }
+                    for(int i=0;i<arraysToAdd.Length;i++)//pongo las demas arrays :D
                     {
                         fixed(byte* ptrArrayToAdd=arraysToAdd[i])
                         {
-                            ptArrayToAdd = ptrArrayResult;
+                            ptArrayToAdd = ptrArrayToAdd;
                             for(int j=0;j<arraysToAdd[i].Length;j++)
                             {
                                 *ptArrayResult = *ptArrayToAdd;
