@@ -2464,7 +2464,8 @@ namespace Gabriel.Cat.Extension
             byte[] bytesResult;
             int espacioTotal = 0;
             for (int i = 0; i < arraysToAdd.Length; i++)
-                espacioTotal += arraysToAdd[i].Length;
+                if(arraysToAdd[i]!=null)
+                   espacioTotal += arraysToAdd[i].Length;
             bytesResult = new byte[espacioTotal+array.Length];
             unsafe
             {
@@ -2479,6 +2480,7 @@ namespace Gabriel.Cat.Extension
                     }
                     for(int i=0;i<arraysToAdd.Length;i++)//pongo las demas arrays :D
                     {
+                        if(arraysToAdd[i]!=null)
                         fixed(byte* ptrArrayToAdd=arraysToAdd[i])
                         {
                             ptArrayToAdd = ptrArrayToAdd;
@@ -2494,7 +2496,96 @@ namespace Gabriel.Cat.Extension
             }
             return bytesResult;
         }
-       
+        public static Hex BuscarArray(this byte[] datos,  byte[] arrayAEncontrar)
+        {
+            return BuscarArray(datos, 0, arrayAEncontrar);
+        }
+        public static void Remove(this byte[] datos, Hex offsetInicio, Hex longitud, byte byteEnBlanco = 0x0)
+        {
+            if (offsetInicio < 0 || longitud < 0 || datos.Length < offsetInicio + longitud)
+                throw new ArgumentException();
+            unsafe
+            {
+                fixed (byte* ptrbytesRom = datos)
+                {
+                    byte* ptbytesRom = ptrbytesRom;
+                    ptbytesRom += offsetInicio;
+                    for (int i = 0, f = longitud; i < f; i++)
+                    {
+                        *ptbytesRom = byteEnBlanco;
+                        ptbytesRom++;
+                    }
+                }
+            }
+        }
+        public static void SetArray(this byte[] datos, Hex offsetIncioArrayDatos, byte[] arrayAPoner)
+        {
+            if (offsetIncioArrayDatos < 0 || arrayAPoner == null || offsetIncioArrayDatos + arrayAPoner.Length > datos.Length)
+                throw new ArgumentException();
+            unsafe
+            {
+                fixed (byte* ptrBytesDatos = datos)
+                {
+                    fixed (byte* ptrBytesSet = arrayAPoner)
+                    {
+                        byte* ptBytesDatos = ptrBytesDatos;
+                        byte* ptBytesSet = ptrBytesDatos;
+                        ptBytesDatos += offsetIncioArrayDatos;
+                        for (int i = 0; i < arrayAPoner.Length; i++)
+                        {
+                            *ptBytesDatos = *ptBytesSet;
+                            ptBytesSet++;
+                            ptBytesDatos++;
+                        }
+                    }
+                }
+
+            }
+        }
+        public static Hex BuscarArray(this byte[] datos,Hex offsetInicio, byte[] arrayAEncontrar)
+        {
+            //por testear!!! no va bien...por arreglar!!
+                if (arrayAEncontrar == null)
+                    throw new ArgumentNullException("bytesAEncontrar");
+            if (offsetInicio + arrayAEncontrar.Length > datos.Length)
+                throw new ArgumentOutOfRangeException();
+            const int DIRECCIONNOENCONTRADO = -1;
+            long direccionBytes = DIRECCIONNOENCONTRADO;
+            long posibleDireccion = DIRECCIONNOENCONTRADO;
+            int posicionBytesAEncontrar = 0;
+            //busco la primera aparicion de esos bytes y
+            unsafe
+            {
+                fixed (byte* prtBytesDatos = datos, ptrBytesAEcontrar = arrayAEncontrar)
+                {
+                    byte* ptBytesDatos = prtBytesDatos;
+                    byte* ptBytesAEcontrar = ptrBytesAEcontrar;
+                    for (long i = offsetInicio; i < datos.Length && direccionBytes == DIRECCIONNOENCONTRADO && i + (arrayAEncontrar.Length - posicionBytesAEncontrar) < datos.Length/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    {
+                        if (*ptBytesDatos == *ptBytesAEcontrar)
+                        {
+                            if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
+                                posibleDireccion = i;//le pongo el inicio
+                            else if (posicionBytesAEncontrar >= arrayAEncontrar.Length)//si es la ultima vez
+                                direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
+                        }
+                        else
+                        {
+                            posibleDireccion = DIRECCIONNOENCONTRADO;
+                            ptBytesAEcontrar = ptrBytesAEcontrar-1;//reinicio la posicion
+                            posicionBytesAEncontrar = -1;
+                        }
+                        if (i < datos.Length)
+                        {
+                            ptBytesAEcontrar++;
+                            ptBytesDatos++;
+                            posicionBytesAEncontrar++;
+                        }
+                    }
+                }
+            }
+            return direccionBytes;
+        }
         public static void Invertir(this byte[] array)
         {
         	//por testear!!
