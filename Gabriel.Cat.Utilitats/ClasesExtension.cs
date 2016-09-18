@@ -2436,23 +2436,73 @@ namespace Gabriel.Cat.Extension
             if (cantidad + inicio > array.Length) throw new ArgumentOutOfRangeException();
             byte[] subArray = new byte[cantidad];
             unsafe {
-                fixed(byte* ptrArray=array)
-                    fixed(byte* prtSubArray=subArray)
-                       for (long i = inicio, j = 0; j < cantidad; j++, i++)
-                            prtSubArray[j] = ptrArray[i];
+                fixed(byte* ptrArray = array)
+                {
+                    fixed (byte* prtSubArray = subArray)
+                    {
+                        byte* ptArray = ptrArray, ptSubArray = ptrArray;
+                        ptArray += inicio;
+                        for (long  j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
             }
             return subArray;
         }
+        public static byte[] AddArray(this byte[] array,params byte[][] arraysToAdd)
+        {
+           
+            if(arraysToAdd==null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            byte[] bytesResult;
+            int espacioTotal = 0;
+            for (int i = 0; i < arraysToAdd.Length; i++)
+                espacioTotal += arraysToAdd[i].Length;
+            bytesResult = new byte[espacioTotal];
+            unsafe
+            {
+                fixed(byte* ptrArrayResult=bytesResult)
+                {
+                    byte* ptArrayResult = ptrArrayResult, ptArrayToAdd;
+                    for(int i=0;i<arraysToAdd.Length;i++)
+                    {
+                        fixed(byte* ptrArrayToAdd=arraysToAdd[i])
+                        {
+                            ptArrayToAdd = ptrArrayResult;
+                            for(int j=0;j<arraysToAdd[i].Length;j++)
+                            {
+                                *ptArrayResult = *ptArrayToAdd;
+                                ptArrayToAdd++;
+                                ptArrayResult++;
+                            }
+                        }
+                    }
+                }
+            }
+            return bytesResult;
+        }
+       
         public static void Invertir(this byte[] array)
         {
         	//por testear!!
         	byte aux;
-        	for(int i=0,f=array.Length/2,j=array.Length-1;i<f;i++,j--)
-        	{
-        		aux=array[i];
-        		array[i]=array[j];
-        		array[j]=aux;
-        	}
+            unsafe
+            {
+                fixed(byte* ptrArray=array)
+                for (int i = 0, f = array.Length / 2, j = array.Length - 1; i < f; i++, j--)
+                {
+                    aux = ptrArray[i];
+                    ptrArray[i] = ptrArray[j];
+                    ptrArray[j] = aux;
+                }
+            }
         }
         public static string Hash(this byte[] obj)
         {
