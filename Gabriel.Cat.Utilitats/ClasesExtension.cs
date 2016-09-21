@@ -1073,7 +1073,7 @@ namespace Gabriel.Cat.Extension
             }
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
-
+            
         }
         public static int LengthBytes(this Bitmap bmp)
         {
