@@ -393,7 +393,7 @@ namespace Gabriel.Cat
 			posicionId = -1;
 			Prioridad = prioridad;
 			dentroPool = false;
-			idUnico = generadorId.Siguiente();
+			idUnico = (int)generadorId.Siguiente();
 			EstadoFaena = EstadoFaenaEnum.Pendiente;
 			esperaTreballFet = new Semaphore(0, 1);
 			dejeDeEsperar = new System.Timers.Timer();

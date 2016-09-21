@@ -265,15 +265,15 @@ namespace Gabriel.Cat
         {
             return numero.numberHex;
         }
-        public static implicit operator int(Hex numero)
+        public static explicit operator int(Hex numero)
         {
             return Convert.ToInt32((string)numero.numberHex, 16);
         }
-        public static implicit operator uint(Hex numero)
+        public static explicit operator uint(Hex numero)
         {
             return Convert.ToUInt32((long)numero);
         }
-        public static implicit operator byte(Hex numero)
+        public static explicit operator byte(Hex numero)
         {
             return Convert.ToByte((int)numero);
         }

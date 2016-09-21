@@ -2415,25 +2415,26 @@ namespace Gabriel.Cat.Extension
         #region ByteArrayExtension
         public static long IndexByte(this byte[] array, byte byteAEcontrar)
         { return IndexByte(array,0,byteAEcontrar); }
-        public static long IndexByte(this byte[] array, long offsetInicio, byte byteAEcontrar)
+        public static long IndexByte(this byte[] array, Hex offsetInicio, byte byteAEcontrar)
         {
             const long NOENCONTRADO = -1;
             long indexOf = NOENCONTRADO;
+            long inicio = offsetInicio;//por si peta que no sea con el fixed
             unsafe {
                 fixed(byte* prtArray=array)
-                    for (long i = offsetInicio; i < array.Length && indexOf == NOENCONTRADO; i++)
+                    for (long i = inicio; i < array.Length && indexOf == NOENCONTRADO; i++)
                     if (prtArray[i] == byteAEcontrar)
                         indexOf = i;
             }
             return indexOf;
         }
-        public static byte[] SubArray(this byte[] array, long cantidad)
+        public static byte[] SubArray(this byte[] array, Hex cantidad)
         {
             return SubArray(array, 0, cantidad);
         }
-        public static byte[] SubArray(this byte[] array, long inicio , long cantidad)
+        public static byte[] SubArray(this byte[] array, Hex inicio , Hex cantidad)
         {
-            if (cantidad + inicio > array.Length) throw new ArgumentOutOfRangeException();
+            if (cantidad + inicio > array.LongLength) throw new ArgumentOutOfRangeException();
             byte[] subArray = new byte[cantidad];
             unsafe {
                 fixed(byte* ptrArray = array)
@@ -2441,7 +2442,7 @@ namespace Gabriel.Cat.Extension
                     fixed (byte* ptrSubArray = subArray)
                     {
                         byte* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;
+                        ptArray += inicio;//asigno el inicio aqui :D
                         for (long  j = 0; j < cantidad; j++)
                         {
                             *ptSubArray = *ptArray;
@@ -2502,7 +2503,7 @@ namespace Gabriel.Cat.Extension
         }
         public static void Remove(this byte[] datos, Hex offsetInicio, Hex longitud, byte byteEnBlanco = 0x0)
         {
-            if (offsetInicio < 0 || longitud < 0 || datos.Length < offsetInicio + longitud)
+            if (offsetInicio < 0 || longitud < 0 || datos.LongLength < offsetInicio + longitud)
                 throw new ArgumentException();
             unsafe
             {
@@ -2510,7 +2511,7 @@ namespace Gabriel.Cat.Extension
                 {
                     byte* ptbytesRom = ptrbytesRom;
                     ptbytesRom += offsetInicio;
-                    for (int i = 0, f = longitud; i < f; i++)
+                    for (long i = 0, f = longitud; i < f; i++)
                     {
                         *ptbytesRom = byteEnBlanco;
                         ptbytesRom++;
@@ -2520,7 +2521,7 @@ namespace Gabriel.Cat.Extension
         }
         public static void SetArray(this byte[] datos, Hex offsetIncioArrayDatos, byte[] arrayAPoner)
         {
-            if (offsetIncioArrayDatos < 0 || arrayAPoner == null || offsetIncioArrayDatos + arrayAPoner.Length > datos.Length)
+            if (offsetIncioArrayDatos < 0 || arrayAPoner == null || offsetIncioArrayDatos + arrayAPoner.LongLength > datos.LongLength)
                 throw new ArgumentException();
             unsafe
             {
@@ -2530,8 +2531,8 @@ namespace Gabriel.Cat.Extension
                     {
                         byte* ptBytesDatos = ptrBytesDatos;
                         byte* ptBytesSet = ptrBytesDatos;
-                        ptBytesDatos += offsetIncioArrayDatos;
-                        for (int i = 0; i < arrayAPoner.Length; i++)
+                        ptBytesDatos += offsetIncioArrayDatos;//pongo el inicio :)
+                        for (long i = 0,f= arrayAPoner.LongLength; i <f ; i++)
                         {
                             *ptBytesDatos = *ptBytesSet;
                             ptBytesSet++;
@@ -2547,12 +2548,12 @@ namespace Gabriel.Cat.Extension
             //por testear!!! no va bien...por arreglar!!
                 if (arrayAEncontrar == null)
                     throw new ArgumentNullException("bytesAEncontrar");
-            if (offsetInicio + arrayAEncontrar.Length > datos.Length)
+            if (offsetInicio + arrayAEncontrar.LongLength > datos.LongLength)
                 throw new ArgumentOutOfRangeException();
-            const int DIRECCIONNOENCONTRADO = -1;
+            const long DIRECCIONNOENCONTRADO = -1;
             long direccionBytes = DIRECCIONNOENCONTRADO;
             long posibleDireccion = DIRECCIONNOENCONTRADO;
-            int posicionBytesAEncontrar = 0;
+            long posicionBytesAEncontrar = 0;
             //busco la primera aparicion de esos bytes y
             unsafe
             {
@@ -2560,27 +2561,26 @@ namespace Gabriel.Cat.Extension
                 {
                     byte* ptBytesDatos = prtBytesDatos;
                     byte* ptBytesAEcontrar = ptrBytesAEcontrar;
-                    for (long i = offsetInicio; i < datos.Length && direccionBytes == DIRECCIONNOENCONTRADO && i + (arrayAEncontrar.Length - posicionBytesAEncontrar) < datos.Length/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    for (long i = offsetInicio,finDatos=datos.LongLength,finArrayAEncontrar=arrayAEncontrar.LongLength,posicionFinArrayAEcontrar=finArrayAEncontrar-1; i < finDatos && direccionBytes == DIRECCIONNOENCONTRADO && i + (finArrayAEncontrar - posicionBytesAEncontrar) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
                     {
                         if (*ptBytesDatos == *ptBytesAEcontrar)
                         {
                             if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
                                 posibleDireccion = i;//le pongo el inicio
-                            else if (posicionBytesAEncontrar >= arrayAEncontrar.Length)//si es la ultima vez
+                            else if (posicionBytesAEncontrar > posicionFinArrayAEcontrar)//si es la ultima vez
                                 direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
+
+                            ptBytesAEcontrar++;
+                            posicionBytesAEncontrar++;
                         }
                         else
                         {
                             posibleDireccion = DIRECCIONNOENCONTRADO;
-                            ptBytesAEcontrar = ptrBytesAEcontrar-1;//reinicio la posicion
-                            posicionBytesAEncontrar = -1;
+                            ptBytesAEcontrar = ptrBytesAEcontrar;//reinicio la posicion
+                            posicionBytesAEncontrar = 0;
                         }
-                        if (i < datos.Length)
-                        {
-                            ptBytesAEcontrar++;
-                            ptBytesDatos++;
-                            posicionBytesAEncontrar++;
-                        }
+                        ptBytesDatos++;
+
                     }
                 }
             }
