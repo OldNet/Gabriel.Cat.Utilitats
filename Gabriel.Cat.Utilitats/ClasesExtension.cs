@@ -1019,14 +1019,11 @@ namespace Gabriel.Cat.Extension
             pngAnimated.Add(fotogramas);
             return pngAnimated;
         }
-        public static MemoryStream ToStream(this Bitmap bmp)
+        public static MemoryStream ToStream(this Bitmap bmp,bool useRawFormat=false)
         {
             MemoryStream memory;
-
-               // memory = ToStream(bmp, bmp.RawFormat);//no se porque aun pero no funciona...mejor pasarla a png
-
-                memory = ToStream(bmp, ImageFormat.Png);
-            
+            ImageFormat format = useRawFormat ? bmp.RawFormat : ImageFormat.Png;//no se porque aun pero no funciona...mejor pasarla a png
+            memory = ToStream(bmp,format);
             return memory;
 
         }
@@ -1082,8 +1079,12 @@ namespace Gabriel.Cat.Extension
         }
         public static bool IsArgb(this Bitmap bmp)
         {
+            return bmp.PixelFormat.IsArgb();
+        }
+        public static bool IsArgb(this PixelFormat format)
+        {
             bool isArgb = false;
-            switch (bmp.PixelFormat)
+            switch (format)
             {
                 case PixelFormat.Format16bppArgb1555:
                 case PixelFormat.Format32bppArgb:
@@ -1095,7 +1096,6 @@ namespace Gabriel.Cat.Extension
             }
             return isArgb;
         }
-
         #endregion
         #region ColorMatrizExtension
         public static Bitmap ToBitmap(this Color[,] matrizColor)
