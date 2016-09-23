@@ -95,7 +95,7 @@ namespace Gabriel.Cat
         public bool Equals(Hex other)
         {
             // add comparisions for all members here
-            return this.numberHex == other.numberHex;
+            return this.numberHex.Equals(other.numberHex);
         }
         public override string ToString()
         {
@@ -110,12 +110,12 @@ namespace Gabriel.Cat
 
         public static bool operator ==(Hex left, Hex right)
         {
-            return left.Equals(right);
+            return ((long)left)==((long)right);
         }
 
         public static bool operator !=(Hex left, Hex right)
         {
-            return !left.Equals(right);
+            return !(left==right);
         }
         public static Hex operator +(Hex left, Hex right)
         {
@@ -230,17 +230,17 @@ namespace Gabriel.Cat
         }
         public static implicit operator Hex(int numero)
         {
-            return new Hex(QuitaCerosInutiles(numero.ToString("X2")));
+            return (long)numero;
         }
         public static implicit operator Hex(byte numero)
         {
-            return (int)numero;
+            return (long)numero;
         }
         public static explicit operator Hex(byte[] numero)
         {
             string numHex = "";
             for (int i = 0; i < numero.Length; i++)
-                numHex += ((Hex)numero[i]).Number.PadLeft(2,'0');
+                numHex += ((Hex)numero[i]).Number.PadLeft(2, '0');
             return (Hex)numHex;
         }
         public static implicit operator Hex(uint numero)

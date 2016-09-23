@@ -2501,6 +2501,60 @@ namespace Gabriel.Cat.Extension
         {
             return BuscarArray(datos, 0, arrayAEncontrar);
         }
+
+        public static Hex BuscarArray(this byte[] datos,Hex offsetInicio, byte[] arrayAEncontrar)
+        {
+            //por testear!!! no va bien...por arreglar!!
+                if (arrayAEncontrar == null)
+                    throw new ArgumentNullException("bytesAEncontrar");
+            if (offsetInicio<0||offsetInicio + arrayAEncontrar.LongLength > datos.LongLength)
+                throw new ArgumentOutOfRangeException();
+            const long DIRECCIONNOENCONTRADO = -1;
+            long direccionBytes = DIRECCIONNOENCONTRADO;
+            long posibleDireccion = DIRECCIONNOENCONTRADO;
+            long posicionBytesAEncontrar = 0;
+            //busco la primera aparicion de esos bytes a partir del offset dado como parametro
+            unsafe
+            {
+                fixed (byte* ptrBytesDatos = datos, ptrBytesAEcontrar = arrayAEncontrar)
+                {
+                    byte* ptBytesDatos = ptrBytesDatos;
+                    byte* ptBytesAEcontrar = ptrBytesAEcontrar;
+                    for (long i = offsetInicio,finDatos=datos.LongLength,finArrayAEncontrar=arrayAEncontrar.LongLength,posicionFinArrayAEcontrar=finArrayAEncontrar-1; i < finDatos && direccionBytes == DIRECCIONNOENCONTRADO && i + (finArrayAEncontrar-1 - posicionBytesAEncontrar) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    {
+                        if (*ptBytesDatos == *ptBytesAEcontrar)//si no es el siguiente va al otro pero si es el primero se lo salta como si fuese malo...
+                        {
+                            if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
+                                posibleDireccion = i;//le pongo el inicio
+                            else if (posicionBytesAEncontrar== posicionFinArrayAEcontrar)//si es la última vez
+                                direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
+
+                            ptBytesAEcontrar++;
+                            posicionBytesAEncontrar++;
+                        }
+                        else
+                        {
+                            posibleDireccion = DIRECCIONNOENCONTRADO;
+                            ptBytesAEcontrar = ptrBytesAEcontrar;//reinicio la posicion
+                            posicionBytesAEncontrar = 0;
+                            if (*ptBytesDatos == *ptBytesAEcontrar)//si no es el siguiente va al otro pero si es el primero se lo salta como si fuese malo...asi lo arreglo :D
+                            {
+                                if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
+                                    posibleDireccion = i;//le pongo el inicio
+                                else if (posicionBytesAEncontrar == posicionFinArrayAEcontrar)//si es la última vez
+                                    direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
+
+                                ptBytesAEcontrar++;
+                                posicionBytesAEncontrar++;
+                            }
+                        }
+                        ptBytesDatos++;
+
+                    }
+                }
+            }
+            return direccionBytes;
+        }
         public static void Remove(this byte[] datos, Hex offsetInicio, Hex longitud, byte byteEnBlanco = 0x0)
         {
             if (offsetInicio < 0 || longitud < 0 || datos.LongLength < offsetInicio + longitud)
@@ -2521,70 +2575,7 @@ namespace Gabriel.Cat.Extension
         }
         public static void SetArray(this byte[] datos, Hex offsetIncioArrayDatos, byte[] arrayAPoner)
         {
-            if (offsetIncioArrayDatos < 0 || arrayAPoner == null || offsetIncioArrayDatos + arrayAPoner.LongLength > datos.LongLength)
-                throw new ArgumentException();
-            unsafe
-            {
-                fixed (byte* ptrBytesDatos = datos)
-                {
-                    fixed (byte* ptrBytesSet = arrayAPoner)
-                    {
-                        byte* ptBytesDatos = ptrBytesDatos;
-                        byte* ptBytesSet = ptrBytesDatos;
-                        ptBytesDatos += offsetIncioArrayDatos;//pongo el inicio :)
-                        for (long i = 0,f= arrayAPoner.LongLength; i <f ; i++)
-                        {
-                            *ptBytesDatos = *ptBytesSet;
-                            ptBytesSet++;
-                            ptBytesDatos++;
-                        }
-                    }
-                }
-
-            }
-        }
-        public static Hex BuscarArray(this byte[] datos,Hex offsetInicio, byte[] arrayAEncontrar)
-        {
-            //por testear!!! no va bien...por arreglar!!
-                if (arrayAEncontrar == null)
-                    throw new ArgumentNullException("bytesAEncontrar");
-            if (offsetInicio + arrayAEncontrar.LongLength > datos.LongLength)
-                throw new ArgumentOutOfRangeException();
-            const long DIRECCIONNOENCONTRADO = -1;
-            long direccionBytes = DIRECCIONNOENCONTRADO;
-            long posibleDireccion = DIRECCIONNOENCONTRADO;
-            long posicionBytesAEncontrar = 0;
-            //busco la primera aparicion de esos bytes y
-            unsafe
-            {
-                fixed (byte* prtBytesDatos = datos, ptrBytesAEcontrar = arrayAEncontrar)
-                {
-                    byte* ptBytesDatos = prtBytesDatos;
-                    byte* ptBytesAEcontrar = ptrBytesAEcontrar;
-                    for (long i = offsetInicio,finDatos=datos.LongLength,finArrayAEncontrar=arrayAEncontrar.LongLength,posicionFinArrayAEcontrar=finArrayAEncontrar-1; i < finDatos && direccionBytes == DIRECCIONNOENCONTRADO && i + (finArrayAEncontrar - posicionBytesAEncontrar) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
-                    {
-                        if (*ptBytesDatos == *ptBytesAEcontrar)
-                        {
-                            if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
-                                posibleDireccion = i;//le pongo el inicio
-                            else if (posicionBytesAEncontrar > posicionFinArrayAEcontrar)//si es la ultima vez
-                                direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
-
-                            ptBytesAEcontrar++;
-                            posicionBytesAEncontrar++;
-                        }
-                        else
-                        {
-                            posibleDireccion = DIRECCIONNOENCONTRADO;
-                            ptBytesAEcontrar = ptrBytesAEcontrar;//reinicio la posicion
-                            posicionBytesAEncontrar = 0;
-                        }
-                        ptBytesDatos++;
-
-                    }
-                }
-            }
-            return direccionBytes;
+            Buffer.BlockCopy(arrayAPoner, 0, datos, (int)offsetIncioArrayDatos, arrayAPoner.Length);  
         }
         public static void Invertir(this byte[] array)
         {
