@@ -81,6 +81,7 @@
     <Compile Include="Temporizador.cs" />
     <Compile Include="text.cs" />
     <Compile Include="TwoKeysList.cs" />
+    <Compile Include="UnsafeArray.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

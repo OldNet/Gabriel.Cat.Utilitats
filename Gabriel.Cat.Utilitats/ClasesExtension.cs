@@ -2413,6 +2413,10 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region ByteArrayExtension
+        public static void UnsafeMethod(this byte[] array,MetodoUnsafeArray metodo)
+        {
+            UnsafeArray.Usar(array, metodo);
+        }
         public static long IndexByte(this byte[] array, byte byteAEcontrar)
         { return IndexByte(array,0,byteAEcontrar); }
         public static long IndexByte(this byte[] array, Hex offsetInicio, byte byteAEcontrar)
@@ -2421,10 +2425,12 @@ namespace Gabriel.Cat.Extension
             long indexOf = NOENCONTRADO;
             long inicio = offsetInicio;//por si peta que no sea con el fixed
             unsafe {
-                fixed(byte* prtArray=array)
-                    for (long i = inicio; i < array.Length && indexOf == NOENCONTRADO; i++)
-                    if (prtArray[i] == byteAEcontrar)
-                        indexOf = i;
+                array.UnsafeMethod((unsArray) => { 
+
+                    for (long i = inicio; i < unsArray.Length && indexOf == NOENCONTRADO; i++)
+                        if (unsArray[i] == byteAEcontrar)
+                            indexOf = i;
+                });
             }
             return indexOf;
         }
