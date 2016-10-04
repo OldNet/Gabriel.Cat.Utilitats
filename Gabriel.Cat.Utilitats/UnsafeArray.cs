@@ -67,7 +67,7 @@ namespace Gabriel.Cat
                 //lanzo la excepcion en un contexto seguro :D asi no hay problemas con los pointers
                 if (exAux != null)
                     throw exAux;
-        }
+            } }
 
     }
 }

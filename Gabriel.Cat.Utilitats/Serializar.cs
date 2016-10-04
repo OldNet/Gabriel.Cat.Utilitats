@@ -31,12 +31,14 @@ namespace Gabriel.Cat
 		public const string BOOLEANASSEMBLYNAME = "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
 		public const string BITMAPASSEMBLYNAME = "System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 		public const string UINTASSEMBLYNAME = "System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
-        public const string POINTASSEMBLYNAME = "System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-        public const string COLORASSEMBLYNAME = "System.Drawing.Color, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";//por mirar
-        //mis clases
-        public const string POINTZASSEMBLYNAME = "Gabriel.Cat.PointZ, Gabriel.Cat.Utilitats, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";//mientras no le cambie esta info sera valida...
-        //se añade la constante en la lista :D
-        public static readonly string[] AsseblyQualifiedNameTiposMicrosoft = new String[] {
+		public const string POINTASSEMBLYNAME = "System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+		public const string COLORASSEMBLYNAME = "System.Drawing.Color, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+//por mirar
+		//mis clases
+		public const string POINTZASSEMBLYNAME = "Gabriel.Cat.PointZ, Gabriel.Cat.Utilitats, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+//mientras no le cambie esta info sera valida...
+		//se añade la constante en la lista :D
+		public static readonly string[] AsseblyQualifiedNameTiposMicrosoft = new String[] {
 			STRINGASSEMBLYNAME,
 			INTASSEMBLYNAME,
 			SHORTASSEMBLYNAME,
@@ -52,9 +54,9 @@ namespace Gabriel.Cat
 			BITMAPASSEMBLYNAME,
 			UINTASSEMBLYNAME,
 			BYTEASSEMBLYNAME,
-            POINTASSEMBLYNAME,
-            POINTZASSEMBLYNAME,
-            COLORASSEMBLYNAME
+			POINTASSEMBLYNAME,
+			POINTZASSEMBLYNAME,
+			COLORASSEMBLYNAME
 		};
 		#endregion
 		//Si se añaden mas se tiene que dar de alta aqui :D y en el metodo ToTipoAceptado y GetBytes(TipoAceptado,Object)
@@ -75,16 +77,16 @@ namespace Gabriel.Cat
 			DateTime,
 			String,
 			Bitmap,
-            Point,
-            PointZ,
-            Color
+			Point,
+			PointZ,
+			Color
 		}
 
 
 
 
-        //la clase es para convertir a byte[] los objetos
-        #region GetBytes
+		//la clase es para convertir a byte[] los objetos
+		#region GetBytes
 
 		public static byte[] GetBytes(IEnumerable<Object> objsTipoAceptado)
 		{
@@ -98,15 +100,15 @@ namespace Gabriel.Cat
 		{
 			TiposAceptados tipo = GetType(objTipoAceptado);
 			byte[] bytes = new byte[] { };
-				try {
+			try {
 				switch (tipo) {
-                    case TiposAceptados.Point:
-                        bytes = GetBytes((Point)objTipoAceptado);
-                        break;
-                    case TiposAceptados.PointZ:
-                        bytes = GetBytes((PointZ)objTipoAceptado);
-                        break;
-                    case TiposAceptados.Bool:
+					case TiposAceptados.Point:
+						bytes = GetBytes((Point)objTipoAceptado);
+						break;
+					case TiposAceptados.PointZ:
+						bytes = GetBytes((PointZ)objTipoAceptado);
+						break;
+					case TiposAceptados.Bool:
 						bytes = GetBytes((bool)objTipoAceptado);
 						break;
 					case TiposAceptados.Short:
@@ -148,10 +150,12 @@ namespace Gabriel.Cat
 					case TiposAceptados.Byte:
 						bytes = GetBytes((byte)objTipoAceptado);
 						break;
-                    case TiposAceptados.Null:
-                        bytes = new byte[] { 0x00 };break;
-                    case TiposAceptados.Color:
-                        bytes = GetBytes((Color)objTipoAceptado);break;
+					case TiposAceptados.Null:
+						bytes = new byte[] { 0x00 };
+						break;
+					case TiposAceptados.Color:
+						bytes = GetBytes((Color)objTipoAceptado);
+						break;
 				}
 			} catch {
 				throw new Exception("El objeto no es del tipo indicado como parametro");
@@ -165,101 +169,105 @@ namespace Gabriel.Cat
 		/// <returns></returns>
 		public static TiposAceptados GetType(object obj)
 		{
-            return obj != null ? AssemblyToEnumTipoAceptado(obj.GetType().AssemblyQualifiedName) : TiposAceptados.Null;
+			return obj != null ? AssemblyToEnumTipoAceptado(obj.GetType().AssemblyQualifiedName) : TiposAceptados.Null;
 		}
-        public static TiposAceptados AssemblyToEnumTipoAceptado(string assemblyName)
-        {
-            TiposAceptados tipo = TiposAceptados.Null;
-            switch (assemblyName)
-            {
-                //todos los tiposAceptados :)
-                case Serializar.BITMAPASSEMBLYNAME:
-                    tipo = TiposAceptados.Bitmap;
-                    break;
-                case Serializar.BOOLEANASSEMBLYNAME:
-                    tipo = TiposAceptados.Bool;
-                    break;
-                case Serializar.BYTEASSEMBLYNAME:
-                    tipo = TiposAceptados.Byte;
-                    break;
-                case Serializar.CHARASSEMBLYNAME:
-                    tipo = TiposAceptados.Char;
-                    break;
-                case Serializar.DATETIMEASSEMBLYNAME:
-                    tipo = TiposAceptados.DateTime;
-                    break;
-                case Serializar.DOUBLEASSEMBLYNAME:
-                    tipo = TiposAceptados.Double;
-                    break;
-                case Serializar.FLOATASSEMBLYNAME:
-                    tipo = TiposAceptados.Float;
-                    break;
-                case Serializar.INTASSEMBLYNAME:
-                    tipo = TiposAceptados.Int;
-                    break;
-                case Serializar.LONGASSEMBLYNAME:
-                    tipo = TiposAceptados.Long;
-                    break;
-                case Serializar.SHORTASSEMBLYNAME:
-                    tipo = TiposAceptados.Short;
-                    break;
-                case Serializar.STRINGASSEMBLYNAME:
-                    tipo = TiposAceptados.String;
-                    break;
-                case Serializar.UINTASSEMBLYNAME:
-                    tipo = TiposAceptados.UInt;
-                    break;
-                case Serializar.ULONGASSEMBLYNAME:
-                    tipo = TiposAceptados.ULong;
-                    break;
-                case Serializar.USHORTASSEMBLYNAME:
-                    tipo = TiposAceptados.UShort;
-                    break;
-                case Serializar.POINTASSEMBLYNAME:
-                    tipo = TiposAceptados.Point;
-                    break;
-                case Serializar.POINTZASSEMBLYNAME:
-                    tipo = TiposAceptados.PointZ;
-                    break;
-                case Serializar.COLORASSEMBLYNAME:
-                    tipo = TiposAceptados.Color;
-                    break;
-            }
-            return tipo;
-        }
-        public static byte[] GetBytes(Color color)
-        {
-            return new byte[] {color.A,color.R,color.G,color.B };
-        }
-        public static byte[] GetBytes(Point point)
-        {
-            return GetBytes(new PointZ(point.X, point.Y, 0)).SubArray(0,8);
-        }
-        public static byte[] GetBytes(PointZ point)
-        {
-            List<byte> bytesPoint = new List<byte>();
-            bytesPoint.AddRange(GetBytes(point.X));
-            bytesPoint.AddRange(GetBytes(point.Y));
-            bytesPoint.AddRange(GetBytes(point.Z));
-            return bytesPoint.ToArray();
+		public static TiposAceptados AssemblyToEnumTipoAceptado(string assemblyName)
+		{
+			TiposAceptados tipo = TiposAceptados.Null;
+			switch (assemblyName) {
+			//todos los tiposAceptados :)
+				case Serializar.BITMAPASSEMBLYNAME:
+					tipo = TiposAceptados.Bitmap;
+					break;
+				case Serializar.BOOLEANASSEMBLYNAME:
+					tipo = TiposAceptados.Bool;
+					break;
+				case Serializar.BYTEASSEMBLYNAME:
+					tipo = TiposAceptados.Byte;
+					break;
+				case Serializar.CHARASSEMBLYNAME:
+					tipo = TiposAceptados.Char;
+					break;
+				case Serializar.DATETIMEASSEMBLYNAME:
+					tipo = TiposAceptados.DateTime;
+					break;
+				case Serializar.DOUBLEASSEMBLYNAME:
+					tipo = TiposAceptados.Double;
+					break;
+				case Serializar.FLOATASSEMBLYNAME:
+					tipo = TiposAceptados.Float;
+					break;
+				case Serializar.INTASSEMBLYNAME:
+					tipo = TiposAceptados.Int;
+					break;
+				case Serializar.LONGASSEMBLYNAME:
+					tipo = TiposAceptados.Long;
+					break;
+				case Serializar.SHORTASSEMBLYNAME:
+					tipo = TiposAceptados.Short;
+					break;
+				case Serializar.STRINGASSEMBLYNAME:
+					tipo = TiposAceptados.String;
+					break;
+				case Serializar.UINTASSEMBLYNAME:
+					tipo = TiposAceptados.UInt;
+					break;
+				case Serializar.ULONGASSEMBLYNAME:
+					tipo = TiposAceptados.ULong;
+					break;
+				case Serializar.USHORTASSEMBLYNAME:
+					tipo = TiposAceptados.UShort;
+					break;
+				case Serializar.POINTASSEMBLYNAME:
+					tipo = TiposAceptados.Point;
+					break;
+				case Serializar.POINTZASSEMBLYNAME:
+					tipo = TiposAceptados.PointZ;
+					break;
+				case Serializar.COLORASSEMBLYNAME:
+					tipo = TiposAceptados.Color;
+					break;
+			}
+			return tipo;
+		}
+		public static byte[] GetBytes(Color color)
+		{
+			return new byte[] { color.A, color.R, color.G, color.B };
+		}
+		public static byte[] GetBytes(Point point)
+		{
+			return GetBytes(new PointZ(point.X, point.Y, 0)).SubArray(0, 8);
+		}
+		public static byte[] GetBytes(PointZ point)
+		{
+			List<byte> bytesPoint = new List<byte>();
+			bytesPoint.AddRange(GetBytes(point.X));
+			bytesPoint.AddRange(GetBytes(point.Y));
+			bytesPoint.AddRange(GetBytes(point.Z));
+			return bytesPoint.ToArray();
 
-        }
-        //mirar de poder serializar null
-        public static byte[] GetBytes(Bitmap img)
-		{
-            return GetBytes(img,img.RawFormat);
 		}
-        public static byte[] GetBytes(Bitmap img,System.Drawing.Imaging.ImageFormat formato)
-        {
-            return img.ToStream(formato).GetAllBytes();
-        }
-		public static byte[] GetBytes(string text)
+		//mirar de poder serializar null
+		public static byte[] GetBytes(Bitmap img)
 		{
-			return Encoding.UTF8.GetBytes(text);
+			return GetBytes(img, img.RawFormat);
 		}
+		public static byte[] GetBytes(Bitmap img, System.Drawing.Imaging.ImageFormat formato)
+		{
+			return img.ToStream(formato).GetAllBytes();
+		}
+
+		public	static byte[] GetBytes(string str)
+		{
+			byte[] bytes = new byte[str.Length * sizeof(char)];
+			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+			return bytes;
+		}
+
+
 		public static byte[] GetBytes(char caracter)
 		{
-			return Encoding.UTF8.GetBytes(new char[] { caracter });
+			return GetBytes(caracter + "");
 		}
 		public static byte[] GetBytes(DateTime data)
 		{
@@ -346,39 +354,40 @@ namespace Gabriel.Cat
 					obj = ToFloat(ms.Read(8));
 					break;
 				case TiposAceptados.Char:
-					obj=ToChar(ms.Read(1));
+					obj = ToChar(ms.Read(1));
 					break;
 				case TiposAceptados.DateTime:
-					obj=ToDateTime(ms.Read(4));
+					obj = ToDateTime(ms.Read(4));
 					break;
-                case TiposAceptados.Point:
-                    obj = ToPoint(ms.Read(8));
-                    break;
-                case TiposAceptados.PointZ:
-                    obj = ToPointZ(ms.Read(12));
-                    break;
-                case TiposAceptados.String:
-					obj=ToString(ms.Read(ToLong(ms.Read(8))));
+				case TiposAceptados.Point:
+					obj = ToPoint(ms.Read(8));
+					break;
+				case TiposAceptados.PointZ:
+					obj = ToPointZ(ms.Read(12));
+					break;
+				case TiposAceptados.String:
+					obj = ToString(ms.Read(ToLong(ms.Read(8))));
 					break;
 				case TiposAceptados.Bitmap:
-					obj=ToBitmap(ms.Read(ToLong(ms.Read(8))));
+					obj = ToBitmap(ms.Read(ToLong(ms.Read(8))));
 					break;
-                case TiposAceptados.Color:
-                    obj = ToColor(ms.Read(4));break;
+				case TiposAceptados.Color:
+					obj = ToColor(ms.Read(4));
+					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
 			return obj;
 		}
 
-        public static T ToObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, Stream ms)
-        {
-            return (T)ToObjetoAceptado(objHaLeer, ms);
-        }
-        public static Object ToTipoAceptado(string assemblyQualifiedName, byte[] bytesTipo)
-        {
-            return ToTipoAceptado(Serializar.AssemblyToEnumTipoAceptado(assemblyQualifiedName),bytesTipo);
-        }
+		public static T ToObjetoAceptadoTipado<T>(TiposAceptados objHaLeer, Stream ms)
+		{
+			return (T)ToObjetoAceptado(objHaLeer, ms);
+		}
+		public static Object ToTipoAceptado(string assemblyQualifiedName, byte[] bytesTipo)
+		{
+			return ToTipoAceptado(Serializar.AssemblyToEnumTipoAceptado(assemblyQualifiedName), bytesTipo);
+		}
             
 		/// <summary>
 		/// Convierte a obj los bytes al tipo especificado
@@ -389,32 +398,32 @@ namespace Gabriel.Cat
 		public static Object ToTipoAceptado(TiposAceptados tipo, byte[] bytesTipo)
 		{
 			Object obj = null;
-            Stream str = new MemoryStream(bytesTipo);
-            obj = ToObjetoAceptado(tipo, str);
-            str.Close();
+			Stream str = new MemoryStream(bytesTipo);
+			obj = ToObjetoAceptado(tipo, str);
+			str.Close();
 			return obj;
 		}
-        public static T ToTipoAceptadoTipado<T>(TiposAceptados tipo, byte[] bytesTipo)
-        {
-            return (T)ToTipoAceptado(tipo,bytesTipo);
-        }
-        #region Desserializar Medida Fija
-        public static Color ToColor(byte[] bytesObj)
-        {
-            if (bytesObj.Length != 4)
-                throw new ArgumentException("Un color consta de 4 bytes ARGB");
-            return Color.FromArgb(bytesObj[0], bytesObj[1], bytesObj[2], bytesObj[3]);
-        }
-        public static PointZ ToPointZ(byte[] bytesObj)
-        {
-            return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubArray(8)));
-        }
+		public static T ToTipoAceptadoTipado<T>(TiposAceptados tipo, byte[] bytesTipo)
+		{
+			return (T)ToTipoAceptado(tipo, bytesTipo);
+		}
+		#region Desserializar Medida Fija
+		public static Color ToColor(byte[] bytesObj)
+		{
+			if (bytesObj.Length != 4)
+				throw new ArgumentException("Un color consta de 4 bytes ARGB");
+			return Color.FromArgb(bytesObj[0], bytesObj[1], bytesObj[2], bytesObj[3]);
+		}
+		public static PointZ ToPointZ(byte[] bytesObj)
+		{
+			return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubArray(8)));
+		}
 
-        public static Point ToPoint(byte[] bytesObj)
-        {
-            return new Point(ToInt(bytesObj), ToInt(bytesObj.SubArray(4)));
-        }
-        public static bool ToBoolean(byte[] boolean)
+		public static Point ToPoint(byte[] bytesObj)
+		{
+			return new Point(ToInt(bytesObj), ToInt(bytesObj.SubArray(4)));
+		}
+		public static bool ToBoolean(byte[] boolean)
 		{
 			return BitConverter.ToBoolean(boolean, 0);
 		}
@@ -450,42 +459,43 @@ namespace Gabriel.Cat
 		{
 			return BitConverter.ToUInt16(numero, 0);
 		}
-        public static DateTime ToDateTime(byte[] data)
+		public static DateTime ToDateTime(byte[] data)
 		{
 			return new DateTime(ToLong(data));
 		}
-        public static char ToChar(byte[] caracter)
+		public static char ToChar(byte[] caracter)
 		{
-			return Encoding.UTF8.GetString(caracter)[0];
+			return ToString(caracter)[0];
 		}
-        #endregion
-        #region Deserializar medias dynamicas
-        /// <summary>
-        /// int,int,int,byte[](los bytes que queden)[datos img]
-        /// </summary>
-        /// <param name="bytesImgSerializada"></param>
-        /// <returns></returns>
-        public static Bitmap ToBitmap(byte[] bytesImgSerializada)
+		#endregion
+		#region Deserializar medias dynamicas
+		/// <summary>
+		/// int,int,int,byte[](los bytes que queden)[datos img]
+		/// </summary>
+		/// <param name="bytesImgSerializada"></param>
+		/// <returns></returns>
+		public static Bitmap ToBitmap(byte[] bytesImgSerializada)
 		{
-			Bitmap imgDeserializada=null;
-            try
-            {
-                imgDeserializada = new Bitmap(new MemoryStream(bytesImgSerializada));
-            }
-            catch { }
-            return imgDeserializada;
+			Bitmap imgDeserializada = null;
+			try {
+				imgDeserializada = new Bitmap(new MemoryStream(bytesImgSerializada));
+			} catch {
+			}
+			return imgDeserializada;
 			
 		}
 
 
-		public static string ToString(byte[] text)
+		public static string ToString(byte[] bytes)
 		{
-			return Encoding.UTF8.GetString(text);
+			char[] chars = new char[bytes.Length / sizeof(char)];
+			System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+			return new string(chars);
 		}
 		#endregion
 
-        #endregion
+		#endregion
 
 
-    }
+	}
 }
