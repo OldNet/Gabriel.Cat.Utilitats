@@ -258,7 +258,7 @@ namespace Gabriel.Cat
 		}
 
 		public	static byte[] GetBytes(string str)
-		{
+		{//sacado de http://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
 			byte[] bytes = new byte[str.Length * sizeof(char)];
 			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
 			return bytes;
@@ -487,7 +487,7 @@ namespace Gabriel.Cat
 
 
 		public static string ToString(byte[] bytes)
-		{
+		{//sacado de http://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
 			char[] chars = new char[bytes.Length / sizeof(char)];
 			System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
 			return new string(chars);
