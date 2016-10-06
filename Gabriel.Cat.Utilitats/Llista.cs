@@ -185,6 +185,16 @@ namespace Gabriel.Cat
                     Removed(this, new EventArgs());
             }
         }
+        public int IndexOf(TValue value)
+        {
+            int index;
+            semafor.WaitOne();
+            esperando = true;
+            index = llista.IndexOf(value);
+            esperando = false;
+            semafor.Release();
+            return index;
+        }
         public bool Existeix(TValue value)
         {
             bool existeix = false;
