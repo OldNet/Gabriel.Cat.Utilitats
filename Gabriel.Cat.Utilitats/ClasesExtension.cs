@@ -2521,24 +2521,20 @@ namespace Gabriel.Cat.Extension
 
 		#endregion
 		#region StreamExtension
-		public static byte[] Read(this Stream stream, int lenght)
+
+		public static byte[] Read(this Stream stream, Hex lenght)
 		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, uint lenght)
-		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, long lenght)
-		{
-			return stream.Read(Convert.ToUInt64(lenght));
-		}
-		public static byte[] Read(this Stream stream, ulong lenght)
-		{
-			List<byte> bytes = new List<byte>();
-			for (ulong i = 0; i < lenght && !stream.EndOfStream(); i++)
-				bytes.Add((byte)stream.ReadByte());
-			return bytes.ToArray();
+			byte[] bytes = new byte[lenght];
+			unsafe {
+				
+				bytes.UnsafeMethod((ptBytes) => {
+					for (Hex i = 0; i < lenght && !stream.EndOfStream(); i++) {
+						*ptBytes.PtrArray = ((byte)stream.ReadByte());
+						ptBytes.PtrArray++;
+					}
+				});
+			}
+			return bytes;
 		}
 
 		public static String GetMd5Hash(this Stream fs)
@@ -2638,34 +2634,32 @@ namespace Gabriel.Cat.Extension
 			return result;
 		}
 		#endregion
-#region System.Text.Encoding
-		 public static string EncodeBase64(this System.Text.Encoding encoding, string text)
-        {
-            if (text == null)
-            {
-                return null;
-            }
+		#region System.Text.Encoding
+		public static string EncodeBase64(this System.Text.Encoding encoding, string text)
+		{
+			if (text == null) {
+				return null;
+			}
 
-            byte[] textAsBytes = encoding.GetBytes(text);//obtengo los bytes
-            return System.Convert.ToBase64String(textAsBytes);//los paso a base64
-        }
+			byte[] textAsBytes = encoding.GetBytes(text);//obtengo los bytes
+			return System.Convert.ToBase64String(textAsBytes);//los paso a base64
+		}
 
-        public static string DecodeBase64(this System.Text.Encoding encoding, string encodedText)
-        {
-            if (encodedText == null)
-            {
-                return null;
-            }
+		public static string DecodeBase64(this System.Text.Encoding encoding, string encodedText)
+		{
+			if (encodedText == null) {
+				return null;
+			}
 
-            byte[] textAsBytes = System.Convert.FromBase64String(encodedText);//obtengo los bytes decodificados
-            return encoding.GetString(textAsBytes);//lo convierto a string la array decodificada
-        }
-        public static string DecodeBase64(this System.Text.Encoding encoding, byte[] encodedBytesText)
-        {
-        	string strBase64=encoding.GetString(encodedBytesText);//obtengo la string base 64 previamente codificada
-        	return encoding.DecodeBase64(strBase64);
-        }
-#endregion
+			byte[] textAsBytes = System.Convert.FromBase64String(encodedText);//obtengo los bytes decodificados
+			return encoding.GetString(textAsBytes);//lo convierto a string la array decodificada
+		}
+		public static string DecodeBase64(this System.Text.Encoding encoding, byte[] encodedBytesText)
+		{
+			string strBase64 = encoding.GetString(encodedBytesText);//obtengo la string base 64 previamente codificada
+			return encoding.DecodeBase64(strBase64);
+		}
+		#endregion
 		#endregion
 		#region TimeSpan
 		public static string ToHoursMinutesSeconds(this TimeSpan time)

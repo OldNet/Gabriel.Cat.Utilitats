@@ -327,52 +327,52 @@ namespace Gabriel.Cat
 					obj = ms.ReadByte();
 					break;
 				case TiposAceptados.Bool:
-					obj = ToBoolean(ms.Read(1));
+					obj = ToBoolean(ms.Read(sizeof(bool)));
 					break;
 				case TiposAceptados.Short:
-					obj = ToShort(ms.Read(2));
+					obj = ToShort(ms.Read(sizeof(short)));
 					break;
 				case TiposAceptados.UShort:
-					obj = ToUShort(ms.Read(2));
+					obj = ToUShort(ms.Read(sizeof(ushort)));
 					break;
 				case TiposAceptados.Int:
-					obj = ToInt(ms.Read(4));
+					obj = ToInt(ms.Read(sizeof(int)));
 					break;
 				case TiposAceptados.UInt:
-					obj = ToUInt(ms.Read(4));
+					obj = ToUInt(ms.Read(sizeof(uint)));
 					break;
 				case TiposAceptados.Long:
-					obj = ToLong(ms.Read(8));
+					obj = ToLong(ms.Read(sizeof(long)));
 					break;
 				case TiposAceptados.ULong:
-					obj = ToULong(ms.Read(8));
+					obj = ToULong(ms.Read(sizeof(ulong)));
 					break;
 				case TiposAceptados.Double:
-					obj = ToDouble(ms.Read(8));
+					obj = ToDouble(ms.Read(sizeof(double)));
 					break;
 				case TiposAceptados.Float:
-					obj = ToFloat(ms.Read(8));
+					obj = ToFloat(ms.Read(sizeof(float)));
 					break;
 				case TiposAceptados.Char:
-					obj = ToChar(ms.Read(1));
+					obj = ToChar(ms.Read(sizeof(char)));
 					break;
 				case TiposAceptados.DateTime:
-					obj = ToDateTime(ms.Read(4));
+					obj = ToDateTime(ms.Read(sizeof(long)));
 					break;
 				case TiposAceptados.Point:
-					obj = ToPoint(ms.Read(8));
+					obj = ToPoint(ms.Read(sizeof(int)*2));
 					break;
 				case TiposAceptados.PointZ:
-					obj = ToPointZ(ms.Read(12));
+					obj = ToPointZ(ms.Read(sizeof(int) * 3));
 					break;
 				case TiposAceptados.String:
-					obj = ToString(ms.Read(ToLong(ms.Read(8))));
+					obj = ToString(ms.Read(ToLong(ms.Read(sizeof(long)))));
 					break;
 				case TiposAceptados.Bitmap:
-					obj = ToBitmap(ms.Read(ToLong(ms.Read(8))));
+					obj = ToBitmap(ms.Read(ToLong(ms.Read(sizeof(long)))));
 					break;
 				case TiposAceptados.Color:
-					obj = ToColor(ms.Read(4));
+					obj = ToColor(ms.Read(sizeof(int)));
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
@@ -488,7 +488,8 @@ namespace Gabriel.Cat
 
 		public static string ToString(byte[] bytes)
 		{//sacado de http://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
-			char[] chars = new char[bytes.Length / sizeof(char)];
+			const int sizeChar=sizeof(char);
+			char[] chars = new char[bytes.Length / sizeChar];
 			System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
 			return new string(chars);
 		}
