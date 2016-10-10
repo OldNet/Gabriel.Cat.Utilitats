@@ -1119,7 +1119,7 @@ namespace Gabriel.Cat.Extension
 		{
 			if (file.Exists) {
 				FileStream stream = file.GetStream();
-				string sha3 = stream.GetSha256Hash();
+				string sha3 = stream.Sha256Hash();
 				stream.Close();
 				return sha3;
 
@@ -1143,7 +1143,7 @@ namespace Gabriel.Cat.Extension
 		{
 			if (file.Exists) {
 				FileStream stream = file.GetStream();
-				string hash = stream.GetMd5Hash();
+				string hash = stream.Md5Hash();
 				stream.Close();
 				return hash;
 
@@ -2019,11 +2019,11 @@ namespace Gabriel.Cat.Extension
 			byte[] dades = Serializar.GetBytes(datos);
 			str.Write(dades);
 		}
-		public static void Write(this Stream str, byte[] datos)
+		public static void Write(this Stream str, byte[] datos,int offset=0)
 		{
 			if (datos == null)
 				throw new NullReferenceException();
-			str.Write(datos, 0, datos.Length);
+			str.Write(datos, offset, datos.Length);
 		}
 		public static byte[] GetAllBytes(this Stream str)
 		{
@@ -2250,6 +2250,24 @@ namespace Gabriel.Cat.Extension
 		}
         #endregion
         #region ByteArrayExtension
+        public static byte[] Hash(this byte[] bytes, HashAlgorithm hash)
+        {
+            return new MemoryStream(bytes).Hash(hash);
+        }
+        public static byte[] Md5(this byte[] bytes)
+        {
+            return bytes.Hash(new MD5CryptoServiceProvider());
+        }
+
+        public static byte[] Sha1(this byte[] bytes)
+        {
+            return bytes.Hash(new SHA1Managed());
+        }
+
+        public static byte[] Sha256(this byte[] bytes)
+        {
+            return bytes.Hash(new SHA256Managed());
+        }
         public static byte[][] Split(this byte[] array, byte byteSplit)
         {
             return Split(array, new byte[] { byteSplit });
@@ -2461,7 +2479,7 @@ namespace Gabriel.Cat.Extension
 		public static string Hash(this byte[] obj)
 		{
 			MemoryStream ms = new MemoryStream(obj);
-			string hash = ms.GetMd5Hash();
+			string hash = ms.Md5Hash();
 			ms.Close();
 			return hash;
 		}
@@ -2476,7 +2494,7 @@ namespace Gabriel.Cat.Extension
 		public static string SHA3(this byte[] obj)
 		{
 			MemoryStream ms = new MemoryStream(obj);
-			string sha3 = ms.GetSha256Hash();
+			string sha3 = ms.Sha256Hash();
 			ms.Close();
 			return sha3;
 		}
@@ -2495,9 +2513,9 @@ namespace Gabriel.Cat.Extension
 		{
 			System.Runtime.InteropServices.Marshal.Copy(ptr, destino, 0, destino.Length);
 		}
-		public static void CopyTo(this byte[] source, IntPtr ptrDestino)
+		public static void CopyTo(this byte[] source, IntPtr ptrDestino,int startIndex=0)
 		{
-			System.Runtime.InteropServices.Marshal.Copy(source, 0, ptrDestino, source.Length);
+			System.Runtime.InteropServices.Marshal.Copy(source, startIndex, ptrDestino, source.Length);
 		}
 		public static void Dispose(this IntPtr point)
 		{
@@ -2579,21 +2597,38 @@ namespace Gabriel.Cat.Extension
 			return bytes;
 		}
 
-		public static String GetMd5Hash(this Stream fs)
+		public static String Md5Hash(this Stream fs)
 		{
 			return getHash(fs, new MD5CryptoServiceProvider());
 		}
 
-		public static String GetSha1Hash(this Stream fs)
+		public static String Sha1Hash(this Stream fs)
 		{
 			return getHash(fs, new SHA1Managed());
 		}
 
-		public static String GetSha256Hash(this Stream fs)
+		public static String Sha256Hash(this Stream fs)
 		{
 			return getHash(fs, new SHA256Managed());
 		}
+        public static byte[]  Md5(this Stream fs)
+        {
+            return fs.Hash(new MD5CryptoServiceProvider());
+        }
 
+        public static byte[] Sha1(this Stream fs)
+        {
+            return fs.Hash( new SHA1Managed());
+        }
+
+        public static byte[] Sha256(this Stream fs)
+        {
+            return fs.Hash(new SHA256Managed());
+        }
+        public static byte[] Hash(this Stream fs,HashAlgorithm hash)
+        {
+            return hash.ComputeHash(fs);
+        }
 		private static String getHash(Stream fs, HashAlgorithm hash)
 		{
 			Int64 currentPos = fs.Position;
@@ -2603,7 +2638,7 @@ namespace Gabriel.Cat.Extension
 			try {
 				fs.Seek(0, SeekOrigin.Begin);
 				sb = new StringBuilder();
-				hashBytes = hash.ComputeHash(fs);
+                hashBytes = fs.Hash(hash);
 				for (int i = 0; i < hashBytes.Length; i++) {
 					sb.Append(hashBytes[i].ToString("X2"));
 				}
