@@ -2248,9 +2248,51 @@ namespace Gabriel.Cat.Extension
 				uso = UsoPropiedad.Get;
 			return uso;
 		}
-		#endregion
-		#region ByteArrayExtension
-		public static void UnsafeMethod(this byte[] array, MetodoUnsafeArray metodo)
+        #endregion
+        #region ByteArrayExtension
+        public static byte[][] Split(this byte[] array, byte byteSplit)
+        {
+            return Split(array, new byte[] { byteSplit });
+        }
+        public static byte[][] Split(this byte[] array, byte[] bytesSplit)
+        {
+            if (bytesSplit == null) throw new ArgumentNullException();
+            List<byte[]> bytesSplited = new List<byte[]>();
+            Hex posicionArray;
+            Hex posicionArrayEncontrada;
+            if (bytesSplit.Length != 0)
+            {
+
+                posicionArray = array.BuscarArray(0, bytesSplit);
+                
+                //opero
+                if (posicionArray > -1)
+                {
+                    bytesSplited.Add(array.SubArray(0, posicionArray));
+                    posicionArray += bytesSplit.Length;
+                    do
+                    {
+                        posicionArrayEncontrada = array.BuscarArray(posicionArray, bytesSplit);
+                        if (posicionArrayEncontrada > -1)
+                        {
+                            bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
+                            posicionArray = posicionArrayEncontrada+ bytesSplit.Length;
+               
+                        }
+                    }
+                    while (posicionArrayEncontrada > -1);
+                    if (posicionArray < array.Length)
+                        bytesSplited.Add(array.SubArray(posicionArray, array.Length));
+
+                }else
+                {
+                    bytesSplited.Add(array);//no la ha encontrado pues la pongo toda
+                }
+            }
+            else bytesSplited.Add(array);//no hay bytesPara hacer split pues pongo toda
+            return bytesSplited.ToArray();
+        }
+        public static void UnsafeMethod(this byte[] array, MetodoUnsafeArray metodo)
 		{
 			UnsafeArray.Usar(array, metodo);
 		}
