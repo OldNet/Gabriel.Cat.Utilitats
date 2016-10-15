@@ -1534,11 +1534,7 @@ namespace Gabriel.Cat.Extension
 			}
 			return bytes;
 		}
-		public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source)
-		{
-			return source.Casting<TResult>(false);
-		}
-		public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting)
+		public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting=false)
 		{
 			Llista<TResult> llista = new Llista<TResult>();
 			foreach (Object obj in source) {
