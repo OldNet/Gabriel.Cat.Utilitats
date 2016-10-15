@@ -185,6 +185,28 @@ namespace Gabriel.Cat
                     Removed(this, new EventArgs());
             }
         }
+        public TValue FirstOrDefault(IComparable keyToFindItem) 
+        {
+            TValue value;
+            semafor.WaitOne();
+            esperando = true;
+            if (llistaOrdenada == null)
+            {
+                value = llista.FirstOrDefault((item) =>
+                {
+                    return (object)keyToFindItem == (object)item;
+                });
+            }else
+            {
+                value = llistaOrdenada[keyToFindItem];
+            }
+            semafor.Release();
+            esperando = false;
+            return value;
+        }
+      
+
+
         public int IndexOf(TValue value)
         {
             int index;
