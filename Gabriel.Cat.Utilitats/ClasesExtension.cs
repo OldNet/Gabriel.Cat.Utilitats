@@ -2011,9 +2011,35 @@ namespace Gabriel.Cat.Extension
 			}
 			return clonNew;
 		}
-		#endregion
-		#region Stream
+        #endregion
+        #region Stream
+        /// <summary>
+        /// Devuelve los bytes que quedan por leer
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="modificarPosicionAlLeer">si es true la posicion estará al final sino por donde estaba</param>
+        /// <returns>bytes to end stream</returns>
+        public static byte[] ReadToEnd(this Stream str, bool modificarPosicionAlLeer=false)
+        {
+            if (!str.CanRead)
+                throw new ArgumentException("Can't Read stream","str");
+            byte[] bytesToEnd = new byte[str.Length - str.Position];
+            long pos = str.Position;
+            unsafe
+            {
+                bytesToEnd.UnsafeMethod((unsBytesToEnd) => {
+                    for(int i=0;i<unsBytesToEnd.Length;i++)
+                    {
+                        *unsBytesToEnd.PtrArray =(byte) str.ReadByte();
+                         unsBytesToEnd.PtrArray++;
+                    }
 
+                });
+            }
+            if(modificarPosicionAlLeer)
+               str.Position = pos;
+            return bytesToEnd;
+        }
 		public static void Write(this Stream str, string datos)
 		{
 			byte[] dades = Serializar.GetBytes(datos);
