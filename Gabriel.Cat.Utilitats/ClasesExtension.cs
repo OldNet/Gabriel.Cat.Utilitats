@@ -1096,22 +1096,22 @@ namespace Gabriel.Cat.Extension
 			return file.Miniatura(250, 250);
 		}
 		/// <summary>
-		/// Miniatura (Thumbnail Handlers) o icono en caso de no tener el archivo
+		/// Miniatura (Thumbnail Handlers)
 		/// </summary>
 		/// <param name="file"></param>
 		/// <param name="amplitud"></param>
 		/// <param name="altura"></param>
-		/// <returns></returns>
+		/// <returns> si hay algun problema devuelve null</returns>
 		public static Bitmap Miniatura(this FileInfo file, int amplitud, int altura)
 		{
 			Bitmap bmp = null;
 			ShellThumbnail thub = new ShellThumbnail();
 			try {
-				bmp = thub.GetThumbnail(file.FullName, amplitud, altura);
+				bmp = thub.GetThumbnail(file.FullName, amplitud, altura).Clone() as Bitmap;
 			} catch {
-				bmp = file.Icono();
+                bmp = null;
 			}
-			return bmp.Clone() as Bitmap;
+			return bmp;
 		}
 		public static string RutaRelativa(this FileInfo file, DirectoryInfo dir)
 		{
