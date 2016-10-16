@@ -944,7 +944,7 @@ namespace Gabriel.Cat.Extension
 		public static MemoryStream ToStream(this Bitmap bmp, bool useRawFormat = false)
 		{
 			MemoryStream memory;
-			ImageFormat format = useRawFormat ? bmp.RawFormat :ImageFormat.Png;//no se porque aun pero no funciona...mejor pasarla a png
+			ImageFormat format = useRawFormat ? bmp.RawFormat :bmp.IsArgb()?ImageFormat.Png:ImageFormat.Jpeg;//no se porque aun pero no funciona...mejor pasarla a png
 			memory = ToStream(bmp, format);
 			return memory;
 
@@ -952,8 +952,20 @@ namespace Gabriel.Cat.Extension
 		public static MemoryStream ToStream(this Bitmap bmp, ImageFormat format)
 		{
 			MemoryStream stream = new MemoryStream();
-			bmp.Save(stream, format);
-			return stream;
+            string path;
+            FileStream fs;
+			try{
+				new Bitmap(bmp).Save(stream, format);
+			}catch(Exception ex){
+                path = System.IO.Path.GetRandomFileName();
+                format = bmp.IsArgb() ? ImageFormat.Png : ImageFormat.Jpeg;
+                new Bitmap(bmp).Save(path, format);
+                fs=File.OpenRead(path);
+                new Bitmap(fs).Save(stream, format);
+                fs.Close();
+                File.Delete(path);
+            }
+			return new MemoryStream(stream.GetAllBytes());
 		}
 
 		public static void TrataBytes(this Bitmap bmp, MetodoTratarByteArray metodo)

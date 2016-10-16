@@ -250,7 +250,7 @@ namespace Gabriel.Cat
 		//mirar de poder serializar null
 		public static byte[] GetBytes(Bitmap img)
 		{
-			return GetBytes(img, img.RawFormat);
+			return GetBytes(img,img.RawFormat);
 		}
 		public static byte[] GetBytes(Bitmap img, System.Drawing.Imaging.ImageFormat formato)
 		{
