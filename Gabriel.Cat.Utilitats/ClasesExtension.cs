@@ -28,6 +28,7 @@ namespace Gabriel.Cat.Extension
 	public delegate bool ComprovaEventHandler<Tvalue>(Tvalue valorAComprovar);
 	public delegate T TrataObjeto<T>(T objHaTratar);
 	public delegate ContinuaTratando<T> ContinuaTratandoObjeto<T>(T objHaTratar);
+    public delegate TOut ConvertEventHandler<TOut,TIn>(TIn objToConvert);
 	public struct ContinuaTratando<T>
 	{
 		public bool Continua;
@@ -677,7 +678,6 @@ namespace Gabriel.Cat.Extension
 			FileInfo fitxerAFerLloc = new FileInfo(pathArchivoHaCopiar);
 
 			int contadorIguales = 1;
-			bool encontradoPath = false;
 			string nombreArchivo = Path.GetFileNameWithoutExtension(pathArchivoHaCopiar);
 			string extension = Path.GetExtension(pathArchivoHaCopiar);
 			string direccionArchivoFinal = dir.FullName + Path.DirectorySeparatorChar + nombreArchivo + extension;
@@ -944,7 +944,7 @@ namespace Gabriel.Cat.Extension
 		public static MemoryStream ToStream(this Bitmap bmp, bool useRawFormat = false)
 		{
 			MemoryStream memory;
-			ImageFormat format = useRawFormat ? bmp.RawFormat : ImageFormat.Png;//no se porque aun pero no funciona...mejor pasarla a png
+			ImageFormat format = useRawFormat ? bmp.RawFormat :ImageFormat.Png;//no se porque aun pero no funciona...mejor pasarla a png
 			memory = ToStream(bmp, format);
 			return memory;
 
@@ -1295,7 +1295,30 @@ namespace Gabriel.Cat.Extension
 		}
 		#endregion
 		#region IEnumerable
-		public static SortedList<T, T> ToSortedList<T>(this IEnumerable<T> list) where T : IComparable<T>
+        public static IEnumerable<T> ConvertTo<T>(this IEnumerable enumeracion,ConvertEventHandler<T,object> metodoParaConvertirUnoAUno,bool omitirExcepciones=true)
+        {
+            return ConvertTo(enumeracion.Casting<object>(), metodoParaConvertirUnoAUno, omitirExcepciones);
+        }
+        public static IEnumerable<TOut> ConvertTo<TOut,TIn>(this IEnumerable<TIn> enumeracion, ConvertEventHandler<TOut,TIn> metodoParaConvertirUnoAUno,bool omitirExcepciones=true)
+        {
+            if (metodoParaConvertirUnoAUno == null) throw new ArgumentNullException();
+            TOut outValue;
+            foreach (TIn obj in enumeracion)
+            {
+                try
+                {
+                    outValue = metodoParaConvertirUnoAUno(obj);
+                }
+                catch
+                {
+                    if (!omitirExcepciones) throw;
+                    outValue = default(TOut);
+                }
+                yield return outValue;
+
+            }
+        }
+        public static SortedList<T, T> ToSortedList<T>(this IEnumerable<T> list) where T : IComparable<T>
 		{
 			SortedList<T, T> sortedList = new SortedList<T, T>();
 			foreach (T element in list)
