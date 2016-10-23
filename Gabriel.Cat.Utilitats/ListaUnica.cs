@@ -16,7 +16,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Es una lista hash para ir mas rapido
 	/// </summary>
-	public class ListaUnica<T>:IList<T>,IReadOnlyList<T>
+	public class ListaUnica<T>:IList<T>,IReadOnlyList<T>, IColeccion<T>
         where T:IClauUnicaPerObjecte
 	{
 		LlistaOrdenada<IComparable,T> listaOrdenada;
@@ -59,7 +59,7 @@ namespace Gabriel.Cat
         #region Existe
         public bool Contains(T obj)
 		{
-			return listaOrdenada.ContainsKey(obj.Clau());
+			return listaOrdenada.ContainsKey(obj.Clau);
 		}
 		public bool Contains(IComparable key)
 		{
@@ -79,7 +79,7 @@ namespace Gabriel.Cat
 		}
 		public bool Remove(T obj)
 		{
-			return RemoveKey(obj.Clau());
+			return RemoveKey(obj.Clau);
 		}
 		public bool RemoveKey(IComparable key)
 		{
@@ -104,10 +104,10 @@ namespace Gabriel.Cat
 		public void Add(T obj)
 		{
             if (obj == null) throw new ArgumentNullException("item");
-            if (listaOrdenada.ContainsKey(obj.Clau()))
+            if (listaOrdenada.ContainsKey(obj.Clau))
                 throw new ArgumentException("Is already on the list");
             else {
-                listaOrdenada.Add(obj.Clau(), obj);
+                listaOrdenada.Add(obj.Clau, obj);
                 lista.Add(obj);
             }
 		}
@@ -140,7 +140,7 @@ namespace Gabriel.Cat
         public void Insert(int index, T item)
         {
             if (item == null) throw new ArgumentNullException("item");
-            if (listaOrdenada.ContainsKey(((IClauUnicaPerObjecte)item).Clau()))
+            if (listaOrdenada.ContainsKey(((IClauUnicaPerObjecte)item).Clau))
                 lista.Insert(index, item);
             else throw new ArgumentException("item","item is already on list");
         }

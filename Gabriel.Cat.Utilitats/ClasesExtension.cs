@@ -486,13 +486,13 @@ namespace Gabriel.Cat.Extension
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
-            llista.Add((TKey)value.Clau(), (TValue)value);
+            llista.Add((TKey)value.Clau, (TValue)value);
         }
         public static void AfegirORemplaçar<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
-            llista.AddOrReplace((TKey)value.Clau(), (TValue)value);
+            llista.AddOrReplace((TKey)value.Clau, (TValue)value);
         }
         #endregion
         #region ICollection<T>Extension
@@ -1833,7 +1833,7 @@ namespace Gabriel.Cat.Extension
         #region IEnumerable<T[]>
         public static bool Contains<T>(this IEnumerable<T> list, IComparable objToFind)
         {
-            return !list.Busca(objToFind).Equals(default(T));
+            return !Equals(list.Busca(objToFind),default(T));
         }
         public static T Busca<T>(this IEnumerable<T> list, IComparable objToFind)
         {

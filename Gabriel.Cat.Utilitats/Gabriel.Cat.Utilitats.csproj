@@ -58,6 +58,7 @@
     <Compile Include="Clases de Internet\Sha3\SHA3Managed.cs" />
     <Compile Include="Clases de Internet\Sha3\_Utils.cs" />
     <Compile Include="ClasesExtension.cs" />
+    <Compile Include="Coleccion.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="Enumerador.cs" />
     <Compile Include="GeneradorHex.cs" />
