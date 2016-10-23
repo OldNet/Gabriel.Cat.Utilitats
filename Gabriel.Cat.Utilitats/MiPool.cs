@@ -502,9 +502,12 @@ namespace Gabriel.Cat
             taskHaciendoSeEnClase = null;
         }
         #region IClauUnicaPerObjecte implementation
-        public IComparable Clau()
+        public IComparable Clau
 		{
-			return idUnico;
+            get
+            {
+                return idUnico;
+            }
 		}
 		#endregion
 		/// <summary>

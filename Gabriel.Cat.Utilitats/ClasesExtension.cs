@@ -1803,30 +1803,35 @@ namespace Gabriel.Cat.Extension
                 llista.Add(pair.Key);
             return llista;
         }
-        public static Tvalue[] ToTaula<Tvalue>(this IEnumerable<Tvalue> valors)
+        public static T[] ToTaula<T>(this IEnumerable<T> valors)
         {
 
             return valors.ToArray();
         }
-        public static Tvalue[] SubArray<Tvalue>(this IEnumerable<Tvalue> arrayB, long inicio)
+        public static Coleccion<T> ToColeccion<T>(this IEnumerable<T> valors)
         {
-            return arrayB.SubArray(inicio, arrayB.Count() - inicio);
+
+            return valors.ToArray();
         }
-        public static Tvalue[] SubArray<Tvalue>(this IEnumerable<Tvalue> arrayB, long inicio, long longitud)
+        public static IColeccion<T> SubColeccion<T>(this IEnumerable<T> arrayB, long inicio)
         {
-            Tvalue[] array;
-            Llista<Tvalue> subArray;
+            return arrayB.SubColeccion(inicio, arrayB.Count() - inicio);
+        }
+        public static IColeccion<T> SubColeccion<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
+        {
+            T[] array;
+            Llista<T> subArray;
 
             if (inicio < 0 || longitud <= 0)
                 throw new IndexOutOfRangeException();
             array = arrayB.ToTaula();
             if (longitud + inicio > array.Length)
                 throw new IndexOutOfRangeException();
-            subArray = new Llista<Tvalue>();
+            subArray = new Llista<T>();
 
             for (long i = inicio, fin = inicio + longitud; i < fin; i++)
                 subArray.Add(array[i]);
-            return subArray.ToArray();
+            return subArray;
 
         }
         #endregion
@@ -2494,21 +2499,21 @@ namespace Gabriel.Cat.Extension
                 //opero
                 if (posicionArray > -1)
                 {
-                    bytesSplited.Add(array.SubArray(0, posicionArray));
+                    bytesSplited.Add(array.SubColeccion(0, posicionArray));
                     posicionArray += bytesSplit.Length;
                     do
                     {
                         posicionArrayEncontrada = array.BuscarArray(posicionArray, bytesSplit);
                         if (posicionArrayEncontrada > -1)
                         {
-                            bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
+                            bytesSplited.Add(array.SubColeccion(posicionArray, posicionArrayEncontrada));
                             posicionArray = posicionArrayEncontrada + bytesSplit.Length;
 
                         }
                     }
                     while (posicionArrayEncontrada > -1);
                     if (posicionArray < array.Length)
-                        bytesSplited.Add(array.SubArray(posicionArray, array.Length));
+                        bytesSplited.Add(array.SubColeccion(posicionArray, array.Length));
 
                 }
                 else
@@ -2544,11 +2549,11 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
-        public static byte[] SubArray(this byte[] array, Hex cantidad)
+        public static byte[] SubColeccion(this byte[] array, Hex cantidad)
         {
-            return SubArray(array, 0, cantidad);
+            return SubColeccion(array, 0, cantidad);
         }
-        public static byte[] SubArray(this byte[] array, Hex inicio, Hex cantidad)
+        public static byte[] SubColeccion(this byte[] array, Hex inicio, Hex cantidad)
         {
             if (cantidad + inicio > array.LongLength)
                 throw new ArgumentOutOfRangeException();

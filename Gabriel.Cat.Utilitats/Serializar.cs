@@ -236,7 +236,7 @@ namespace Gabriel.Cat
 		}
 		public static byte[] GetBytes(Point point)
 		{
-			return GetBytes(new PointZ(point.X, point.Y, 0)).SubArray(0, 8);
+			return GetBytes(new PointZ(point.X, point.Y, 0)).SubColeccion(0, 8);
 		}
 		public static byte[] GetBytes(PointZ point)
 		{
@@ -416,12 +416,12 @@ namespace Gabriel.Cat
 		}
 		public static PointZ ToPointZ(byte[] bytesObj)
 		{
-			return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubArray(8)));
+			return new PointZ(ToPoint(bytesObj), ToInt(bytesObj.SubColeccion(8)));
 		}
 
 		public static Point ToPoint(byte[] bytesObj)
 		{
-			return new Point(ToInt(bytesObj), ToInt(bytesObj.SubArray(4)));
+			return new Point(ToInt(bytesObj), ToInt(bytesObj.SubColeccion(4)));
 		}
 		public static bool ToBoolean(byte[] boolean)
 		{

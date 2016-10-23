@@ -105,6 +105,10 @@ namespace Gabriel.Cat
             {
                 return this[pos];
             }
+            set
+            {
+                this[pos] = value;
+            }
         }
 
         public T this[int pos]
@@ -581,9 +585,6 @@ namespace Gabriel.Cat
         }
         #endregion
     }
-    public interface IClauUnicaPerObjecte
-    {
-        IComparable Clau { get; }
-    }
+ 
 
 }

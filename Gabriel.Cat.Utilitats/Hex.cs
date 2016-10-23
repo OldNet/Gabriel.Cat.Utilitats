@@ -16,7 +16,7 @@ namespace Gabriel.Cat
     /// Description of Hex.Por acabar...se tienen que hacer las operaciones...son muy chungas...
     /// de momento se limita a convertir y operar...en el futuro no se convierte asi pueden ser numero gigantes
     /// </summary>
-    public struct Hex : IEquatable<Hex>
+    public struct Hex : IEquatable<Hex>,IClauUnicaPerObjecte,IComparable,IComparable<Hex>
     {
         static LlistaOrdenada<char, char> diccionarioCaracteresValidos;
         public static readonly string[] caracteresHex = new string[]{
@@ -78,6 +78,14 @@ namespace Gabriel.Cat
             get
             {
                 return "0x" + Number;
+            }
+        }
+
+        public IComparable Clau
+        {
+            get
+            {
+                return numberHex;
             }
         }
         #region Equals and GetHashCode implementation
@@ -334,5 +342,18 @@ namespace Gabriel.Cat
 
         }
 
+        public int CompareTo(object obj)
+        {
+            int compareTo;
+            if (obj is Hex)
+                compareTo = CompareTo((Hex)obj);
+            else compareTo = -1;
+            return compareTo;
+        }
+
+        public int CompareTo(Hex other)
+        {
+            return numberHex.CompareTo(other.numberHex);
+        }
     }
 }

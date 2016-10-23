@@ -33,6 +33,12 @@ namespace Gabriel.Cat
                 else value = lst[pos];
                 return value;
             }
+            set
+            {
+                if (array != null)
+                    array[pos]=value;
+                else  lst[pos]=value;
+            }
         }
 
         public int Count
@@ -127,6 +133,7 @@ namespace Gabriel.Cat
        T this[int pos]
         {
             get;
+            set;
         }
     }
 }

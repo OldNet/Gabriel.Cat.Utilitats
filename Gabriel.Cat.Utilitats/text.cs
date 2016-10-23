@@ -370,9 +370,12 @@ namespace Gabriel.Cat
             return CompareTo(obj as text);
 		}
 
-        public IComparable Clau()
+        public IComparable Clau
         {
-          return  this;
+           get
+            {
+                return this;
+            }
         }
 
         public int CompareTo(text other)
