@@ -522,7 +522,7 @@ namespace Gabriel.Cat
 				interlaceMethod
 			};
 			for (int i = 0; i < fields.Length; i++)
-				dataBytes.AfegirMolts(Serializar.GetBytes(fields[i]));
+				dataBytes.AddRange(Serializar.GetBytes(fields[i]));
 			ChunkData = dataBytes.ToTaula();
 		}
 
@@ -691,15 +691,15 @@ namespace Gabriel.Cat
 		void Update()
 		{
 			Llista<byte> dataBytes = new Llista<byte>();
-			dataBytes.AfegirMolts(Serializar.GetBytes(SequenceNumber));
-			dataBytes.AfegirMolts(Serializar.GetBytes(Width));
-			dataBytes.AfegirMolts(Serializar.GetBytes(Height));
-			dataBytes.AfegirMolts(Serializar.GetBytes(OffsetX));
-			dataBytes.AfegirMolts(Serializar.GetBytes(OffsetY));
-			dataBytes.AfegirMolts(Serializar.GetBytes(DelayNum));
-			dataBytes.AfegirMolts(Serializar.GetBytes(DelayDen));
-			dataBytes.Afegir((byte)DisposeOP);
-			dataBytes.Afegir((byte)BlendOP);
+			dataBytes.AddRange(Serializar.GetBytes(SequenceNumber));
+			dataBytes.AddRange(Serializar.GetBytes(Width));
+			dataBytes.AddRange(Serializar.GetBytes(Height));
+			dataBytes.AddRange(Serializar.GetBytes(OffsetX));
+			dataBytes.AddRange(Serializar.GetBytes(OffsetY));
+			dataBytes.AddRange(Serializar.GetBytes(DelayNum));
+			dataBytes.AddRange(Serializar.GetBytes(DelayDen));
+			dataBytes.Add((byte)DisposeOP);
+			dataBytes.Add((byte)BlendOP);
 			ChunkData = dataBytes.ToTaula();
 		}
 
@@ -894,9 +894,9 @@ namespace Gabriel.Cat
 		protected virtual void UpdateData()
 		{
 			Llista<Byte> data = new Llista<byte>();
-			data.AfegirMolts(Serializar.GetBytes(Keyword));//Keyword
-			data.Afegir(NULLBYTE);//null separator
-			data.AfegirMolts(System.Text.ASCIIEncoding.Convert(Encoding.ASCII, System.Text.Encoding.GetEncoding(1252), Serializar.GetBytes(Information)));//text
+			data.AddRange(Serializar.GetBytes(Keyword));//Keyword
+			data.Add(NULLBYTE);//null separator
+			data.AddRange(System.Text.ASCIIEncoding.Convert(Encoding.ASCII, System.Text.Encoding.GetEncoding(1252), Serializar.GetBytes(Information)));//text
 			ChunkData = data.ToTaula();
 		}
 		protected override void ParseData(byte[] chunkData)
@@ -904,14 +904,14 @@ namespace Gabriel.Cat
 			Llista<byte> bytesAConvertir = new Llista<byte>();
 			long posicion = 0;
 			while (chunkData[posicion] != NULLBYTE && chunkData.LongLength > posicion) {
-				bytesAConvertir.Afegir(chunkData[posicion++]);
+				bytesAConvertir.Add(chunkData[posicion++]);
 			}
 			if (chunkData[posicion] == NULLBYTE) {
 				keyword = Serializar.ToString(bytesAConvertir.ToTaula());
-				bytesAConvertir.Buida();
+				bytesAConvertir.Clear();
 				posicion++;//paso nullByte
 				while (chunkData.LongLength > posicion) {
-					bytesAConvertir.Afegir(chunkData[posicion++]);
+					bytesAConvertir.Add(chunkData[posicion++]);
 				}
 				Information = Serializar.ToString(System.Text.ASCIIEncoding.Convert(System.Text.Encoding.GetEncoding(1252), Encoding.ASCII, bytesAConvertir.ToTaula()));
 			} else
@@ -966,10 +966,10 @@ namespace Gabriel.Cat
 		protected virtual void UpdateData()
 		{
 			Llista<Byte> data = new Llista<byte>();
-			data.AfegirMolts(Serializar.GetBytes(Keyword));//Keyword
-			data.Afegir(NULLBYTE);//null separator
-			data.Afegir(COMPRESION);
-			data.AfegirMolts(System.Text.ASCIIEncoding.Convert(Encoding.ASCII, System.Text.Encoding.GetEncoding(1252), Serializar.GetBytes(Information)));//text
+			data.AddRange(Serializar.GetBytes(Keyword));//Keyword
+			data.Add(NULLBYTE);//null separator
+			data.Add(COMPRESION);
+			data.AddRange(System.Text.ASCIIEncoding.Convert(Encoding.ASCII, System.Text.Encoding.GetEncoding(1252), Serializar.GetBytes(Information)));//text
 			ChunkData = data.ToTaula();
 		}
 		protected override void ParseData(byte[] chunkData)
@@ -978,17 +978,17 @@ namespace Gabriel.Cat
 			Encoding encodingSource = null;
 			long posicion = 0;
 			while (chunkData[posicion] != NULLBYTE && chunkData.LongLength > posicion) {
-				bytesAConvertir.Afegir(chunkData[posicion++]);
+				bytesAConvertir.Add(chunkData[posicion++]);
 			}
 			if (chunkData[posicion] == NULLBYTE) {
 				
 				keyword = Serializar.ToString(bytesAConvertir.ToTaula());
-				bytesAConvertir.Buida();
+				bytesAConvertir.Clear();
 				posicion++;//paso el Null byte
                 if (COMPRESION != chunkData[posicion++])//leo la compresion
                     throw new ChunkFormatException();
 				while (chunkData.LongLength > posicion) {
-					bytesAConvertir.Afegir(chunkData[posicion++]);
+					bytesAConvertir.Add(chunkData[posicion++]);
 				}
 				encodingSource = System.Text.Encoding.GetEncoding(1252);//es la unica usada...
 				Information = Serializar.ToString(System.Text.ASCIIEncoding.Convert(encodingSource, Encoding.ASCII, bytesAConvertir.ToTaula()));

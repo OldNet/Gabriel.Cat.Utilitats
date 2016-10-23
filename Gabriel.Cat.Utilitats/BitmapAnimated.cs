@@ -28,7 +28,7 @@ namespace Gabriel.Cat
             if (bmps != null)
                     foreach (Bitmap bmp in bmps)
                     {
-                        frames.Afegir(new KeyValuePair<Bitmap, int>(bmp, delays[i]));
+                        frames.Add(new KeyValuePair<Bitmap, int>(bmp, delays[i]));
                         if (delays.Length > i)
                             i++;
                     }
@@ -101,16 +101,16 @@ namespace Gabriel.Cat
             KeyValuePair<Bitmap, int> frame = new KeyValuePair<Bitmap, int>(bmp, delay);
 
             if (posicion < 0 || posicion > frames.Count)
-                frames.Afegir(frame);
+                frames.Add(frame);
             else
-                frames.InserirEn(posicion, frame);
+                frames.Insert(posicion, frame);
          }
        
         public void RemoveFrame(int index)
         {
             if (frames.Count < index + 1)
                 throw new ArgumentOutOfRangeException();
-            frames.Elimina(index);
+            frames.RemoveAt(index);
         }
         public void Start()
         {

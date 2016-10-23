@@ -184,17 +184,17 @@ namespace Gabriel.Cat
 			set {
 				estaOrdenado = value;
 				if (estaOrdenado)
-					faenasEstaticas.Ordena();
+					faenasEstaticas.Sort();
 				else
-					faenasEstaticas.Desordena();
+					faenasEstaticas.Disorder();
 			}
 		}
 		public static void AñadirFaena(Tiket<TipoTrabajo> tiket)
 		{
 			tiket.DentroPool = true;
-			faenasEstaticas.Afegir(tiket);
+			faenasEstaticas.Add(tiket);
 			if (estaOrdenado)
-				faenasEstaticas.Ordena();
+				faenasEstaticas.Sort();
 
 		}
 		public static Tiket<TipoTrabajo> AñadirFaena(TrabajaEventHandler<TipoTrabajo> metodo, TipoTrabajo trabajo)
@@ -210,13 +210,13 @@ namespace Gabriel.Cat
 		}
 		public static void QuitarFaena(Tiket<TipoTrabajo> tiketFaena)
 		{
-			faenasEstaticas.Elimina(tiketFaena);
+			faenasEstaticas.Remove(tiketFaena);
 			tiketFaena.DentroPool = false;
 		}
 
 		public static void OrdenarFaena()
 		{
-			faenasEstaticas.Ordena();
+			faenasEstaticas.Sort();
 
 		}
 
@@ -251,7 +251,7 @@ namespace Gabriel.Cat
 		}
 		public static void VaciaListaFaenas()
 		{
-			faenasEstaticas.Buida();
+			faenasEstaticas.Clear();
 		}
 
 		static void IIniciaFaena()
@@ -262,7 +262,7 @@ namespace Gabriel.Cat
 				hiloFaena = new Thread(() => HazFaena());
 				hiloFaena.Priority = ThreadPriority;
 				hiloFaena.Name = generadorId.Siguiente();
-				hilosFaenas.Afegir(hiloFaena.Name, hiloFaena);
+				hilosFaenas.Add(hiloFaena.Name, hiloFaena);
 				hiloFaena.Start();
 			}
 
@@ -274,7 +274,7 @@ namespace Gabriel.Cat
 			while (faenasEstaticas.Count > 0) {
 				tiket = faenasEstaticas.Pop();
 				if (tiket != null) {
-					feanasHaciendose.Afegir(tiket.IdUnico, new KeyValuePair<Thread, Tiket<TipoTrabajo>>(Thread.CurrentThread, tiket));
+					feanasHaciendose.Add(tiket.IdUnico, new KeyValuePair<Thread, Tiket<TipoTrabajo>>(Thread.CurrentThread, tiket));
 					tiket.EstadoFaena = Tiket<TipoTrabajo>.EstadoFaenaEnum.Haciendose;
 					try {
 						tiket.HazFaena();
@@ -282,26 +282,26 @@ namespace Gabriel.Cat
 						tiket.Excepcion(ex);
 					}
 					QuitarFaena(tiket);
-					feanasHaciendose.Elimina(tiket.IdUnico);
+					feanasHaciendose.Remove(tiket.IdUnico);
 					tiket.EstadoFaena = Tiket<TipoTrabajo>.EstadoFaenaEnum.Acabado;
 					tiket.FaenaHechaEvent();
 				}
 			}
-			hilosFaenas.Elimina(Thread.CurrentThread.Name);
+			hilosFaenas.Remove(Thread.CurrentThread.Name);
 
 		}
 		public static void QuitaOAbortaFaena(Tiket<TipoTrabajo> faenaHaAbortar)
 		{
-			if (feanasHaciendose.Existeix(faenaHaAbortar.IdUnico)) {
-				hilosFaenas.Elimina(feanasHaciendose[faenaHaAbortar.IdUnico].Key.Name);
+			if (feanasHaciendose.ContainsKey(faenaHaAbortar.IdUnico)) {
+				hilosFaenas.Remove(feanasHaciendose[faenaHaAbortar.IdUnico].Key.Name);
 				try {
 					feanasHaciendose[faenaHaAbortar.IdUnico].Key.Abort();
 				} catch {
 				}
-				feanasHaciendose.Elimina(faenaHaAbortar.IdUnico);
+				feanasHaciendose.Remove(faenaHaAbortar.IdUnico);
 				faenaHaAbortar.DentroPool = false;
-			} else if (faenasEstaticas.Existeix(faenaHaAbortar)) {
-				faenasEstaticas.Elimina(faenaHaAbortar);
+			} else if (faenasEstaticas.Contains(faenaHaAbortar)) {
+				faenasEstaticas.Remove(faenaHaAbortar);
 				faenaHaAbortar.DentroPool = false;
 			}
 		}

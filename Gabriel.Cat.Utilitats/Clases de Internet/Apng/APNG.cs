@@ -261,39 +261,39 @@ namespace Gabriel.Cat
             if (pngs.Count > 0)
             {
                 //	pngs.Ordena();
-                chunks.Afegir(IhdrChunk);//IHDR
-                chunks.Afegir(new acTLChunk(NumeroDeRepeticiones, (uint)pngs.Count));//acTL
+                chunks.Add(IhdrChunk);//IHDR
+                chunks.Add(new acTLChunk(NumeroDeRepeticiones, (uint)pngs.Count));//acTL
 
                                //pongo los pngs
                                //fcTL
                 if (!SaltarPrimerFotograma)
                 {
                     pngs[0].FCTL.SequenceNumber = orden; orden += 3;
-                    chunks.Afegir(pngs[0].FCTL);
+                    chunks.Add(pngs[0].FCTL);
                 }
                 //Idata
                 for (int j = 0; j < pngs[0].IDATS.Count; j++)
                 {
                     pngs[0].IDATS[j].ChunkType = IDATChunk.NAME;//el primero es IDAT
-                    chunks.Afegir(pngs[0].IDATS[j]);
+                    chunks.Add(pngs[0].IDATS[j]);
                 }
                 for (int i = 1; i < pngs.Count; i++)
                 {
                     //fcTL
 
                     pngs[i].FCTL.SequenceNumber = orden; orden += 3;
-                    chunks.Afegir(pngs[i].FCTL);
+                    chunks.Add(pngs[i].FCTL);
                     //Idata
                     for (int j = 0; j < pngs[i].IDATS.Count; j++)
                     {
                         chunkIDAT = pngs[i].IDATS[j].Clon();
                         chunkIDAT.ChunkType = fdATChunk.NAME;// los demás fdAT
-                        chunks.Afegir(chunkIDAT);
+                        chunks.Add(chunkIDAT);
                     }
 
                 }
-                chunks.AfegirMolts(metadata);
-                chunks.Afegir(IendChunk);
+                chunks.AddRange(metadata);
+                chunks.Add(IendChunk);
             }
             return chunks.ToTaula();
         }

@@ -48,7 +48,7 @@ namespace Gabriel.Cat
         {
             diccionarioCaracteresValidos = new LlistaOrdenada<char, char>();
             for (int i = 0; i < caracteresHex.Length; i++)
-                diccionarioCaracteresValidos.Afegir(caracteresHex[i][0], caracteresHex[i][0]);
+                diccionarioCaracteresValidos.Add(caracteresHex[i][0], caracteresHex[i][0]);
         }
 
 
@@ -328,7 +328,7 @@ namespace Gabriel.Cat
             bool valida = true;
             for(int i=0;i<stringHex.Length&&valida;i++)
             {
-                valida = diccionarioCaracteresValidos.Existeix(stringHex[i]);   
+                valida = diccionarioCaracteresValidos.ContainsKey(stringHex[i]);   
             }
             return valida;
 

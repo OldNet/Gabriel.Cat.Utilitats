@@ -18,11 +18,11 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of Llista.
     /// </summary>
-    public class Llista<TValue> : IEnumerable<TValue>
+    public class Llista<TValue> : IList<TValue>, IReadOnlyList<TValue>
     {
         List<TValue> llista;
         Semaphore semafor;
-        bool esperando = false;
+        public bool Whaiting { get; private set; }
         LlistaOrdenada<IComparable, TValue> llistaOrdenada;//sirve para facilitar el encontrar los valores para que sea lo mas ágil posible
         /// <summary>
         /// Ocurre cuando la lista es modificada ya sea en el numero de elementos o en el orden
@@ -30,322 +30,56 @@ namespace Gabriel.Cat
         public event EventHandler Updated;
         public event EventHandler Added;
         public event EventHandler Removed;
-        ConfirmacionEventHandler<Llista<TValue>,TValue> AntesDeAñadir;
-        ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> AntesDeAñadirMuchos;
-        ConfirmacionEventHandler<Llista<TValue>,TValue> AntesDeBorrar;
-        ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> AntesDeBorrarMuchos;
-        ConfirmacionEventHandler<Llista<TValue>> AntesDeVaciar;
-        ConfirmacionEventHandler<Llista<TValue>> AntesDeActualizar;
+        ConfirmationEventHandler<Llista<TValue>,TValue> AddConfirmation;
+        ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> AddRangeConfirmation;
+        ConfirmationEventHandler<Llista<TValue>,TValue> RemoveConfirmation;
+        ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> ReomveRangeConfirmation;
+        ConfirmacionEventHandler<Llista<TValue>> ClearConfirmation;
+        ConfirmacionEventHandler<Llista<TValue>> UpdateConfirmation;
         public Llista()
         {
+            Whaiting = false;
             llista = new List<TValue>();
             if (typeof(TValue).GetInterface("IClauUnicaPerObjecte") != null)
                 llistaOrdenada = new LlistaOrdenada<IComparable, TValue>();
             semafor = new Semaphore(1, 1);
         }
-        public Llista(ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntedDeAñadir, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeAñadirMuchos, ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntesDeBorrar, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeBorrarMuchos, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeActualizar, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeVaciar) : this()
+        public Llista(ConfirmationEventHandler<Llista<TValue>, TValue> metodoAddConfirmation, ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAddRangeConfirmation, ConfirmationEventHandler<Llista<TValue>, TValue> metodoRemoveConfirmation, ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoReomveRangeConfirmation, ConfirmacionEventHandler<Llista<TValue>> metodoUpdateConfirmation, ConfirmacionEventHandler<Llista<TValue>> metodoClearConfirmation) : this()
         {
-            AntesDeActualizar = metodoAntesDeActualizar;
-            AntesDeAñadir = metodoAntedDeAñadir;
-            AntesDeAñadirMuchos = metodoAntesDeAñadirMuchos;
-            AntesDeBorrar = metodoAntesDeBorrar;
-            AntesDeBorrarMuchos = metodoAntesDeBorrarMuchos;
-            AntesDeVaciar = metodoAntesDeVaciar;
+            UpdateConfirmation = metodoUpdateConfirmation;
+            AddConfirmation = metodoAddConfirmation;
+            AddRangeConfirmation = metodoAddRangeConfirmation;
+            RemoveConfirmation = metodoRemoveConfirmation;
+            ReomveRangeConfirmation = metodoReomveRangeConfirmation;
+            ClearConfirmation = metodoClearConfirmation;
         }
         public Llista(IEnumerable<TValue> valors)
             : this()
         {
-            AfegirMolts(valors);
+            AddRange(valors);
         }
-        public Llista(IEnumerable<TValue> valors,ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntedDeAñadir, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeAñadirMuchos, ConfirmacionEventHandler<Llista<TValue>, TValue> metodoAntesDeBorrar, ConfirmacionEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAntesDeBorrarMuchos, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeActualizar, ConfirmacionEventHandler<Llista<TValue>> metodoAntesDeVaciar):this(metodoAntedDeAñadir,metodoAntesDeAñadirMuchos,metodoAntesDeBorrar,metodoAntesDeBorrarMuchos,metodoAntesDeActualizar,metodoAntesDeVaciar)
+        public Llista(IEnumerable<TValue> valors,ConfirmationEventHandler<Llista<TValue>, TValue> metodoAddConfirmation, ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoAddRangeConfirmation, ConfirmationEventHandler<Llista<TValue>, TValue> metodoRemoveConfirmation, ConfirmationEventHandler<Llista<TValue>, IEnumerable<TValue>> metodoReomveRangeConfirmation, ConfirmacionEventHandler<Llista<TValue>> metodoUpdateConfirmation, ConfirmacionEventHandler<Llista<TValue>> metodoClearConfirmation) :this(metodoAddConfirmation,metodoAddRangeConfirmation,metodoRemoveConfirmation,metodoReomveRangeConfirmation,metodoUpdateConfirmation,metodoClearConfirmation)
         {
-            AfegirMolts(valors);
+            AddRange(valors);
         }
-        public void Afegir(TValue value)
+        public bool IsReadOnly
         {
-
-            if(AntesDeAñadir==null||AntesDeAñadir(this,value))
-            try
+            get
             {
-                semafor.WaitOne();
-                esperando = true;
-                llista.Add(value);
-                if (llistaOrdenada != null)
-                    llistaOrdenada.AfegirORemplaçar(((IClauUnicaPerObjecte)value).Clau(), value);
-            }
-            finally
-            {
-                semafor.Release();
-                esperando=false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Added != null)
-                    Added(this, new EventArgs());
+                return false;
             }
         }
-        public void AfegirMolts(IEnumerable<TValue> values)
-        {
-            if (AntesDeAñadirMuchos == null || AntesDeAñadirMuchos(this, values))
-                try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                llista.AddRange(values);
-                if (llistaOrdenada != null)
-                {
-                    foreach (TValue value in values)
-                        try
-                        {
-                            llistaOrdenada.AfegirORemplaçar(((IClauUnicaPerObjecte)value).Clau(), value);
-                        }
-                        catch { }
-                }
-            }
-            finally
-            {
-                semafor.Release();
-                esperando=false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Added != null)
-                    Added(this, new EventArgs());
-            }
-        }
-        public void Elimina(TValue value)
-        {
-            if (AntesDeBorrar == null || AntesDeBorrar(this, value))
-                try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                if (llistaOrdenada != null)
-                    llistaOrdenada.Elimina((value as IClauUnicaPerObjecte).Clau());
-                llista.Remove(value);
-            }
-            finally
-            {
-                semafor.Release();
-                esperando=false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Removed != null)
-                    Removed(this, new EventArgs());
-
-            }
-        }
-        public void Elimina(IEnumerable<TValue> values)
-        {
-            if (AntesDeBorrarMuchos == null || AntesDeBorrarMuchos(this, values))
-            try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                if (llistaOrdenada != null)
-                {
-                    foreach (TValue value in values)
-                    {
-                        llistaOrdenada.Elimina((value as IClauUnicaPerObjecte).Clau());
-                        llista.Remove(value);
-                    }
-                    }
-                else
-                {
-                    foreach (TValue value in values)
-                        llista.Remove(value);
-                }
-            }
-            finally
-            {
-                semafor.Release();
-                esperando = false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Removed != null)
-                    Removed(this, new EventArgs());
-            }
-        }
-        public void Elimina(int pos)
-        {
-            if (AntesDeBorrar == null || AntesDeBorrar(this,this[pos]))
-                try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                if (llistaOrdenada != null)
-                    llistaOrdenada.Elimina((llista[pos] as IClauUnicaPerObjecte).Clau());
-                llista.RemoveAt(pos);
-            }
-            finally
-            {
-                semafor.Release();
-                esperando=false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Removed != null)
-                    Removed(this, new EventArgs());
-            }
-        }
-        public TValue FirstOrDefault(IComparable keyToFindItem) 
-        {
-            TValue value;
-            semafor.WaitOne();
-            esperando = true;
-            if (llistaOrdenada == null)
-            {
-                value = llista.FirstOrDefault((item) =>
-                {
-                    return (object)keyToFindItem == (object)item;
-                });
-            }else
-            {
-                value = llistaOrdenada[keyToFindItem];
-            }
-            semafor.Release();
-            esperando = false;
-            return value;
-        }
-      
-
-
-        public int IndexOf(TValue value)
-        {
-            int index;
-            semafor.WaitOne();
-            esperando = true;
-            index = llista.IndexOf(value);
-            esperando = false;
-            semafor.Release();
-            return index;
-        }
-        public bool Existeix(TValue value)
-        {
-            bool existeix = false;
-
-            try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                if (llistaOrdenada != null)
-                    existeix = llistaOrdenada.Existeix(((IClauUnicaPerObjecte)value).Clau());
-                else
-                    existeix = llista.Contains(value);
-            }
-            finally
-            {
-                try
-                {
-                    semafor.Release();
-                }
-                finally
-                {
-                    esperando = false;
-                }
-            }
-            return existeix;
-
-        }
-        public bool Existeix(IComparable value)
-        {
-            bool existeix = false;
-   
-            try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                if (llistaOrdenada != null)
-                    existeix = llistaOrdenada.Existeix(value);
-                else
-                    existeix = llista.Contains(value);
-            }
-            finally
-            {
-                try
-                {
-                    semafor.Release();
-                }
-                finally
-                {
-                    esperando = false;
-                }
-            }
-            return existeix;
-
-        }
-        public void Ordena()
-        {
-            Ordena(Comparer<TValue>.Default);//por mirar si funciona
-        }
-        public void Ordena(IComparer<TValue> comparador)
-        {
-            if (AntesDeActualizar == null || AntesDeActualizar(this))
-                try
-            {
-                semafor.WaitOne(); 
-                esperando = true;
-                llista.Sort(comparador);
-            }
-            finally
-            {
-                try
-                {
-                    semafor.Release();
-                }
-                finally
-                {
-                    esperando = false;
-                    if (Updated != null)
-                        Updated(this, new EventArgs());
-                }
-            }
-        }
-        public void Desordena()
-        {
-            if (AntesDeActualizar == null || AntesDeActualizar(this))
-            try
-            {
-                semafor.WaitOne();
-                esperando = true;
-                IEnumerable<TValue> desorden = llista.Desordena();
-                this.llista.Clear();
-                this.llista.AddRange(desorden);
-            }
-            finally
-            {
-                semafor.Release();
-                esperando = false;
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-            }
-        }
-
         public int Count
         {
             get
             {
                 int count;
                 semafor.WaitOne();
-                esperando = true;
+                Whaiting = true;
                 count = llista.Count;
                 semafor.Release();
-                esperando=false;
+                Whaiting = false;
                 return count;
-            }
-        }
-        public void Buida()
-        {
-            if (AntesDeVaciar == null || AntesDeVaciar(this))
-            {
-                semafor.WaitOne();
-                esperando = true;
-                llista.Clear();
-                semafor.Release();
-                esperando = false;
-                if (llistaOrdenada != null)
-                    llistaOrdenada.Buida();
-                if (Updated != null)
-                    Updated(this, new EventArgs());
-                if (Removed != null)
-                    Removed(this, new EventArgs());
             }
         }
         public TValue this[int pos]
@@ -356,7 +90,7 @@ namespace Gabriel.Cat
                 try
                 {
                     semafor.WaitOne();
-                    esperando = true;
+                    Whaiting = true;
                     value = llista[pos];
                 }
                 catch (Exception ex)
@@ -371,7 +105,7 @@ namespace Gabriel.Cat
                     }
                     finally
                     {
-                        esperando = false;
+                        Whaiting = false;
 
                     }
                 }
@@ -381,35 +115,313 @@ namespace Gabriel.Cat
             set
             {
 
-                if(AntesDeActualizar==null||AntesDeActualizar(this))
-                try
-                {
-                    semafor.WaitOne();
-                    esperando = true;
-                    llista[pos] = value;
-                }
-                finally
-                {
+                if (UpdateConfirmation == null || UpdateConfirmation(this))
                     try
                     {
-                        semafor.Release();
+                        semafor.WaitOne();
+                        Whaiting = true;
+                        llista[pos] = value;
                     }
                     finally
                     {
-                        esperando = false;
-                        if (Updated != null)
-                            Updated(this, new EventArgs());
+                        try
+                        {
+                            semafor.Release();
+                        }
+                        finally
+                        {
+                            Whaiting = false;
+                            if (Updated != null)
+                                Updated(this, new EventArgs());
+                        }
                     }
-                }
             }
         }
-        public void InserirEn(int posicio, TValue valor)
+        public void Add(TValue value)
         {
-            if(AntesDeAñadir==null||AntesDeAñadir(this,valor))
+
+            if(AddConfirmation==null||AddConfirmation(this,value))
             try
             {
                 semafor.WaitOne();
-                esperando = true;
+                Whaiting = true;
+                llista.Add(value);
+                if (llistaOrdenada != null)
+                    llistaOrdenada.AddOrReplace(((IClauUnicaPerObjecte)value).Clau(), value);
+            }
+            finally
+            {
+                semafor.Release();
+                Whaiting=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Added != null)
+                    Added(this, new EventArgs());
+            }
+        }
+        public void AddRange(IEnumerable<TValue> values)
+        {
+            if(values!=null)
+            if (AddRangeConfirmation == null || AddRangeConfirmation(this, values))
+                try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                llista.AddRange(values);
+                if (llistaOrdenada != null)
+                {
+                    foreach (TValue value in values)
+                        try
+                        {
+                            llistaOrdenada.AddOrReplace(((IClauUnicaPerObjecte)value).Clau(), value);
+                        }
+                        catch { }
+                }
+            }
+            finally
+            {
+                semafor.Release();
+                Whaiting=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Added != null)
+                    Added(this, new EventArgs());
+            }
+        }
+        public bool Remove(TValue value)
+        {
+            bool removeDone=false;
+            if (RemoveConfirmation == null || RemoveConfirmation(this, value))
+                try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                if (llistaOrdenada != null)
+                    llistaOrdenada.Remove((value as IClauUnicaPerObjecte).Clau());
+                    removeDone=llista.Remove(value);
+            }
+            finally
+            {
+                semafor.Release();
+                Whaiting=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
+
+            }
+            return removeDone;
+        }
+        public bool[] RemoveRange(IEnumerable<TValue> values)
+        {
+            List<bool> result = new List<bool>();
+            if (values != null)
+                if (ReomveRangeConfirmation == null || ReomveRangeConfirmation(this, values))
+                    try
+                    {
+                        semafor.WaitOne();
+                        Whaiting = true;
+                        if (llistaOrdenada != null)
+                        {
+                            foreach (TValue value in values)
+                            {
+                                llistaOrdenada.Remove((value as IClauUnicaPerObjecte).Clau());
+                                result.Add(llista.Remove(value));
+                            }
+                        }
+                        else
+                        {
+                            foreach (TValue value in values)
+                                result.Add(llista.Remove(value));
+                        }
+                    }
+                    finally
+                    {
+                        semafor.Release();
+                        Whaiting = false;
+                        if (Updated != null)
+                            Updated(this, new EventArgs());
+                        if (Removed != null)
+                            Removed(this, new EventArgs());
+                    }
+            return result.ToArray();
+        }
+        public void RemoveAt(int pos)
+        {
+            if (RemoveConfirmation == null || RemoveConfirmation(this,this[pos]))
+                try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                if (llistaOrdenada != null)
+                    llistaOrdenada.Remove((llista[pos] as IClauUnicaPerObjecte).Clau());
+                llista.RemoveAt(pos);
+            }
+            finally
+            {
+                semafor.Release();
+                Whaiting=false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
+            }
+        }
+        public TValue FirstOrDefault(IComparable keyToFindItem) 
+        {
+            TValue value;
+            semafor.WaitOne();
+            Whaiting = true;
+            if (llistaOrdenada == null)
+            {
+                value = llista.FirstOrDefault((item) =>
+                {
+                    return (object)keyToFindItem == (object)item;
+                });
+            }else
+            {
+                value = llistaOrdenada[keyToFindItem];
+            }
+            semafor.Release();
+            Whaiting = false;
+            return value;
+        }
+        public int IndexOf(TValue value)
+        {
+            int index;
+            semafor.WaitOne();
+            Whaiting = true;
+            index = llista.IndexOf(value);
+            Whaiting = false;
+            semafor.Release();
+            return index;
+        }
+        public bool Contains(TValue value)
+        {
+            bool existeix = false;
+
+            try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                if (llistaOrdenada != null)
+                    existeix = llistaOrdenada.ContainsKey(((IClauUnicaPerObjecte)value).Clau());
+                else
+                    existeix = llista.Contains(value);
+            }
+            finally
+            {
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    Whaiting = false;
+                }
+            }
+            return existeix;
+
+        }
+        public bool Contains(IComparable value)
+        {
+            bool existeix = false;
+   
+            try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                if (llistaOrdenada != null)
+                    existeix = llistaOrdenada.ContainsKey(value);
+                else
+                    existeix = llista.Contains(value);
+            }
+            finally
+            {
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    Whaiting = false;
+                }
+            }
+            return existeix;
+
+        }
+        public void Sort()
+        {
+            Sort(Comparer<TValue>.Default);//por mirar si funciona
+        }
+        public void Sort(IComparer<TValue> comparador)
+        {
+            if (UpdateConfirmation == null || UpdateConfirmation(this))
+                try
+            {
+                semafor.WaitOne(); 
+                Whaiting = true;
+                llista.Sort(comparador);
+            }
+            finally
+            {
+                try
+                {
+                    semafor.Release();
+                }
+                finally
+                {
+                    Whaiting = false;
+                    if (Updated != null)
+                        Updated(this, new EventArgs());
+                }
+            }
+        }
+        public void Disorder()
+        {
+            if (UpdateConfirmation == null || UpdateConfirmation(this))
+            try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                IEnumerable<TValue> desorden = llista.Desordena();
+                this.llista.Clear();
+                this.llista.AddRange(desorden);
+            }
+            finally
+            {
+                semafor.Release();
+                Whaiting = false;
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+            }
+        }
+
+        public void Clear()
+        {
+            if (ClearConfirmation == null || ClearConfirmation(this))
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                llista.Clear();
+                semafor.Release();
+                Whaiting = false;
+                if (llistaOrdenada != null)
+                    llistaOrdenada.Clear();
+                if (Updated != null)
+                    Updated(this, new EventArgs());
+                if (Removed != null)
+                    Removed(this, new EventArgs());
+            }
+        }
+        
+        public void Insert(int posicio, TValue valor)
+        {
+            if(AddConfirmation==null||AddConfirmation(this,valor))
+            try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
                 llista.Insert(posicio, valor);
             }
             finally
@@ -420,7 +432,7 @@ namespace Gabriel.Cat
                 }
                 finally
                 {
-                    esperando = false;
+                    Whaiting = false;
                     if (Updated != null)
                         Updated(this, new EventArgs());
                     if (Added != null)
@@ -430,7 +442,7 @@ namespace Gabriel.Cat
         }
         public void Push(TValue valor)
         {
-            InserirEn(0, valor);
+            Insert(0, valor);
         }
 
         public TValue Peek()
@@ -439,21 +451,21 @@ namespace Gabriel.Cat
             try
             {
                 semafor.WaitOne();
-                esperando = true;
+                Whaiting = true;
                 peek = llista[0];
             }
             catch { }
             finally
             {
                 semafor.Release();
-                esperando = false;
+                Whaiting = false;
             }
             return peek;
         }
         public TValue Pop()
         {
             TValue primero = Peek();
-            Elimina(0);
+            RemoveAt(0);
             return primero;
         }
 
@@ -465,10 +477,10 @@ namespace Gabriel.Cat
             TValue valor;
             TValue[] taula;
             semafor.WaitOne();
-            esperando = true;
+            Whaiting = true;
             taula = llista.ToArray();
             semafor.Release();
-            esperando=false;
+            Whaiting=false;
             for (int i = 0, taulaLength = taula.Length; i < taulaLength; i++)
             {
                 valor = taula[i];
@@ -476,15 +488,26 @@ namespace Gabriel.Cat
             }
         }
 
-        #endregion
-
-        #region IEnumerable implementation
-
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
+        public void CopyTo(TValue[] array, int arrayIndex)
+        {
+            try
+            {
+                semafor.WaitOne();
+                Whaiting = true;
+                llista.CopyTo(array, arrayIndex);
+            }
+            finally
+            {
+                Whaiting = false;
+                semafor.Release();
+            }
+           
+        }
         #endregion
     }
     public interface IClauUnicaPerObjecte

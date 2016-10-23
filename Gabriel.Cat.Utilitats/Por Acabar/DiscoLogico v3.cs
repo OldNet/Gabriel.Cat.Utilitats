@@ -131,11 +131,11 @@ namespace Gabriel.Cat.Utilitats.New
                 subDirs = dir.GetDirectories();
                 for (int i = 0; i < subDirs.Length; i++)
                 {
-                    if (!DiscoLogico.discosOmitidos.Existeix(subDirs[i].FullName))
+                    if (!DiscoLogico.discosOmitidos.ContainsKey(subDirs[i].FullName))
                     {
-                        if (!this.subDirsSorted.Existeix(subDirs[i].FullName))
+                        if (!this.subDirsSorted.ContainsKey(subDirs[i].FullName))
                         {
-                            if (!discosPendientesDeColocar.Existeix(subDirs[i].FullName))
+                            if (!discosPendientesDeColocar.ContainsKey(subDirs[i].FullName))
                             {
                                 //lo aviso como nuevo encontrado
                                 if (DirectorioEncontrado != null)
@@ -148,11 +148,11 @@ namespace Gabriel.Cat.Utilitats.New
                             {
                                 discoAux = discosPendientesDeColocar[subDirs[i].FullName];
                                 discoAux.parent = this;
-                                discosPendientesDeColocar.Elimina(subDirs[i].FullName);
+                                discosPendientesDeColocar.Remove(subDirs[i].FullName);
                             }
                             AñadeSubdirAlTotal(subDirs[i]);
-                            subDirsSorted.Afegir(subDirs[i].FullName, discoAux);
-                            this.subDirs.Afegir(discoAux);
+                            subDirsSorted.Add(subDirs[i].FullName, discoAux);
+                            this.subDirs.Add(discoAux);
                         }
                     }
                 }
@@ -166,7 +166,7 @@ namespace Gabriel.Cat.Utilitats.New
                 //si es un foco omitido se evitara 
                 //para hacer la actividad se deja como pendiente en ThreadPool y ya se hara cuando toque...asi no gasta muchos recursos y se controla
                
-                if (!discosFocoActivoForzado.Existeix(this.subDirs[i].dir.FullName) && !discosFocoDesactivadoForzado.Existeix(this.subDirs[i].dir.FullName)) //Si es no es un foco activo lo hago sino lo omito
+                if (!discosFocoActivoForzado.ContainsKey(this.subDirs[i].dir.FullName) && !discosFocoDesactivadoForzado.ContainsKey(this.subDirs[i].dir.FullName)) //Si es no es un foco activo lo hago sino lo omito
                 {
                     if (this.subDirs[i].Actividad > NivelMinimoFocoActivo)
                         this.subDirs[i].ActivarFocoActivo(); //si esta desactivado se mira si tiene mucha actividad manualmente, si tiene se activa :D
@@ -177,8 +177,8 @@ namespace Gabriel.Cat.Utilitats.New
             for (int i = 0; i < tiketsPendientes.Count; i++)
             {
                 while (tiketsHaciendose.Count == MAXPROCESS)System.Threading.Thread.Sleep(100);
-                tiketsHaciendose.Afegir(tiketsPendientes[i]);
-                tiketsPendientes[i].FaenaHecha += (tiket, args) => { tiketsHaciendose.Elimina(tiket); };
+                tiketsHaciendose.Add(tiketsPendientes[i]);
+                tiketsPendientes[i].FaenaHecha += (tiket, args) => { tiketsHaciendose.Remove(tiket); };
                 tiketsPendientes[i].HazFaena();
             }
             while (tiketsHaciendose.Count != 0) System.Threading.Thread.Sleep(100);
@@ -201,7 +201,7 @@ namespace Gabriel.Cat.Utilitats.New
                 for (int i = 0; i < files.Length; i++)
                 {
 
-                    if (!this.dirFiles.Existeix(files[i].FullName))
+                    if (!this.dirFiles.ContainsKey(files[i].FullName))
                     {
                         //lo aviso como nuevo encontrado
                         if (ArchivoEncontrado != null)
@@ -214,9 +214,9 @@ namespace Gabriel.Cat.Utilitats.New
                     }
                     else
                     {
-                        this.dirFiles.Elimina(files[i].FullName);
+                        this.dirFiles.Remove(files[i].FullName);
                     }
-                    archivos.Afegir(files[i].FullName, files[i]);
+                    archivos.Add(files[i].FullName, files[i]);
                 }
 
                 foreach (KeyValuePair<string, FileInfo> filePerdido in dirFiles)
@@ -240,7 +240,7 @@ namespace Gabriel.Cat.Utilitats.New
             {
                 parent.AñadeFileAlTotal(fileInfo);
             }
-            totalDirFiles.Afegir(fileInfo.FullName, fileInfo);
+            totalDirFiles.Add(fileInfo.FullName, fileInfo);
         }
         private void QuitaFileAlTotal(FileInfo fileInfo)
         {
@@ -248,7 +248,7 @@ namespace Gabriel.Cat.Utilitats.New
             {
                 parent.QuitaFileAlTotal(fileInfo);
             }
-            totalDirFiles.Elimina(fileInfo.FullName);
+            totalDirFiles.Remove(fileInfo.FullName);
         }
         private void AñadeSubdirAlTotal(DirectoryInfo subDir)
         {
@@ -256,7 +256,7 @@ namespace Gabriel.Cat.Utilitats.New
             {
                 parent.AñadeSubdirAlTotal(subDir);
             }
-            totalSubDirs.Afegir(subDir.FullName, subDir);
+            totalSubDirs.Add(subDir.FullName, subDir);
         }
         private void QuitaSubdirAlTotal(DirectoryInfo subDir)
         {
@@ -264,7 +264,7 @@ namespace Gabriel.Cat.Utilitats.New
             {
                 parent.QuitaSubdirAlTotal(subDir);
             }
-            totalSubDirs.Elimina(subDir.FullName);
+            totalSubDirs.Remove(subDir.FullName);
         }
         #region CompareTo
         public int CompareTo(object obj)
@@ -296,14 +296,14 @@ namespace Gabriel.Cat.Utilitats.New
         {
             Llista<FileInfo> files = new Llista<FileInfo>();
             for (int i = 0; i < todosLosDiscos.Count; i++)
-                files.AfegirMolts(todosLosDiscos[i].totalDirFiles.ValuesToArray());
+                files.AddRange(todosLosDiscos[i].totalDirFiles.ValuesToArray());
             return files.ToArray();
         }
         public static DirectoryInfo[] GetAllDirs()
         {
             Llista<DirectoryInfo> dirs = new Llista<DirectoryInfo>();
             for (int i = 0; i < todosLosDiscos.Count; i++)
-                dirs.AfegirMolts(todosLosDiscos[i].totalSubDirs.ValuesToArray());
+                dirs.AddRange(todosLosDiscos[i].totalSubDirs.ValuesToArray());
             return dirs.ToArray();
         }
         public static DiscoLogico GetDiscoLogico(string path)
@@ -340,7 +340,7 @@ namespace Gabriel.Cat.Utilitats.New
 
                 if (discoEncontrado == null)
                 {
-                    discosPendientesDeColocar.Afegir(path, new DiscoLogico(null,new DirectoryInfo(path)));
+                    discosPendientesDeColocar.Add(path, new DiscoLogico(null,new DirectoryInfo(path)));
                     discoEncontrado = discosPendientesDeColocar[path];
                 }
             }

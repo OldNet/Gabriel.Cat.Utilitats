@@ -33,33 +33,33 @@ namespace Gabriel.Cat
 		}
 		public void Add(Tkey1 key1, Tkey2 key2, Tvalue value)
 		{
-            if (llista1.Existeix(key1))
+            if (llista1.ContainsKey(key1))
                 throw new Exception("Esta duplicada la clave1 para el valor");
-            if (llista2.Existeix(key2))
+            if (llista2.ContainsKey(key2))
                 throw new Exception("Esta duplicada la clave2 para el valor");
-            llista1.Afegir(key1, value);
-			llista2.Afegir(key2, value);
-			llistaClau1.Afegir(key1, key2);
-			llistaClau2.Afegir(key2, key1);
+            llista1.Add(key1, value);
+			llista2.Add(key2, value);
+			llistaClau1.Add(key1, key2);
+			llistaClau2.Add(key2, key1);
 		}
 		public void Remove1(Tkey1 key1)
 		{
 			Tkey2 key2 = llistaClau1[key1];
 
-				llistaClau1.Elimina(key1);
-				llistaClau2.Elimina(key2);
-				llista1.Elimina(key1);
-				llista2.Elimina(key2);
+				llistaClau1.Remove(key1);
+				llistaClau2.Remove(key2);
+				llista1.Remove(key1);
+				llista2.Remove(key2);
 			
 		}
 		public void Remove2(Tkey2 key2)
 		{
 			Tkey1 key1 = llistaClau2[key2];
 
-				llistaClau1.Elimina(key1);
-				llistaClau2.Elimina(key2);
-				llista1.Elimina(key1);
-				llista2.Elimina(key2);
+				llistaClau1.Remove(key1);
+				llistaClau2.Remove(key2);
+				llista1.Remove(key1);
+				llista2.Remove(key2);
 			
 		}
 		public Tvalue ObtainValueWithKey1(Tkey1 key)
@@ -105,10 +105,10 @@ namespace Gabriel.Cat
 		}
 		public void Clear()
 		{
-			llistaClau1.Buida();
-			llista2.Buida();
-			llistaClau2.Buida();
-			llista1.Buida();
+			llistaClau1.Clear();
+			llista2.Clear();
+			llistaClau2.Clear();
+			llista1.Clear();
 		}
 		public Tvalue this[Tkey1 key1] {
 			get{ return llista1[key1]; }
@@ -149,11 +149,11 @@ namespace Gabriel.Cat
 		}
 		public bool ContainsKey1(Tkey1 key1)
 		{
-			return llistaClau1.Existeix(key1);
+			return llistaClau1.ContainsKey(key1);
 		}
 		public bool ContainsKey2(Tkey2 key2)
 		{
-			return llistaClau2.Existeix(key2);
+			return llistaClau2.ContainsKey(key2);
 		}
 		public int Count
 		{ get { return llistaClau1.Count; } }

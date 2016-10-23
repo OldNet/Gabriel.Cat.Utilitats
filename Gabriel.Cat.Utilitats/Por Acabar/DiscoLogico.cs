@@ -275,12 +275,12 @@ namespace Gabriel.Cat
         public void StopAndClear()
         {
             AcabaActividad();
-            directoriosIOEncontrados.Buida();
-            directoriosEncontrados.Buida();
-            archivosEncontrados.Buida();
-            archivosIOEncontrados.Buida();
-            archivosEncontradosPorDirectorio.Buida();
-            archivosIOEncontradosPorDirectorio.Buida();
+            directoriosIOEncontrados.Clear();
+            directoriosEncontrados.Clear();
+            archivosEncontrados.Clear();
+            archivosIOEncontrados.Clear();
+            archivosEncontradosPorDirectorio.Clear();
+            archivosIOEncontradosPorDirectorio.Clear();
         }
         public void PonApunto()
         {
@@ -359,7 +359,7 @@ namespace Gabriel.Cat
                     Exception ex = null;
                     TratarCarpeta metodo = (directorio, pos, total) =>
                     {
-                        if (!blackList.Existeix(directorio.FullName))
+                        if (!blackList.ContainsKey(directorio.FullName))
                         {
                             FileInfo[] filesDir;
                             Thread.Sleep((int)velocidad);
@@ -388,7 +388,7 @@ namespace Gabriel.Cat
                                     for (int j = 0; j < filesDir.Length; j++)
                                     {
                                         Thread.Sleep((int)velocidad);
-                                        if (!archivosIOEncontradosPorDirectorio[directorio.FullName].Existeix(filesDir[j].FullName))
+                                        if (!archivosIOEncontradosPorDirectorio[directorio.FullName].ContainsKey(filesDir[j].FullName))
                                             throw new Exception("");
                                     }
                                 }
@@ -399,7 +399,7 @@ namespace Gabriel.Cat
                                     for (int j = 0; j < filesDir.Length; j++)
                                     {
                                         Thread.Sleep((int)velocidad);
-                                        if (!archivosEncontradosPorDirectorio[directorio.FullName].Existeix(filesDir[j].FullName))
+                                        if (!archivosEncontradosPorDirectorio[directorio.FullName].ContainsKey(filesDir[j].FullName))
                                             throw new Exception("");
                                     }
                                 }
@@ -586,7 +586,7 @@ namespace Gabriel.Cat
                     //Hago un metodoConParametros para poder escanear el directorio Raiz evitando añadirlo a la coleccion...perdiendo tiempo...con la  conversion
                     TratarCarpeta metodo = (directorio, posicionDir, totalDirs) =>
                     {
-                        if (!blackList.Existeix(directorio.FullName))
+                        if (!blackList.ContainsKey(directorio.FullName))
                         {
                             filesDir = null;
                             Thread.Sleep((int)velocidad);
@@ -613,22 +613,22 @@ namespace Gabriel.Cat
                                 {
 
                                     //pongo si no esta
-                                    if (!directoriosIOEncontradosAux.Existeix(directorio.FullName))
+                                    if (!directoriosIOEncontradosAux.ContainsKey(directorio.FullName))
                                     {
-                                        directoriosIOEncontradosAux.Afegir(directorio.FullName, directorio);
+                                        directoriosIOEncontradosAux.Add(directorio.FullName, directorio);
 
                                     }
-                                    if (!archivosIOEncontradosPorDirectorioAux.Existeix(directorio.FullName))
+                                    if (!archivosIOEncontradosPorDirectorioAux.ContainsKey(directorio.FullName))
                                     {
-                                        archivosIOEncontradosPorDirectorioAux.Afegir(directorio.FullName, new LlistaOrdenada<string, FileInfo>());
+                                        archivosIOEncontradosPorDirectorioAux.Add(directorio.FullName, new LlistaOrdenada<string, FileInfo>());
                                     }
                                     //si esta lo quito para que me queden los que ya no estan
-                                    if (directoriosIOEncontrados.Existeix(directorio.FullName))
-                                        directoriosIOEncontrados.Elimina(directorio.FullName);
+                                    if (directoriosIOEncontrados.ContainsKey(directorio.FullName))
+                                        directoriosIOEncontrados.Remove(directorio.FullName);
                                     //me  quedo con los nuevos
                                     else
                                     {
-                                        directoriosNuevos.Afegir(directorio.FullName, directorio.FullName);
+                                        directoriosNuevos.Add(directorio.FullName, directorio.FullName);
                                         if (DirectorioNuevo != null)
                                             DirectorioNuevo(this, new IOArgs(directorio.FullName, true, posicionDir, totalDirs));
                                     }
@@ -636,19 +636,19 @@ namespace Gabriel.Cat
                                     {
                                         Thread.Sleep((int)velocidad);
                                         //si no esta lo pongo
-                                        if (!archivosIOEncontradosPorDirectorioAux.Existeix(filesDir[j].FullName))
-                                            archivosIOEncontradosPorDirectorioAux[directorio.FullName].Afegir(filesDir[j].FullName, filesDir[j]);
-                                        if (!archivosIOEncontradosAux.Existeix(filesDir[j].FullName))
-                                            archivosIOEncontradosAux.Afegir(filesDir[j].FullName, filesDir[j]);
+                                        if (!archivosIOEncontradosPorDirectorioAux.ContainsKey(filesDir[j].FullName))
+                                            archivosIOEncontradosPorDirectorioAux[directorio.FullName].Add(filesDir[j].FullName, filesDir[j]);
+                                        if (!archivosIOEncontradosAux.ContainsKey(filesDir[j].FullName))
+                                            archivosIOEncontradosAux.Add(filesDir[j].FullName, filesDir[j]);
                                         //si esta lo quito para quedarme con los perdidos
-                                        if (archivosIOEncontrados.Existeix(filesDir[j].FullName))
+                                        if (archivosIOEncontrados.ContainsKey(filesDir[j].FullName))
                                         {
-                                            archivosIOEncontrados.Elimina(filesDir[j].FullName);
+                                            archivosIOEncontrados.Remove(filesDir[j].FullName);
                                         }
                                         //si no lo guardo con los nuevos
                                         else
                                         {
-                                            archivosNuevos.Afegir(filesDir[j].FullName, filesDir[j].FullName);
+                                            archivosNuevos.Add(filesDir[j].FullName, filesDir[j].FullName);
                                             if (ArchivoNuevo != null)
                                                 ArchivoNuevo(this, new IOArgs(filesDir[j].FullName, false, j, filesDir.Length));
                                         }
@@ -656,36 +656,36 @@ namespace Gabriel.Cat
                                 }
                                 else
                                 {
-                                    if (!directoriosEncontradosAux.Existeix(directorio.FullName))
+                                    if (!directoriosEncontradosAux.ContainsKey(directorio.FullName))
                                     {
-                                        directoriosEncontradosAux.Afegir(directorio.FullName, directorio.FullName);
+                                        directoriosEncontradosAux.Add(directorio.FullName, directorio.FullName);
 
                                     }
-                                    if (!archivosEncontradosPorDirectorioAux.Existeix(directorio.FullName))
+                                    if (!archivosEncontradosPorDirectorioAux.ContainsKey(directorio.FullName))
                                     {
-                                        archivosEncontradosPorDirectorioAux.Afegir(directorio.FullName, new LlistaOrdenada<string, string>());
+                                        archivosEncontradosPorDirectorioAux.Add(directorio.FullName, new LlistaOrdenada<string, string>());
                                     }
 
-                                    if (directoriosEncontrados.Existeix(directorio.FullName))
-                                        directoriosEncontrados.Elimina(directorio.FullName);//asi solo me quedan los perdidos :D
+                                    if (directoriosEncontrados.ContainsKey(directorio.FullName))
+                                        directoriosEncontrados.Remove(directorio.FullName);//asi solo me quedan los perdidos :D
                                     else
                                     {
-                                        directoriosNuevos.Afegir(directorio.FullName, directorio.FullName);
+                                        directoriosNuevos.Add(directorio.FullName, directorio.FullName);
                                         if (DirectorioNuevo != null)
                                             DirectorioNuevo(this, new IOArgs(directorio.FullName, true, posicionDir, totalDirs));
                                     }
                                     for (int j = 0; j < filesDir.Length; j++)
                                     {
                                         Thread.Sleep((int)velocidad);
-                                        if (!archivosEncontradosPorDirectorioAux.Existeix(filesDir[j].FullName))
-                                            archivosEncontradosPorDirectorioAux[directorio.FullName].Afegir(filesDir[j].FullName, filesDir[j].FullName);
-                                        if (!archivosEncontradosAux.Existeix(filesDir[j].FullName))
-                                            archivosEncontradosAux.Afegir(filesDir[j].FullName, filesDir[j].FullName);
-                                        if (archivosEncontrados.Existeix(filesDir[j].FullName))
-                                            archivosEncontrados.Elimina(filesDir[j].FullName);//asi me quedo con los archivos perdidos :D
+                                        if (!archivosEncontradosPorDirectorioAux.ContainsKey(filesDir[j].FullName))
+                                            archivosEncontradosPorDirectorioAux[directorio.FullName].Add(filesDir[j].FullName, filesDir[j].FullName);
+                                        if (!archivosEncontradosAux.ContainsKey(filesDir[j].FullName))
+                                            archivosEncontradosAux.Add(filesDir[j].FullName, filesDir[j].FullName);
+                                        if (archivosEncontrados.ContainsKey(filesDir[j].FullName))
+                                            archivosEncontrados.Remove(filesDir[j].FullName);//asi me quedo con los archivos perdidos :D
                                         else
                                         {
-                                            archivosNuevos.Afegir(filesDir[j].FullName, filesDir[j].FullName);
+                                            archivosNuevos.Add(filesDir[j].FullName, filesDir[j].FullName);
                                             if (ArchivoNuevo != null)
                                                 ArchivoNuevo(this, new IOArgs(filesDir[j].FullName, false, j, filesDir.Length));
                                         }
@@ -837,16 +837,16 @@ namespace Gabriel.Cat
             string[] archivosRutas = null;
             if (usarObjetosIO)
             {
-                if (archivosIOEncontradosPorDirectorio.Existeix(carpeta))
+                if (archivosIOEncontradosPorDirectorio.ContainsKey(carpeta))
                     archivosRutas = archivosIOEncontradosPorDirectorio[carpeta].KeysToArray();
             }
             else
             {
-                if (archivosEncontradosPorDirectorio.Existeix(carpeta))
+                if (archivosEncontradosPorDirectorio.ContainsKey(carpeta))
                     archivosRutas = archivosEncontradosPorDirectorio[carpeta].KeysToArray();
             }
             if (archivosRutas != null)
-                archivosRutas = archivosRutas.Filtra((file) => { return !blackList.Existeix(Path.GetDirectoryName(file)); }).ToArray();
+                archivosRutas = archivosRutas.Filtra((file) => { return !blackList.ContainsKey(Path.GetDirectoryName(file)); }).ToArray();
             return archivosRutas;
 
         }
@@ -864,7 +864,7 @@ namespace Gabriel.Cat
                     archivosRutas[i] = new FileInfo(archivosRutasString[i]);
             }
             if (archivosRutas != null)
-                archivosRutas = archivosRutas.Filtra((file) => { return !blackList.Existeix(file.Directory.FullName); }).ToArray();
+                archivosRutas = archivosRutas.Filtra((file) => { return !blackList.ContainsKey(file.Directory.FullName); }).ToArray();
             return archivosRutas;
 
         }
@@ -877,16 +877,16 @@ namespace Gabriel.Cat
         {
             FileInfo[] archivosRutas = null;
             string[] archivosRutasString = null;
-            if (!blackList.Existeix(carpeta))
+            if (!blackList.ContainsKey(carpeta))
             {
                 if (usarObjetosIO)
                 {
-                    if (archivosIOEncontradosPorDirectorio.Existeix(carpeta))
+                    if (archivosIOEncontradosPorDirectorio.ContainsKey(carpeta))
                         archivosRutas = archivosIOEncontradosPorDirectorio[carpeta].ValuesToArray();
                 }
                 else
                 {
-                    if (archivosEncontradosPorDirectorio.Existeix(carpeta))
+                    if (archivosEncontradosPorDirectorio.ContainsKey(carpeta))
                     {
                         archivosRutasString = archivosEncontradosPorDirectorio[carpeta].KeysToArray();
                         archivosRutas = new FileInfo[archivosRutasString.Length];
@@ -905,7 +905,7 @@ namespace Gabriel.Cat
                 directorios = directoriosIOEncontrados.KeysToArray();
             else
                 directorios = directoriosEncontrados.KeysToArray();
-            directorios = directorios.Filtra((dir) => { return !blackList.Existeix(dir); }).ToArray();
+            directorios = directorios.Filtra((dir) => { return !blackList.ContainsKey(dir); }).ToArray();
             return directorios;
         }
         public DirectoryInfo[] DirectoriosIO()
@@ -922,7 +922,7 @@ namespace Gabriel.Cat
                     directorios[i] = new DirectoryInfo(rutasDirs[i]);
 
             }
-            directorios = directorios.Filtra((dir) => { return !blackList.Existeix(dir.FullName); }).ToArray();
+            directorios = directorios.Filtra((dir) => { return !blackList.ContainsKey(dir.FullName); }).ToArray();
             return directorios;
         }
         #endregion
@@ -956,7 +956,7 @@ namespace Gabriel.Cat
                         {
                             try
                             {
-                                if (!discosEncontrados.Existeix(unidadesDetectadas[i]) && !blackList.Existeix(unidadesDetectadas[i]))
+                                if (!discosEncontrados.ContainsKey(unidadesDetectadas[i]) && !blackList.ContainsKey(unidadesDetectadas[i]))
                                 {
                                     Directory.GetDirectories(unidadesDetectadas[i]);//si no puedo es que no se puede leer como el dvd :D
                                     discoEncontrado = new DiscoLogico(unidadesDetectadas[i]);
@@ -964,7 +964,7 @@ namespace Gabriel.Cat
                                         UnidadEncontrada(discoEncontrado, new DiscoLogicoEventArgs(discoEncontrado));
                                     todoIgual = false;
                                 }
-                                else if (discosEncontrados.Existeix(unidadesDetectadas[i]) && discosEncontrados[unidadesDetectadas[i]].Desactivada)
+                                else if (discosEncontrados.ContainsKey(unidadesDetectadas[i]) && discosEncontrados[unidadesDetectadas[i]].Desactivada)
                                 {
                                     discosEncontrados[unidadesDetectadas[i]].Desactivada = false;
                                     todoIgual = false;
@@ -1029,21 +1029,21 @@ namespace Gabriel.Cat
         {
             if (String.IsNullOrEmpty(path))
                 throw new Exception("Se necesita una ruta para buscar");
-            return discosEncontrados.Existeix(path);
+            return discosEncontrados.ContainsKey(path);
         }
         public static void AñadirDisco(DiscoLogico disco)
         {
-            if (!discosEncontrados.Existeix(disco.Root))
+            if (!discosEncontrados.ContainsKey(disco.Root))
             {
-                discosEncontrados.Afegir(disco.Root, disco);
+                discosEncontrados.Add(disco.Root, disco);
                 disco.PonApunto();
             }
         }
         public static void QuitarDisco(DiscoLogico disco)
         {
-            if (discosEncontrados.Existeix(disco.Root))
+            if (discosEncontrados.ContainsKey(disco.Root))
             {
-                discosEncontrados.Elimina(disco.Root);
+                discosEncontrados.Remove(disco.Root);
             }
             //si es una unidad logica pues poner en la blackList...i poder quitar de esa blacklist
         }
@@ -1058,11 +1058,11 @@ namespace Gabriel.Cat
             string rootPath = Path.GetPathRoot(path);
             if (add)
             {
-                blackList.AfegirORemplaçar(path, path);
+                blackList.AddOrReplace(path, path);
             }
             else
             {
-                blackList.Elimina(path);
+                blackList.Remove(path);
             }
         }
         public static string[] GetBlackList()
@@ -1133,8 +1133,8 @@ namespace Gabriel.Cat
                 try
                 {
                     discoLogico = new DiscoLogico(nodoXml.ChildNodes[1].ChildNodes[i]);
-                    if (!discos.Existeix(discoLogico.Root))
-                        discos.Afegir(discoLogico.Root, discoLogico);//falla algo
+                    if (!discos.ContainsKey(discoLogico.Root))
+                        discos.Add(discoLogico.Root, discoLogico);//falla algo
                 }
                 catch { }//hay un error en el xml
             }
@@ -1143,7 +1143,7 @@ namespace Gabriel.Cat
             for (int i = 0; i < nodoXml.LastChild.ChildNodes.Count; i++)
             {
                 blackPath = nodoXml.LastChild.ChildNodes[i].InnerText.EscaparCaracteresXML();
-                blackList.AfegirORemplaçar(blackPath, blackPath);
+                blackList.AddOrReplace(blackPath, blackPath);
             }
             return discos.ValuesToArray();
 
@@ -1169,10 +1169,10 @@ namespace Gabriel.Cat
             if (discosNoAñadidos != null)
             {
                 foreach (DiscoLogico disco in discosNoAñadidos)
-                    if (!discos.Existeix(disco.Root))
-                        discos.Afegir(disco.Root, disco);
+                    if (!discos.ContainsKey(disco.Root))
+                        discos.Add(disco.Root, disco);
             }
-            discos.AfegirMolts(discosEncontrados);
+            discos.AddRange(discosEncontrados);
             stringXml += "<Discos>";
             foreach (var discoAGuardar in discos)
                 stringXml += discoAGuardar.Value.ToXml().OuterXml;
@@ -1313,13 +1313,13 @@ namespace Gabriel.Cat
                 {
                     if (!Directory.Exists(value))
                         throw new Exception("La ruta no es valida para ser escaneada porque no existe");
-                    if (discosEncontrados.Existeix(value))
+                    if (discosEncontrados.ContainsKey(value))
                         throw new Exception("La ruta ya se esta escaneando actualmente");
                     ModoEscaneo modo = modoEscaneoBD;
                     string[] dirsDejadosDeVigilar;
-                    discosEncontrados.Elimina(root);
+                    discosEncontrados.Remove(root);
                     root = value;
-                    discosEncontrados.Afegir(root, this);
+                    discosEncontrados.Add(root, this);
                     //como cambio de Root dejo de vigilar esas carpetas...lo malo es que si hay otro disco con una root que inculya alguna de estas carpetas...se daran de bajaa...
                     dirsDejadosDeVigilar = Directorios();
                     for (int i = 0; i < dirsDejadosDeVigilar.Length; i++)

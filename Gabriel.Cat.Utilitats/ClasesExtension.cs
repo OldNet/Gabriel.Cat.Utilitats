@@ -128,8 +128,8 @@ namespace Gabriel.Cat.Extension
             caracteresReservadosXml = new LlistaOrdenada<string, string>();
             for (int i = 0; i < caracteresXmlReservados.Length; i++)
             {
-                caracteresReservadosXml.Afegir(caracteresXmlReservados[i], caracteresXmlSustitutos[i]);
-                caracteresReservadosXml.Afegir(caracteresXmlSustitutos[i], caracteresXmlReservados[i]);
+                caracteresReservadosXml.Add(caracteresXmlReservados[i], caracteresXmlSustitutos[i]);
+                caracteresReservadosXml.Add(caracteresXmlSustitutos[i], caracteresXmlReservados[i]);
             }
             #endregion
         }
@@ -486,13 +486,13 @@ namespace Gabriel.Cat.Extension
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
-            llista.Afegir((TKey)value.Clau(), (TValue)value);
+            llista.Add((TKey)value.Clau(), (TValue)value);
         }
         public static void AfegirORemplaçar<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
-            llista.AfegirORemplaçar((TKey)value.Clau(), (TValue)value);
+            llista.AddOrReplace((TKey)value.Clau(), (TValue)value);
         }
         #endregion
         #region ICollection<T>Extension
@@ -577,11 +577,11 @@ namespace Gabriel.Cat.Extension
             FileInfo[] files = null;
             string hashArchivo = null;
             foreach (string hash in hashes)
-                if (!llista.Existeix(hash))
-                    llista.Afegir(hash, hash);
-            dirs.Afegir(dir);
+                if (!llista.ContainsKey(hash))
+                    llista.Add(hash, hash);
+            dirs.Add(dir);
             if (recursivo)
-                dirs.AfegirMolts(dir.SubDirectoris());
+                dirs.AddRange(dir.SubDirectoris());
 
             for (int i = 0; i < dirs.Count && llista.Count != 0; i++)
             {
@@ -600,10 +600,10 @@ namespace Gabriel.Cat.Extension
 
                     }
 
-                    if (llista.Existeix(hashArchivo))
+                    if (llista.ContainsKey(hashArchivo))
                     {
-                        filesEncontrados.Afegir(files[j]);
-                        llista.Elimina(hashArchivo);
+                        filesEncontrados.Add(files[j]);
+                        llista.Remove(hashArchivo);
 
                     }
                 }
@@ -660,13 +660,13 @@ namespace Gabriel.Cat.Extension
             DirectoryInfo[] subDirs;
             if (dir.CanRead())
             {
-                files.AfegirMolts(dir.GetFiles(formatsAdmessos));
+                files.AddRange(dir.GetFiles(formatsAdmessos));
                 if (recursivo)
                 {
                     subDirs = dir.SubDirectoris();
                     for (int i = 0; i < subDirs.Length; i++)
                         if (subDirs[i].CanRead())
-                            files.AfegirMolts(subDirs[i].GetFiles(formatsAdmessos));
+                            files.AddRange(subDirs[i].GetFiles(formatsAdmessos));
                 }
             }
             return files.ToArray();
@@ -820,7 +820,7 @@ namespace Gabriel.Cat.Extension
                         if (!idArxiusPerCopiar.ContainsKey(fitxer.IdUnicoRapido()))
                             idArxiusPerCopiar.Add(fitxer.IdUnicoRapido(), fitxer);
                         else
-                            archivosDuplicados.Afegir(fitxer);
+                            archivosDuplicados.Add(fitxer);
                     }
             foreach (var archiuACopiar in idArxiusPerCopiar)
             {//miro archivo a copiar uno a uno  para ver si se tiene que copiar o no :)
@@ -841,10 +841,10 @@ namespace Gabriel.Cat.Extension
                     pathsFinals.Add(direccioFinalArxiu, fitxersCarpeta.Current.IdUnicoRapido(), archiuACopiar.Value);
                 }
             }
-            llistaFinal.AfegirMolts(pathsFinals.Key1ValuePair());
+            llistaFinal.AddRange(pathsFinals.Key1ValuePair());
             for (int i = 0; i < archivosDuplicados.Count; i++)
             {
-                llistaFinal.Afegir(new KeyValuePair<string, FileInfo>(pathsFinals.ObtainValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
+                llistaFinal.Add(new KeyValuePair<string, FileInfo>(pathsFinals.ObtainValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
             }
             return llistaFinal.ToTaula();
 
@@ -1335,7 +1335,7 @@ namespace Gabriel.Cat.Extension
             if (fila <= matriu.GetLength(DimensionMatriz.Fila))
             {
                 for (int x = 0; x < matriu.GetLength(DimensionMatriz.Columna); x++)
-                    filas.Afegir(matriu[x, fila]);
+                    filas.Add(matriu[x, fila]);
             }
             return filas.ToTaula();
         }
@@ -1345,7 +1345,7 @@ namespace Gabriel.Cat.Extension
             if (columna <= matriu.GetLength(DimensionMatriz.Columna))
             {
                 for (int y = 0; y < matriu.GetLength(DimensionMatriz.Fila); y++)
-                    columnas.Afegir(matriu[columna, y]);
+                    columnas.Add(matriu[columna, y]);
             }
             return columnas.ToTaula();
         }
@@ -1463,8 +1463,8 @@ namespace Gabriel.Cat.Extension
         {
             LlistaOrdenada<T, T> llistaOrdenada = new LlistaOrdenada<T, T>();
             foreach (T element in list)
-                if (!llistaOrdenada.Existeix(element))
-                    llistaOrdenada.Afegir(element, element);
+                if (!llistaOrdenada.ContainsKey(element))
+                    llistaOrdenada.Add(element, element);
             return llistaOrdenada;
         }
         /// <summary>
@@ -1673,7 +1673,7 @@ namespace Gabriel.Cat.Extension
             Llista<Tvalue> valorsOk = new Llista<Tvalue>();
             foreach (Tvalue valor in valors)
                 if (comprovador(valor))
-                    valorsOk.Afegir(valor);
+                    valorsOk.Add(valor);
             return valorsOk;
 
         }
@@ -1686,8 +1686,8 @@ namespace Gabriel.Cat.Extension
             for (int i = 0, total = llistaOrdenada.Count; i < total; i++)
             {
                 posicionAzar = MiRandom.Next(0, llistaOrdenada.Count);
-                llistaDesordenada.Afegir(llistaOrdenada[posicionAzar]);
-                llistaOrdenada.Elimina(posicionAzar);
+                llistaDesordenada.Add(llistaOrdenada[posicionAzar]);
+                llistaOrdenada.RemoveAt(posicionAzar);
 
             }
             return llistaDesordenada;
@@ -1714,13 +1714,13 @@ namespace Gabriel.Cat.Extension
             {
                 try
                 {
-                    llista.Afegir((TResult)obj);//lo malo es cuando no es un int casting double
+                    llista.Add((TResult)obj);//lo malo es cuando no es un int casting double
                 }
                 catch
                 {
                     //mirar de poder convertir el valor en caso de que sea posible ...
                     if (conservarNoCompatiblesCasting)
-                        llista.Afegir(default(TResult));
+                        llista.Add(default(TResult));
                 }
             }
 
@@ -1731,7 +1731,7 @@ namespace Gabriel.Cat.Extension
         public static IEnumerable<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
         {
             Llista<Tvalue> llista = new Llista<Tvalue>(valors);
-            llista.Ordena();
+            llista.Sort();
             return llista;
         }
         public static IEnumerable<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
@@ -1761,7 +1761,7 @@ namespace Gabriel.Cat.Extension
         public static IEnumerable<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
         {
             Llista<Tvalue> valorsFinals = new Llista<Tvalue>(valors);
-            valorsFinals.Afegir(valorNou);
+            valorsFinals.Add(valorNou);
             return valorsFinals;
         }
         public static IEnumerable<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents) where Tvalue : IComparable
@@ -1774,12 +1774,12 @@ namespace Gabriel.Cat.Extension
                     foreach (Tvalue valor in valorsNous)
                     {
                         if (noPosarValorsJaExistents)
-                            valorEnLista = llista.Contains(valor);
+                            valorEnLista = Contains(llista, valor);
                         if (!valorEnLista && noPosarValorsJaExistents)
-                            llista.Afegir(valor);
+                            llista.Add(valor);
                         else if (!noPosarValorsJaExistents)
                         {
-                            llista.Afegir(valor);
+                            llista.Add(valor);
                         }
                     }
                 return llista;
@@ -1792,7 +1792,7 @@ namespace Gabriel.Cat.Extension
         {
             Llista<Tvalue> llista = new Llista<Tvalue>(valors);
             if (valorsNous != null)
-                llista.AfegirMolts(valorsNous);
+                llista.AddRange(valorsNous);
             return llista;
 
         }
@@ -1800,7 +1800,7 @@ namespace Gabriel.Cat.Extension
         {
             Llista<Tkey> llista = new Llista<Tkey>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
-                llista.Afegir(pair.Key);
+                llista.Add(pair.Key);
             return llista;
         }
         public static Tvalue[] ToTaula<Tvalue>(this IEnumerable<Tvalue> valors)
@@ -1825,7 +1825,7 @@ namespace Gabriel.Cat.Extension
             subArray = new Llista<Tvalue>();
 
             for (long i = inicio, fin = inicio + longitud; i < fin; i++)
-                subArray.Afegir(array[i]);
+                subArray.Add(array[i]);
             return subArray.ToArray();
 
         }
@@ -2021,7 +2021,7 @@ namespace Gabriel.Cat.Extension
             Llista<string> valorsAmbPrefixISufix = new Llista<string>();
 
             foreach (string valor in valors)
-                valorsAmbPrefixISufix.Afegir(prefix + valor + sufix);
+                valorsAmbPrefixISufix.Add(prefix + valor + sufix);
             return valorsAmbPrefixISufix;
         }
         public static string[] Contenidos(this string aComparar, IEnumerable<string> acontenerLista)
@@ -2049,14 +2049,14 @@ namespace Gabriel.Cat.Extension
                     aComprarAux = ((text)aCompararLow);
                     aComprarAux.Remove(ordenados[i].ToLower());
                     aCompararLow = aComprarAux;
-                    contenidosExcatamente.Afegir(ordenados[i]);
+                    contenidosExcatamente.Add(ordenados[i]);
                 }
             return contenidosExcatamente.ToTaula();
         }
         public static IEnumerable<string> OrdenaPorLongitud(this IEnumerable<string> lista)
         {
             List<string> listaOrdenada = new List<string>(lista);
-            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2)
+            listaOrdenada.Sort(new Comparer<string>(delegate (string vString1, string vString2)
             {
                 return vString1.Length.CompareTo(vString2.Length);
             }));
@@ -2066,7 +2066,7 @@ namespace Gabriel.Cat.Extension
         {
             List<string> listaOrdenada = new List<string>(lista);
             int compareTo;
-            listaOrdenada.Sort(new Comparador<string>(delegate (string vString1, string vString2)
+            listaOrdenada.Sort(new Comparer<string>(delegate (string vString1, string vString2)
             {
                 if (ordenAscendente)
                     compareTo = vString1.Length.CompareTo(vString2.Length);
@@ -2081,7 +2081,7 @@ namespace Gabriel.Cat.Extension
         public static string[] Ordena(this IEnumerable<string> valores)
         {
             List<string> llista = new List<string>(valores);
-            llista.Sort(new Comparador<string>((vString1, vString2) =>
+            llista.Sort(new Comparer<string>((vString1, vString2) =>
             {
                 return string.Compare(vString1, vString2, StringComparison.CurrentCulture);
             }));
@@ -2357,7 +2357,7 @@ namespace Gabriel.Cat.Extension
             {
                 campoTipo = camposTipo[i];
                 if (!campoTipo.GetCustomAttributes(false).Contains(new SerialitzeIgnoreAttribute()))// no tiene el atributo SerialitzeIgnore lo añade :)
-                    campos.Afegir(new Propiedad(campoTipo.Name, campoTipo.GetValue(obj)));
+                    campos.Add(new Propiedad(campoTipo.Name, campoTipo.GetValue(obj)));
             }
             return campos.ToTaula();
         }
@@ -2381,14 +2381,14 @@ namespace Gabriel.Cat.Extension
             LlistaOrdenada<string, object> lista = new LlistaOrdenada<string, object>();
             PropertyInfo campoTipo;
             foreach (Propiedad objPropiedad in objetosPropiedades)
-                if (!lista.Existeix(objPropiedad.Nombre))
-                    lista.Afegir(objPropiedad.Nombre, objPropiedad.Objeto);
+                if (!lista.ContainsKey(objPropiedad.Nombre))
+                    lista.Add(objPropiedad.Nombre, objPropiedad.Objeto);
                 else
                     lista[objPropiedad.Nombre] = objPropiedad.Objeto;
             for (int i = 0; i < camposTipo.Length; i++)
             {
                 campoTipo = camposTipo[i];
-                if (lista.Existeix(campoTipo.Name))
+                if (lista.ContainsKey(campoTipo.Name))
                     campoTipo.SetValue(obj, lista[campoTipo.Name]);
             }
 

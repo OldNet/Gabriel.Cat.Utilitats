@@ -35,15 +35,15 @@ namespace Gabriel.Cat
             {
                 imagen = value;
                 bytesImg = imagen.GetBytes();
-                pointLocatedByColorList.Buida();
-                colorLocatedByPointerList.Buida();
+                pointLocatedByColorList.Clear();
+                colorLocatedByPointerList.Clear();
             }
         }
         public Point GetPoint(Color color)
         {
             int colorInt = color.ToArgb();
             Point location;
-            if (pointLocatedByColorList.Existeix(colorInt))
+            if (pointLocatedByColorList.ContainsKey(colorInt))
                 location = pointLocatedByColorList[colorInt];
             else
                 location = GetPoint(colorInt);
@@ -57,7 +57,7 @@ namespace Gabriel.Cat
             byte[] bytesColor;
             Point location = default(Point);
             bool encontrado = false;
-            if (pointLocatedByColorList.Existeix(colorInt))
+            if (pointLocatedByColorList.ContainsKey(colorInt))
                 location = pointLocatedByColorList[colorInt];
             else
             {
@@ -72,9 +72,9 @@ namespace Gabriel.Cat
                     }
                 if (!encontrado)
                     throw new ArgumentOutOfRangeException("El color no esta dentro de la imagen!");
-                else { pointLocatedByColorList.Afegir(colorInt, location);
-                    if (!colorLocatedByPointerList.Existeix(new PointZ(location, 0)))
-                        colorLocatedByPointerList.Afegir(new PointZ(location, 0), Color.FromArgb(colorInt));
+                else { pointLocatedByColorList.Add(colorInt, location);
+                    if (!colorLocatedByPointerList.ContainsKey(new PointZ(location, 0)))
+                        colorLocatedByPointerList.Add(new PointZ(location, 0), Color.FromArgb(colorInt));
                 }
 
             }
@@ -84,14 +84,14 @@ namespace Gabriel.Cat
         {
             Color color;
             PointZ location = new PointZ(point, 0);
-            if (colorLocatedByPointerList.Existeix(location))
+            if (colorLocatedByPointerList.ContainsKey(location))
                 color = colorLocatedByPointerList[location];
             else
             {
                 color = imagen.GetPixel(point.X, point.Y);
-                colorLocatedByPointerList.Afegir(location, color);
-                if (!pointLocatedByColorList.Existeix(color.ToArgb()))
-                    pointLocatedByColorList.Afegir(color.ToArgb(), point);
+                colorLocatedByPointerList.Add(location, color);
+                if (!pointLocatedByColorList.ContainsKey(color.ToArgb()))
+                    pointLocatedByColorList.Add(color.ToArgb(), point);
             }
             return color;
         }

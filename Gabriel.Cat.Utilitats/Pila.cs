@@ -71,7 +71,7 @@ namespace Gabriel.Cat
 		public void Clear()
 		{
 
-			pila.Buida();
+			pila.Clear();
 
 		}
 

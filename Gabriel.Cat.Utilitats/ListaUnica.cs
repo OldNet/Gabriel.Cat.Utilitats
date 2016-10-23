@@ -44,25 +44,25 @@ namespace Gabriel.Cat
         }
         public void Vaciar()
         {
-            listaOrdenada.Buida();
-            lista.Buida();
+            listaOrdenada.Clear();
+            lista.Clear();
         }
         #region Existe
         public bool Existe(T obj)
 		{
-			return listaOrdenada.Existeix(obj.Clau());
+			return listaOrdenada.ContainsKey(obj.Clau());
 		}
 		public bool Existe(IComparable key)
 		{
-			return listaOrdenada.Existeix(key);
+			return listaOrdenada.ContainsKey(key);
 		}
 		public bool ExisteObjeto(T obj)
 		{
-			return listaOrdenada.Existeix(obj.Clau());
+			return listaOrdenada.ContainsKey(obj.Clau());
 		}
 		public bool ExisteClave(IComparable key)
 		{
-			return listaOrdenada.Existeix(key);
+			return listaOrdenada.ContainsKey(key);
 		}
 		#endregion
 		#region Elimina
@@ -78,7 +78,7 @@ namespace Gabriel.Cat
 		}
 		public bool Elimina(T obj)
 		{
-            lista.Elimina(obj);
+            lista.Remove(obj);
 			return Elimina(obj.Clau());
 		}
 		public bool[] Elimina(IEnumerable<IComparable> objs)
@@ -93,7 +93,7 @@ namespace Gabriel.Cat
 		}
 		public bool Elimina(IComparable key)
 		{
-			return listaOrdenada.Elimina(key);
+			return listaOrdenada.Remove(key);
 		}
 		public bool[] EliminaObjeto(IEnumerable<T> objs)
 		{
@@ -127,11 +127,11 @@ namespace Gabriel.Cat
 		#region Añadir
 		public void Añadir(T obj)
 		{
-            if (listaOrdenada.Existeix(obj.Clau()))
+            if (listaOrdenada.ContainsKey(obj.Clau()))
                 throw new ArgumentException("Ya existe en la lista");
             else {
-                listaOrdenada.Afegir(obj.Clau(), obj);
-                lista.Afegir(obj);
+                listaOrdenada.Add(obj.Clau(), obj);
+                lista.Add(obj);
             }
 		}
 		public void Añadir(IEnumerable<T> listObj)

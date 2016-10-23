@@ -240,11 +240,11 @@ namespace Gabriel.Cat
 					break;
 				case tEXtChunk.NAME:
 					tEXtChunk tEXt = new tEXtChunk(chunk);
-					metadata.Afegir(tEXt.Keyword, tEXt);
+					metadata.Add(tEXt.Keyword, tEXt);
 					break;
 				case zTXtChunk.NAME:
 					zTXtChunk zTXt = new zTXtChunk(chunk);
-					metadata.Afegir(zTXt.Keyword, zTXt);
+					metadata.Add(zTXt.Keyword, zTXt);
 					break;
 				default:
 					if (!chunksCeroOIlimitados.Existe(chunk.ChunkType)) {
@@ -257,12 +257,12 @@ namespace Gabriel.Cat
 						//si existe lo trato
 						if (chunkABuscar != null) {
 							if (reemplazarOExcepcion)
-								extras.Elimina(chunkABuscar);
+								extras.Remove(chunkABuscar);
 							else
 								throw new Exception("Solo puede haber uno de " + chunkABuscar);
 						}
 					}
-					extras.Afegir(chunk);
+					extras.Add(chunk);
 					break;
 			}
 		}
@@ -330,7 +330,7 @@ namespace Gabriel.Cat
 		}
 		public void AddMetadata(string metadata, string information)
 		{
-			this.metadata.Afegir(metadata, new tEXtChunk(metadata, information));
+			this.metadata.Add(metadata, new tEXtChunk(metadata, information));
 			
 		}
 		public void UpdateTIMELastModification()
@@ -421,7 +421,7 @@ namespace Gabriel.Cat
 			if (tIME == null)
 				UpdateTIMELastModification();
 			if (SoftwareMetadata) {
-				metadata.AfegirORemplaçar(Metadata.Software.ToString(), new tEXtChunk(Metadata.Software.ToString(), "Gabriel.Cat.PNG"));
+				metadata.AddOrReplace(Metadata.Software.ToString(), new tEXtChunk(Metadata.Software.ToString(), "Gabriel.Cat.PNG"));
 			}
 			chunksPorOrden.Add(tIME);
 			chunksPorOrden.AddRange(metadata.ValuesToArray());
