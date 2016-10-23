@@ -16,7 +16,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Es una lista hash para ir mas rapido
 	/// </summary>
-	public class ListaUnica<T>:IEnumerable<T>
+	public class ListaUnica<T>:IList<T>,IReadOnlyList<T>
         where T:IClauUnicaPerObjecte
 	{
 		LlistaOrdenada<IComparable,T> listaOrdenada;
@@ -31,6 +31,15 @@ namespace Gabriel.Cat
         {
             get { return listaOrdenada.Count; }
         }
+
+        public bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public T this[int pos]
         {
             get { return lista[pos]; }
@@ -42,105 +51,76 @@ namespace Gabriel.Cat
                 return listaOrdenada[key];
             }
         }
-        public void Vaciar()
+        public void Clear()
         {
             listaOrdenada.Clear();
             lista.Clear();
         }
         #region Existe
-        public bool Existe(T obj)
+        public bool Contains(T obj)
 		{
 			return listaOrdenada.ContainsKey(obj.Clau());
 		}
-		public bool Existe(IComparable key)
-		{
-			return listaOrdenada.ContainsKey(key);
-		}
-		public bool ExisteObjeto(T obj)
-		{
-			return listaOrdenada.ContainsKey(obj.Clau());
-		}
-		public bool ExisteClave(IComparable key)
+		public bool Contains(IComparable key)
 		{
 			return listaOrdenada.ContainsKey(key);
 		}
 		#endregion
 		#region Elimina
-		public bool[] Elimina(IEnumerable<T> objs)
+		public bool[] RemoveRange(IEnumerable<T> objs)
 		{
 			if(objs==null)
 				throw new NullReferenceException("Se esperaba una coleccion de objetos para quitar");
 			List<bool> resultados=new List<bool>();
 			foreach(T obj in objs)
-				resultados.Add(Elimina(obj));
+				resultados.Add(Remove(obj));
 			return resultados.ToArray();
 			
 		}
-		public bool Elimina(T obj)
+		public bool Remove(T obj)
 		{
-            lista.Remove(obj);
-			return Elimina(obj.Clau());
+			return RemoveKey(obj.Clau());
 		}
-		public bool[] Elimina(IEnumerable<IComparable> objs)
+		public bool RemoveKey(IComparable key)
 		{
-			if(objs==null)
-				throw new NullReferenceException("Se esperaba una coleccion de objetos para quitar");
-			List<bool> resultados=new List<bool>();
-			foreach(T obj in objs)
-				resultados.Add(Elimina(obj));
-			return resultados.ToArray();
-			
-		}
-		public bool Elimina(IComparable key)
-		{
+            if(listaOrdenada.ContainsKey(key))
+               lista.Remove(listaOrdenada[key]);
 			return listaOrdenada.Remove(key);
 		}
-		public bool[] EliminaObjeto(IEnumerable<T> objs)
+		public bool[] RemoveKeyRange(IEnumerable<IComparable> objs)
 		{
-			if(objs==null)
-				throw new NullReferenceException("Se esperaba una coleccion de objetos para quitar");
+			
+			
 			List<bool> resultados=new List<bool>();
-			foreach(T obj in objs)
-				resultados.Add(EliminaObjeto(obj));
+            if (objs != null)
+                foreach (IComparable obj in objs)
+				resultados.Add(RemoveKey(obj));
 			return resultados.ToArray();
 			
 		}
-		public bool EliminaObjeto(T obj)
-		{
-			return Elimina(obj.Clau());
-		}
-		public bool[] EliminaClave(IEnumerable<IComparable> objs)
-		{
-			if(objs==null)
-				throw new NullReferenceException("Se esperaba una coleccion de objetos para quitar");
-			List<bool> resultados=new List<bool>();
-			foreach(IComparable obj in objs)
-				resultados.Add(EliminaClave(obj));
-			return resultados.ToArray();
-			
-		}
-		public bool EliminaClave(IComparable key)
-		{
-			return Elimina(key);
-		}
+
 		#endregion
 		#region Añadir
-		public void Añadir(T obj)
+		public void Add(T obj)
 		{
+            if (obj == null) throw new ArgumentNullException("item");
             if (listaOrdenada.ContainsKey(obj.Clau()))
-                throw new ArgumentException("Ya existe en la lista");
+                throw new ArgumentException("Is already on the list");
             else {
                 listaOrdenada.Add(obj.Clau(), obj);
                 lista.Add(obj);
             }
 		}
-		public void Añadir(IEnumerable<T> listObj)
+		public void AddRange(IEnumerable<T> listObj)
 		{
 			if(listObj==null)
-				throw new NullReferenceException("Se esperaba una coleccion de objetos para añadir");
+				throw new ArgumentNullException("listObj");
 			foreach(T obj in listObj)
-				Añadir(obj);
+				Add(obj);
 		}
+
+
+        #endregion
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -151,9 +131,29 @@ namespace Gabriel.Cat
         {
             return GetEnumerator();
         }
-        #endregion
 
+        public int IndexOf(T item)
+        {
+            return lista.IndexOf(item);
+        }
 
-	}
+        public void Insert(int index, T item)
+        {
+            if (item == null) throw new ArgumentNullException("item");
+            if (listaOrdenada.ContainsKey(((IClauUnicaPerObjecte)item).Clau()))
+                lista.Insert(index, item);
+            else throw new ArgumentException("item","item is already on list");
+        }
+
+        public void RemoveAt(int index)
+        {
+               Remove(lista[index]);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            lista.CopyTo(array, arrayIndex);
+        }
+    }
 
 }

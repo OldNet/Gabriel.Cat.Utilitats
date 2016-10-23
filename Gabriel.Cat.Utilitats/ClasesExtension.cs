@@ -402,7 +402,7 @@ namespace Gabriel.Cat.Extension
         public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T : IClauUnicaPerObjecte
         {
             ListaUnica<T> lista = new ListaUnica<T>();
-            lista.Añadir(enumeracion);
+            lista.AddRange(enumeracion);
             return lista;
         }
         #endregion

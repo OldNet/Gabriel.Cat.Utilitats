@@ -9,30 +9,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Gabriel.Cat
 {
 	/// <summary>
 	/// Description of Pila.
 	/// </summary>
-	public class Pila<Tvalue>:IEnumerable<Tvalue>
+	public class Pila<T>:IList<T>
 	{
         bool throwExceptionIfEmpty = false;
-
-
-		Llista<Tvalue> pila;
+		Llista<T> pila;
 		public Pila()
 		{
-			pila = new Llista<Tvalue>();
+      
+			pila = new Llista<T>();
 		}
-        public Pila(IEnumerable<Tvalue> valors)
+        public Pila(IEnumerable<T> valors)
             :this(){Push(valors);}
 		public int Count
 		{ get { return pila.Count; } }
 		public bool Empty
 		{ get { return Count == 0; } }
-		public Tvalue this[int index]
+		public T this[int index]
 		{ get { return pila[index]; }
 			set { pila[index] = value; } }
         public bool ThrowExceptionIfEmpty
@@ -40,20 +38,29 @@ namespace Gabriel.Cat
             get { return throwExceptionIfEmpty; }
             set { throwExceptionIfEmpty = value; }
         }
-		public void Push(Tvalue valor)
+
+        public bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public void Push(T valor)
 		{
 
 			pila.Push(valor);
 
 		}
-		public void Push(IEnumerable<Tvalue> valores)
+		public void Push(IEnumerable<T> valores)
 		{
-			foreach (Tvalue valor in valores)
+			foreach (T valor in valores)
 				Push(valor);
 		}
-		public Tvalue Pop()
+		public T Pop()
 		{
-			Tvalue valorPop = default(Tvalue);
+			T valorPop = default(T);
             if (!Empty)
             {
 
@@ -63,7 +70,7 @@ namespace Gabriel.Cat
                 throw new Exception("Is empty");
 			return valorPop;
 		}
-		public Tvalue Peek()
+		public T Peek()
 		{
 			return pila.Peek();
 			
@@ -75,7 +82,7 @@ namespace Gabriel.Cat
 
 		}
 
-		public IEnumerator<Tvalue> GetEnumerator()
+		public IEnumerator<T> GetEnumerator()
 		{
 			return pila.GetEnumerator();
 		}
@@ -84,5 +91,49 @@ namespace Gabriel.Cat
 		{
 			return GetEnumerator();
 		}
-	}
+
+        public int IndexOf(T item)
+        {
+            return pila.IndexOf(item);
+        }
+
+        public void Insert(int index, T item)
+        {
+            pila.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            pila.RemoveAt(index);
+        }
+
+        public void Add(T item)
+        {
+            pila.Add(item);
+        }
+
+        public bool Contains(T item)
+        {
+           return pila.Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            pila.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(T item)
+        {
+            return pila.Remove(item);
+        }
+
+        public static implicit operator Llista<T>(Pila<T> stack)
+        {
+            return stack.pila;
+        }
+        public static implicit operator Pila<T>(Llista<T> stack)
+        {
+            return new Pila<T>() {pila=stack };
+        }
+    }
 }
