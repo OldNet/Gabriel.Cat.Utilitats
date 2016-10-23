@@ -86,16 +86,25 @@ namespace Gabriel.Cat
 
         public override bool Equals(object obj)
         {
-            if (obj is Hex)
-                return Equals((Hex)obj); // use Equals method below
-            else
-                return false;
+            bool isEquals;
+            Hex other;
+            try
+            {
+                other = (Hex)obj;
+                isEquals = Equals(other); // use Equals method below
+            }
+            catch
+            {
+                isEquals = false;
+            }
+            return isEquals;
         }
 
         public bool Equals(Hex other)
         {
+            string thisNumber = QuitaCerosInutiles(this.numberHex), otherNumber = QuitaCerosInutiles(other.numberHex);
             // add comparisions for all members here
-            return this.numberHex.Equals(other.numberHex);
+            return thisNumber.Equals(otherNumber);
         }
         public override string ToString()
         {
@@ -224,6 +233,8 @@ namespace Gabriel.Cat
         }
         #endregion
 
+
+  
         public static implicit operator Hex(string numero)
         {
             return new Hex(numero);
@@ -238,10 +249,24 @@ namespace Gabriel.Cat
         }
         public static explicit operator Hex(byte[] numero)
         {
-            string numHex = "";
-            for (int i = 0; i < numero.Length; i++)
-                numHex += ((Hex)numero[i]).Number.PadLeft(2, '0');
-            return (Hex)numHex;
+            //sacado de internet
+            List<char> bytesHex = new List<char>();
+            byte byteHaciendose;
+
+            for (int bx = 0, cx = 0; bx < numero.Length; ++bx, ++cx)
+            {
+                byteHaciendose = ((byte)(numero[bx] >> 4));
+                if (byteHaciendose > 9)
+                    bytesHex.Add((char)(byteHaciendose - 10 + 'A'));
+                else
+                    bytesHex.Add((char)(byteHaciendose + '0'));
+
+
+                byteHaciendose = ((byte)(numero[bx] & 0x0F));
+                bytesHex.Add((char)(byteHaciendose > 9 ? byteHaciendose - 10 + 'A' : byteHaciendose + '0'));
+            }
+
+            return new string(bytesHex.ToArray());
         }
         public static implicit operator Hex(uint numero)
         {
@@ -281,16 +306,33 @@ namespace Gabriel.Cat
         {
             return Convert.ToInt64((string)numero.numberHex, 16);
         }
+        public static implicit operator byte[](Hex numero)
+        {//sacado de internet
+            byte[] bytes = new byte[numero.numberHex.Length / 2];
+            int[] hexValue = new int[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
+                0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+            };
+
+            for (int x = 0, i = 0; i < numero.numberHex.Length; i += 2, x += 1)
+            {
+                bytes[x] = (byte)(hexValue[Char.ToUpper(numero.numberHex[i + 0]) - '0'] << 4 |
+                hexValue[Char.ToUpper(numero.numberHex[i + 1]) - '0']);
+            }
+           
+
+            return bytes;
+        }
         public static bool ValidaString(string stringHex)
         {
             bool valida = true;
-            stringHex.WhileEach((caracterAComprovar) =>
+            for(int i=0;i<stringHex.Length&&valida;i++)
             {
-                valida = diccionarioCaracteresValidos.Existeix(caracterAComprovar);
-                return valida;
-            });
+                valida = diccionarioCaracteresValidos.Existeix(stringHex[i]);   
+            }
             return valida;
 
         }
+
     }
 }
