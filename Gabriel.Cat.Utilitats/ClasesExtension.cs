@@ -1813,11 +1813,11 @@ namespace Gabriel.Cat.Extension
 
             return valors.ToArray();
         }
-        public static IColeccion<T> SubColeccion<T>(this IEnumerable<T> arrayB, long inicio)
+        public static IColeccion<T> SubArray<T>(this IEnumerable<T> arrayB, long inicio)
         {
-            return arrayB.SubColeccion(inicio, arrayB.Count() - inicio);
+            return arrayB.SubArray(inicio, arrayB.Count() - inicio);
         }
-        public static IColeccion<T> SubColeccion<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
+        public static IColeccion<T> SubArray<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
         {
             T[] array;
             Llista<T> subArray;
@@ -2499,21 +2499,21 @@ namespace Gabriel.Cat.Extension
                 //opero
                 if (posicionArray > -1)
                 {
-                    bytesSplited.Add(array.SubColeccion(0, posicionArray));
+                    bytesSplited.Add(array.SubArray(0, posicionArray));
                     posicionArray += bytesSplit.Length;
                     do
                     {
                         posicionArrayEncontrada = array.BuscarArray(posicionArray, bytesSplit);
                         if (posicionArrayEncontrada > -1)
                         {
-                            bytesSplited.Add(array.SubColeccion(posicionArray, posicionArrayEncontrada));
+                            bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
                             posicionArray = posicionArrayEncontrada + bytesSplit.Length;
 
                         }
                     }
                     while (posicionArrayEncontrada > -1);
                     if (posicionArray < array.Length)
-                        bytesSplited.Add(array.SubColeccion(posicionArray, array.Length));
+                        bytesSplited.Add(array.SubArray(posicionArray, array.Length));
 
                 }
                 else
@@ -2549,11 +2549,12 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
-        public static byte[] SubColeccion(this byte[] array, Hex cantidad)
+        #region SubArray with pointers me gustaria no repetir codigo haciendo un metodo generico con un filtro pero de momento el c# no me lo permite hacer...
+        public static byte[] SubArray(this byte[] array, Hex cantidad)
         {
-            return SubColeccion(array, 0, cantidad);
+            return SubArray(array, 0, cantidad);
         }
-        public static byte[] SubColeccion(this byte[] array, Hex inicio, Hex cantidad)
+        public static  byte[] SubArray(this byte[] array, Hex inicio, Hex cantidad) 
         {
             if (cantidad + inicio > array.LongLength)
                 throw new ArgumentOutOfRangeException();
@@ -2577,6 +2578,208 @@ namespace Gabriel.Cat.Extension
             }
             return subArray;
         }
+
+        public static char[] SubArray(this char[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static char[] SubArray(this char[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            char[] subArray = new char[cantidad];
+            unsafe
+            {
+                fixed (char* ptrArray = array)
+                {
+                    fixed (char* ptrSubArray = subArray)
+                    {
+                        char* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+
+        public static int[] SubArray(this int[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static int[] SubArray(this int[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            int[] subArray = new int[cantidad];
+            unsafe
+            {
+                fixed (int* ptrArray = array)
+                {
+                    fixed (int* ptrSubArray = subArray)
+                    {
+                        int* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+
+        public static uint[] SubArray(this uint[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static uint[] SubArray(this uint[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            uint[] subArray = new uint[cantidad];
+            unsafe
+            {
+                fixed (uint* ptrArray = array)
+                {
+                    fixed (uint* ptrSubArray = subArray)
+                    {
+                        uint* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+
+        public static short[] SubArray(this short[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static short[] SubArray(this short[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            short[] subArray = new short[cantidad];
+            unsafe
+            {
+                fixed (short* ptrArray = array)
+                {
+                    fixed (short* ptrSubArray = subArray)
+                    {
+                        short* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+        public static ushort[] SubArray(this ushort[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static ushort[] SubArray(this ushort[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            ushort[] subArray = new ushort[cantidad];
+            unsafe
+            {
+                fixed (ushort* ptrArray = array)
+                {
+                    fixed (ushort* ptrSubArray = subArray)
+                    {
+                        ushort* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+        public static long[] SubArray(this long[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static long[] SubArray(this long[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            long[] subArray = new long[cantidad];
+            unsafe
+            {
+                fixed (long* ptrArray = array)
+                {
+                    fixed (long* ptrSubArray = subArray)
+                    {
+                        long* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+        public static ulong[] SubArray(this ulong[] array, Hex cantidad)
+        {
+            return SubArray(array, 0, cantidad);
+        }
+        public static ulong[] SubArray(this ulong[] array, Hex inicio, Hex cantidad)
+        {
+            if (cantidad + inicio > array.LongLength)
+                throw new ArgumentOutOfRangeException();
+            ulong[] subArray = new ulong[cantidad];
+            unsafe
+            {
+                fixed (ulong* ptrArray = array)
+                {
+                    fixed (ulong* ptrSubArray = subArray)
+                    {
+                        ulong* ptArray = ptrArray, ptSubArray = ptrSubArray;
+                        ptArray += inicio;//asigno el inicio aqui :D
+                        for (long j = 0; j < cantidad; j++)
+                        {
+                            *ptSubArray = *ptArray;
+                            ptArray++;
+                            ptSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
+        }
+
+        #endregion
         public static byte[] AddArray(this byte[] array, params byte[][] arraysToAdd)
         {
 
