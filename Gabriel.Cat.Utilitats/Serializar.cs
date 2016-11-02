@@ -179,8 +179,7 @@ namespace Gabriel.Cat
 			}
 			return bytesList.ToArray();
 		}
-        //lo hago privado porque se usa en el metodo de arriba solo...y no tendria logica por la sobrecarga :D
-		private static byte[] GetBytes(Object objTipoAceptado)
+		public static byte[] GetBytes(Object objTipoAceptado)
 		{
 			TiposAceptados tipo = GetType(objTipoAceptado);
 			byte[] bytes = new byte[] { };

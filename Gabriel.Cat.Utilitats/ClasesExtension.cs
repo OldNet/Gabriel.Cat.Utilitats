@@ -1428,6 +1428,18 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable
+        public static bool ContainsAny<T>(this IEnumerable<T> list,IEnumerable<T> elementsToFindOne) where T:IComparable<T>
+        {
+            bool contains = false;
+            SortedList<T, T> dicElements = elementsToFindOne.ToSortedList();
+            list.WhileEach((elementList) =>
+            {
+                contains = dicElements.ContainsKey(elementList);
+                return contains;
+            });
+            return contains;
+
+        }
         public static IEnumerable<T> ConvertTo<T>(this IEnumerable enumeracion, ConvertEventHandler<T, object> metodoParaConvertirUnoAUno, bool omitirExcepciones = true)
         {
             return ConvertTo(enumeracion.Casting<object>(), metodoParaConvertirUnoAUno, omitirExcepciones);
@@ -1459,6 +1471,14 @@ namespace Gabriel.Cat.Extension
                     sortedList.Add(element, element);
             return sortedList;
         }
+        public static SortedList<IComparable, T> ToSortedListClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
+        {
+            SortedList<IComparable, T> sortedList = new SortedList<IComparable, T>();
+            foreach (T element in list)
+                if (!sortedList.ContainsKey(element.Clau))
+                    sortedList.Add(element.Clau, element);
+            return sortedList;
+        }
         public static LlistaOrdenada<T, T> ToLlistaOrdenada<T>(this IEnumerable<T> list) where T : IComparable<T>
         {
             LlistaOrdenada<T, T> llistaOrdenada = new LlistaOrdenada<T, T>();
@@ -1466,6 +1486,14 @@ namespace Gabriel.Cat.Extension
                 if (!llistaOrdenada.ContainsKey(element))
                     llistaOrdenada.Add(element, element);
             return llistaOrdenada;
+        }
+        public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
+        {
+            LlistaOrdenada<IComparable, T> sortedList = new LlistaOrdenada<IComparable, T>();
+            foreach (T element in list)
+                if (!sortedList.ContainsKey(element.Clau))
+                    sortedList.Add(element.Clau, element);
+            return sortedList;
         }
         /// <summary>
         /// Ordena por elemetodo de orden indicado sin modificar la coleccion que se va a ordenar
@@ -1584,14 +1612,14 @@ namespace Gabriel.Cat.Extension
             return listaParaOrdenar;
 
         }
-        public static IEnumerable<T> Clon<T>(this IEnumerable<T> listaHaClonar) where T : IClonable<T>
+        public static List<T> Clon<T>(this IEnumerable<T> listaHaClonar) where T : IClonable<T>
         {
             List<T> clones = new List<T>();
             foreach (T item in listaHaClonar)
                 clones.Add(item.Clon());
             return clones;
         }
-        public static IEnumerable<T> Clone<T>(this IEnumerable<T> listaHaClonar) where T : ICloneable
+        public static List<T> Clone<T>(this IEnumerable<T> listaHaClonar) where T : ICloneable
         {
             List<T> clones = new List<T>();
             foreach (T item in listaHaClonar)
@@ -1665,7 +1693,7 @@ namespace Gabriel.Cat.Extension
 
         }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
-        public static IEnumerable<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
+        public static IList<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
             if (comprovador == null)
                 throw new ArgumentNullException("El metodo para realizar la comparacion no puede ser null");
@@ -1677,7 +1705,7 @@ namespace Gabriel.Cat.Extension
             return valorsOk;
 
         }
-        public static IEnumerable<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
+        public static IList<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
         {
             Llista<Tvalue> llistaOrdenada = new Llista<Tvalue>(valors);
             int posicionAzar;
@@ -1707,7 +1735,7 @@ namespace Gabriel.Cat.Extension
             }
             return bytes;
         }
-        public static IEnumerable<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
+        public static IList<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
         {
             Llista<TResult> llista = new Llista<TResult>();
             foreach (Object obj in source)
@@ -1728,21 +1756,18 @@ namespace Gabriel.Cat.Extension
             return llista;
         }
         //filtra los IEnumerable que tienen este metodoConParametros con el where
-        public static IEnumerable<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
+        public static IList<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
         {
             Llista<Tvalue> llista = new Llista<Tvalue>(valors);
             llista.Sort();
             return llista;
         }
-        public static IEnumerable<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
+        public static IList<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
         {
-
+            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            int compareTo = -1;
             if (valorsATreure != null)
             {
-
-                Llista<Tvalue> llista = new Llista<Tvalue>(valors);
-                int compareTo = -1;
-
                 return llista.Filtra(valor =>
                 {
 
@@ -1755,21 +1780,22 @@ namespace Gabriel.Cat.Extension
                 });
             }
             else
-                return valors;
+                return llista;
 
         }
-        public static IEnumerable<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
+        public static Llista<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
         {
             Llista<Tvalue> valorsFinals = new Llista<Tvalue>(valors);
             valorsFinals.Add(valorNou);
             return valorsFinals;
         }
-        public static IEnumerable<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents) where Tvalue : IComparable
+        public static Llista<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
         {
+            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            bool valorEnLista = true;
             if (valorsNous != null)
             {
-                Llista<Tvalue> llista = new Llista<Tvalue>(valors);
-                bool valorEnLista = true;
+              
                 if (valorsNous != null)
                     foreach (Tvalue valor in valorsNous)
                     {
@@ -1782,13 +1808,12 @@ namespace Gabriel.Cat.Extension
                             llista.Add(valor);
                         }
                     }
-                return llista;
+             
             }
-            else
-                return valors;
+            return llista;
 
         }
-        public static IEnumerable<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
+        public static Llista<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
         {
             Llista<Tvalue> llista = new Llista<Tvalue>(valors);
             if (valorsNous != null)
@@ -1796,7 +1821,7 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static IEnumerable<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static Llista<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             Llista<Tkey> llista = new Llista<Tkey>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
