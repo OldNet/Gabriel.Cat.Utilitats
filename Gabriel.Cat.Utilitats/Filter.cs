@@ -14,7 +14,7 @@ namespace Gabriel.Cat
         {
            get
             {
-                if (splitChar == null) splitChar = new char[] { ';' };
+                if (splitChar == null) splitChar = new char[] { ';','|', ',' };
                 return splitChar;
             }
             set

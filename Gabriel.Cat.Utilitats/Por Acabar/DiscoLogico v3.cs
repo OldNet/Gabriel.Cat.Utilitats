@@ -317,7 +317,7 @@ namespace Gabriel.Cat.Utilitats.New
             if (discoEncontrado == null)
             {
                 pathAux = carpetasPath[0];
-                auxParent = todosLosDiscos.Busca(pathAux);
+                auxParent = todosLosDiscos.Search(pathAux);
                 dejarDeBuscar = auxParent == null;//si no esta la raiz dejo de intentarlo
                 for (int i = 1; discoEncontrado == null && !dejarDeBuscar && carpetasPath.Length > i; i++)
                 {

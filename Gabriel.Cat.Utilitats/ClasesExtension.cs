@@ -465,7 +465,7 @@ namespace Gabriel.Cat.Extension
         //cuando quiero metodos que solo aparezcan cuando el TValue cumpla unas determinadas caracteristicas uso metodos de extensión para poderlo hacer
         #region Llista
 
-        public static TValue Busca<TValue>(this Llista<TValue> llista, IComparable comparador) where TValue : IComparable
+        public static TValue Search<TValue>(this Llista<TValue> llista, IComparable comparador) where TValue : IComparable
         {
             TValue valorEncontrado = default(TValue);
             bool encontrado = false;
@@ -482,13 +482,13 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region LlistaOrdenada
-        public static void Afegir<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
+        public static void Add<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
             llista.Add((TKey)value.Clau, (TValue)value);
         }
-        public static void AfegirORemplaçar<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
+        public static void AddOrReplace<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
@@ -504,10 +504,10 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region DirectoriInfoExtension
-        public static KeyValuePair<DirectoryInfo, FileInfo[]>[] GetFiles(this DirectoryInfo dir, bool recursive)
-        {//windows si da error no se puede ominit por lo tanto te quedas sin los archivos que puedes coger...es por eso que hago mi metodo...
+        public static IReadOnlyList<KeyValuePair<DirectoryInfo, FileInfo[]>> GetFiles(this DirectoryInfo dir, bool recursive=false)
+        {//windows si da error no se puede omit por lo tanto te quedas sin los archivos que puedes coger...es por eso que hago mi metodo...
             List<KeyValuePair<DirectoryInfo, FileInfo[]>> carpetasConSusArchivos = new List<KeyValuePair<DirectoryInfo, FileInfo[]>>();
-            DirectoryInfo[] subDirs;
+            IReadOnlyList<DirectoryInfo> subDirs;
             bool canRead = dir.CanRead();
             if (canRead)
             {
@@ -516,69 +516,55 @@ namespace Gabriel.Cat.Extension
                 if (recursive)
                 {
                     subDirs = dir.SubDirectoris();
-                    for (int i = 0; i < subDirs.Length; i++)
+                    for (int i = 0; i < subDirs.Count; i++)
                         if (subDirs[i].CanRead())
                             carpetasConSusArchivos.Add(new KeyValuePair<DirectoryInfo, FileInfo[]>(subDirs[i], subDirs[i].GetFiles()));
 
 
                 }
             }
-            return carpetasConSusArchivos.ToTaula();
+            return carpetasConSusArchivos;
         }
         #region BuscaConHash
-        public static FileInfo BuscaConHash(this DirectoryInfo dir, string fileHash)
-        {
-            return dir.BuscaConHash(fileHash, false);
-        }
-        public static FileInfo BuscaConHash(this DirectoryInfo dir, string fileHash, bool recursivo)
+        public static FileInfo BuscaConHash(this DirectoryInfo dir, string fileHash, bool recursivo=false)
         {
 
-            FileInfo[] files = BuscaConHash(dir, new string[] { fileHash }, recursivo);
-            if (files.Length > 0)
-                return files[0];
+            IReadOnlyList<FileInfo> files = BuscaConHash(dir, new string[] { fileHash }, recursivo);
+            FileInfo file;
+            if (files.Count > 0)
+                file = files[0];
             else
-                return null;
+                file = null;
+            return file;
         }
-        public static FileInfo[] BuscaConHash(this DirectoryInfo dir, IEnumerable<string> filesHash)
-        {
-            return dir.BuscaConHash(filesHash, false);
-        }
-        public static FileInfo BuscaConSHA256(this DirectoryInfo dir, string fileHash)
-        {
-            return dir.BuscaConSHA256(fileHash, false);
-        }
-        public static FileInfo BuscaConSHA256(this DirectoryInfo dir, string fileHash, bool recursivo)
+        public static FileInfo BuscaConSHA256(this DirectoryInfo dir, string fileHash, bool recursivo=false)
         {
 
-            FileInfo[] files = BuscaConSHA256(dir, new string[] { fileHash }, recursivo);
-            if (files.Length > 0)
-                return files[0];
+            IReadOnlyList<FileInfo> files = BuscaConSHA256(dir, new string[] { fileHash }, recursivo);
+            FileInfo file;
+            if (files.Count > 0)
+                file= files[0];
             else
-                return null;
+                file= null;
+            return file;
         }
-        public static FileInfo[] BuscaConSHA256(this DirectoryInfo dir, IEnumerable<string> filesHash)
-        {
-            return dir.BuscaConSHA256(filesHash, false);
-        }
-        public static FileInfo[] BuscaConSHA256(this DirectoryInfo dir, IEnumerable<string> filesSHA3, bool recursivo)
+        public static IReadOnlyList<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IList<string> filesSHA3, bool recursivo=false)
         {
             return dir.IBuscoConHashOSHA256(filesSHA3, recursivo, false);
         }
-        public static FileInfo[] BuscaConHash(this DirectoryInfo dir, IEnumerable<string> filesHash, bool recursivo)
+        public static IReadOnlyList<FileInfo> BuscaConHash(this DirectoryInfo dir, IList<string> filesHash, bool recursivo=false)
         {
             return dir.IBuscoConHashOSHA256(filesHash, recursivo, true);
         }
-        static FileInfo[] IBuscoConHashOSHA256(this DirectoryInfo dir, IEnumerable<string> hashes, bool recursivo, bool isHash)
+        static IReadOnlyList<FileInfo> IBuscoConHashOSHA256(this DirectoryInfo dir, IList<string> hashes, bool recursivo, bool isHash)
         {
             //por probar :)
-            Llista<DirectoryInfo> dirs = new Llista<DirectoryInfo>();
-            LlistaOrdenada<string, string> llista = new LlistaOrdenada<string, string>();
-            Llista<FileInfo> filesEncontrados = new Llista<FileInfo>();
+            List<DirectoryInfo> dirs = new List<DirectoryInfo>();
+            SortedList<string, string> llista = hashes.ToSortedList();
+            List<FileInfo> filesEncontrados = new List<FileInfo>();
             FileInfo[] files = null;
             string hashArchivo = null;
-            foreach (string hash in hashes)
-                if (!llista.ContainsKey(hash))
-                    llista.Add(hash, hash);
+
             dirs.Add(dir);
             if (recursivo)
                 dirs.AddRange(dir.SubDirectoris());
@@ -608,10 +594,10 @@ namespace Gabriel.Cat.Extension
                     }
                 }
             }
-            return filesEncontrados.ToTaula();
+            return filesEncontrados;
         }
         #endregion
-        public static FileInfo[] GetAllFiles(this DirectoryInfo dir)
+        public static IReadOnlyList<FileInfo> GetAllFiles(this DirectoryInfo dir)
         {
             List<DirectoryInfo> dirs = new List<DirectoryInfo>();
             List<FileInfo> files = new List<FileInfo>();
@@ -620,9 +606,9 @@ namespace Gabriel.Cat.Extension
             for (int i = 0; i < dirs.Count; i++)
                 if (dirs[i].CanRead())
                     files.AddRange(dirs[i].GetFiles());
-            return files.ToTaula();
+            return files;
         }
-        public static FileInfo[] GetFiles(this DirectoryInfo dir, params string[] formatsAdmessos)
+        public static IReadOnlyList<FileInfo> GetFiles(this DirectoryInfo dir, params string[] formatsAdmessos)
         {
             List<FileInfo> files = new List<FileInfo>();
             FileInfo[] filesDir;
@@ -639,7 +625,7 @@ namespace Gabriel.Cat.Extension
                         files.Add(filesDir[i]);
                 }
             }
-            return files.ToArray();
+            return files;
         }
 
         private static string DameFormatoCorrectamente(string formato)
@@ -654,54 +640,54 @@ namespace Gabriel.Cat.Extension
             return formato;
         }
 
-        public static FileInfo[] GetFiles(this DirectoryInfo dir, bool recursivo, params string[] formatsAdmessos)
+        public static IReadOnlyList<FileInfo> GetFiles(this DirectoryInfo dir, bool recursivo, params string[] formatsAdmessos)
         {
-            Llista<FileInfo> files = new Llista<FileInfo>();
-            DirectoryInfo[] subDirs;
+            List<FileInfo> files = new List<FileInfo>();
+            IReadOnlyList<DirectoryInfo> subDirs;
             if (dir.CanRead())
             {
                 files.AddRange(dir.GetFiles(formatsAdmessos));
                 if (recursivo)
                 {
                     subDirs = dir.SubDirectoris();
-                    for (int i = 0; i < subDirs.Length; i++)
+                    for (int i = 0; i < subDirs.Count; i++)
                         if (subDirs[i].CanRead())
                             files.AddRange(subDirs[i].GetFiles(formatsAdmessos));
                 }
             }
-            return files.ToArray();
+            return files;
 
         }
-        public static KeyValuePair<DirectoryInfo, FileInfo[]>[] GetFilesWithDirectory(this DirectoryInfo dir)
+        public static IReadOnlyList<KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>> GetFilesWithDirectory(this DirectoryInfo dir)
         {
             return dir.GetFilesWithDirectory("*");
         }
-        public static KeyValuePair<DirectoryInfo, FileInfo[]>[] GetFilesWithDirectory(this DirectoryInfo dir, params string[] formatsAdmessos)
+        public static IReadOnlyList<KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>> GetFilesWithDirectory(this DirectoryInfo dir, params string[] formatsAdmessos)
         {
             return dir.GetFilesWithDirectory(false, "*");
         }
-        public static KeyValuePair<DirectoryInfo, FileInfo[]>[] GetFilesWithDirectory(this DirectoryInfo dir, bool recursive, params string[] formatsAdmessos)
+        public static IReadOnlyList<KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>> GetFilesWithDirectory(this DirectoryInfo dir, bool recursive, params string[] formatsAdmessos)
         {
-            List<KeyValuePair<DirectoryInfo, FileInfo[]>> llistaArxiusPerCarpeta = new List<KeyValuePair<DirectoryInfo, FileInfo[]>>();
-            DirectoryInfo[] subDirs;
+            List<KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>> llistaArxiusPerCarpeta = new List<KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>>();
+            IReadOnlyList<DirectoryInfo> subDirs;
             if (dir.CanRead())
             {
-                llistaArxiusPerCarpeta.Add(new KeyValuePair<DirectoryInfo, FileInfo[]>(dir, dir.GetFiles(formatsAdmessos)));
+                llistaArxiusPerCarpeta.Add(new KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>(dir, dir.GetFiles(formatsAdmessos)));
                 if (recursive)
                 {
                     subDirs = dir.SubDirectoris();
-                    for (int i = 0; i < subDirs.Length; i++)
+                    for (int i = 0; i < subDirs.Count; i++)
                         if (subDirs[i].CanRead())
-                            llistaArxiusPerCarpeta.Add(new KeyValuePair<DirectoryInfo, FileInfo[]>(subDirs[i], subDirs[i].GetFiles(formatsAdmessos)));
+                            llistaArxiusPerCarpeta.Add(new KeyValuePair<DirectoryInfo, IReadOnlyList<FileInfo>>(subDirs[i], subDirs[i].GetFiles(formatsAdmessos)));
                 }
             }
-            return llistaArxiusPerCarpeta.ToArray();
+            return llistaArxiusPerCarpeta;
         }
-        public static DirectoryInfo[] SubDirectoris(this DirectoryInfo dirPare)
+        public static IReadOnlyList<DirectoryInfo> SubDirectoris(this DirectoryInfo dirPare)
         {
-            return dirPare.ISubDirectoris().ToArray();
+            return dirPare.ISubDirectoris();
         }
-        static IEnumerable<DirectoryInfo> ISubDirectoris(this DirectoryInfo dirPare)
+        static List<DirectoryInfo> ISubDirectoris(this DirectoryInfo dirPare)
         {
             List<DirectoryInfo> subDirectoris = new List<DirectoryInfo>();
             DirectoryInfo[] subDirs;
@@ -800,15 +786,15 @@ namespace Gabriel.Cat.Extension
         /// <param name="dir"></param>
         /// <param name="pathsArxius">lista de path de archivos</param>
         /// <returns>key=path final archivo, value= archivo a copiar(solo devuelve los archivos existentes los demas no estan en la lista)</returns>
-        public static KeyValuePair<string, FileInfo>[] HazSitioSiNoEsta(this DirectoryInfo dir, IEnumerable<string> pathsArxius)
+        public static IReadOnlyList<KeyValuePair<string, FileInfo>> HazSitioSiNoEsta(this DirectoryInfo dir, IEnumerable<string> pathsArxius)
         {//por provar con idRapido :) no es un hash que mira el archivo pero puede ser fiable...
             SortedList<string, FileInfo> idArxiusPerCopiar = new SortedList<string, FileInfo>();
             FileInfo fitxer;
             IEnumerator<FileInfo> fitxersCarpeta = dir.GetFiles().ObtieneEnumerador();
             TwoKeysList<string, string, FileInfo> pathsFinals = new TwoKeysList<string, string, FileInfo>();
-            Llista<KeyValuePair<string, FileInfo>> llistaFinal = new Llista<KeyValuePair<string, FileInfo>>();
+            List<KeyValuePair<string, FileInfo>> llistaFinal = new List<KeyValuePair<string, FileInfo>>();
 
-            Llista<FileInfo> archivosDuplicados = new Llista<FileInfo>();
+            List<FileInfo> archivosDuplicados = new List<FileInfo>();
 
             string direccioFinalArxiu;
             int contador;
@@ -846,7 +832,7 @@ namespace Gabriel.Cat.Extension
             {
                 llistaFinal.Add(new KeyValuePair<string, FileInfo>(pathsFinals.ObtainValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
             }
-            return llistaFinal.ToTaula();
+            return llistaFinal;
 
         }
         /*Lo demas ya esta revisado :)  */
@@ -872,9 +858,11 @@ namespace Gabriel.Cat.Extension
             finally
             {
                 if (sw != null)
+                {
                     sw.Close();
-                if (File.Exists(path))
-                    File.Delete(path);
+                    if (File.Exists(path))
+                        File.Delete(path);
+                }
             }
             return canWrite;
         }
@@ -1178,11 +1166,15 @@ namespace Gabriel.Cat.Extension
         /// <returns></returns>
         public static Bitmap Icono(this FileInfo file)
         {
+            Bitmap bmp;
             if (!file.Exists)
-                return null;//si no existe
-            Icon ico =
-                Icon.ExtractAssociatedIcon(file.FullName);
-            return ico.ToBitmap();
+                bmp = null;//si no existe
+            else
+            {
+               bmp=Icon.ExtractAssociatedIcon(file.FullName).ToBitmap();
+                
+            }
+            return bmp;
         }
         /// <summary>
         /// Miniatura (Thumbnail Handlers) o icono en caso de no tener el archivo con medidas 250x250
@@ -1230,16 +1222,18 @@ namespace Gabriel.Cat.Extension
         }
         public static string Sha256(this FileInfo file)
         {
+            string sha3;
             if (file.Exists)
             {
                 FileStream stream = file.GetStream();
-                string sha3 = stream.Sha256Hash();
+                sha3 = stream.Sha256Hash();
                 stream.Close();
-                return sha3;
+         
 
             }
             else
-                return null;
+                sha3= null;
+            return sha3;
         }
         public static bool SHA3Equals(this FileInfo file, FileInfo file2)
         {
@@ -1256,16 +1250,16 @@ namespace Gabriel.Cat.Extension
         /// <returns>devuelve null si el archivo no existe</returns>
         public static string Hash(this FileInfo file)
         {
+            string hash;
             if (file.Exists)
             {
                 FileStream stream = file.GetStream();
-                string hash = stream.Md5Hash();
+                hash = stream.Md5Hash();
                 stream.Close();
-                return hash;
-
             }
             else
-                return null;
+                hash= null;
+            return hash;
         }
         public static bool HashEquals(this FileInfo file, string hash)
         {
@@ -1503,7 +1497,7 @@ namespace Gabriel.Cat.Extension
         /// <returns>devuelve una array ordenada</returns>
         public static T[] Sort<T>(this IEnumerable<T> list, Orden orden) where T : IComparable
         {
-            return list.ToArray().Sort(orden);
+            return (T[])list.ToArray().Sort(orden);
         }
         /// <summary>
         /// Ordena la array actual
@@ -1511,9 +1505,9 @@ namespace Gabriel.Cat.Extension
         /// <param name="list"></param>
         /// <param name="orden"></param>
         /// <returns></returns>
-        public static T[] Sort<T>(this T[] list, Orden orden) where T : IComparable
+        public static IList<T> Sort<T>(this IList<T> list, Orden orden) where T : IComparable
         {
-            T[] listSorted = null;
+            IList<T> listSorted = null;
             switch (orden)
             {
                 case Orden.QuickSort:
@@ -1529,14 +1523,14 @@ namespace Gabriel.Cat.Extension
         }
         public static T[] SortByQuickSort<T>(this IEnumerable<T> list) where T : IComparable
         {
-            return SortByQuickSort(list.ToArray());
+            return (T[])SortByQuickSort(list.ToArray());
         }
-        public static T[] SortByQuickSort<T>(this T[] elements) where T : IComparable
+        public static IList<T> SortByQuickSort<T>(this IList<T> elements) where T : IComparable
         {
-            int left = 0, right = elements.Length - 1;
+            int left = 0, right = elements.Count - 1;
             return ISortByQuickSort(elements, left, right);
         }
-        private static T[] ISortByQuickSort<T>(T[] elements, int left, int right) where T : IComparable
+        private static IList<T> ISortByQuickSort<T>(IList<T> elements, int left, int right) where T : IComparable
         {
             //algoritmo sacado se internet
             //todos los derechos son de http://snipd.net/quicksort-in-c
@@ -1583,16 +1577,16 @@ namespace Gabriel.Cat.Extension
         }
         public static T[] SortByBubble<T>(this IEnumerable<T> list) where T : IComparable
         {
-            return SortByBubble(list.ToArray());
+            return (T[])SortByBubble(list.ToArray());
 
         }
-        public static T[] SortByBubble<T>(this T[] listaParaOrdenar) where T : IComparable
+        public static IList<T> SortByBubble<T>(this IList<T> listaParaOrdenar) where T : IComparable
         {
             //codigo de internet adaptado :)
             //Todos los derechos//http://www.c-sharpcorner.com/UploadFile/3d39b4/bubble-sort-in-C-Sharp/
             bool flag = true;
             T temp;
-            int numLength = listaParaOrdenar.Length;
+            int numLength = listaParaOrdenar.Count;
 
             //sorting an array
             for (int i = 1; (i <= (numLength - 1)) && flag; i++)
@@ -1693,23 +1687,23 @@ namespace Gabriel.Cat.Extension
 
         }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
-        public static IList<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
+        public static List<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
             if (comprovador == null)
                 throw new ArgumentNullException("El metodo para realizar la comparacion no puede ser null");
 
-            Llista<Tvalue> valorsOk = new Llista<Tvalue>();
+            List<Tvalue> valorsOk = new List<Tvalue>();
             foreach (Tvalue valor in valors)
                 if (comprovador(valor))
                     valorsOk.Add(valor);
             return valorsOk;
 
         }
-        public static IList<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
+        public static List<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
         {
-            Llista<Tvalue> llistaOrdenada = new Llista<Tvalue>(valors);
+            List<Tvalue> llistaOrdenada = new List<Tvalue>(valors);
             int posicionAzar;
-            Llista<Tvalue> llistaDesordenada = new Llista<Tvalue>();
+            List<Tvalue> llistaDesordenada = new List<Tvalue>();
 
             for (int i = 0, total = llistaOrdenada.Count; i < total; i++)
             {
@@ -1735,9 +1729,9 @@ namespace Gabriel.Cat.Extension
             }
             return bytes;
         }
-        public static IList<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
+        public static List<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
         {
-            Llista<TResult> llista = new Llista<TResult>();
+            List<TResult> llista = new List<TResult>();
             foreach (Object obj in source)
             {
                 try
@@ -1756,15 +1750,15 @@ namespace Gabriel.Cat.Extension
             return llista;
         }
         //filtra los IEnumerable que tienen este metodoConParametros con el where
-        public static IList<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
+        public static List<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
         {
-            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            List<Tvalue> llista = new List<Tvalue>(valors);
             llista.Sort();
             return llista;
         }
-        public static IList<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
+        public static List<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
         {
-            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            List<Tvalue> llista = new List<Tvalue>(valors);
             int compareTo = -1;
             if (valorsATreure != null)
             {
@@ -1783,15 +1777,15 @@ namespace Gabriel.Cat.Extension
                 return llista;
 
         }
-        public static Llista<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
+        public static List<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
         {
-            Llista<Tvalue> valorsFinals = new Llista<Tvalue>(valors);
+            List<Tvalue> valorsFinals = new List<Tvalue>(valors);
             valorsFinals.Add(valorNou);
             return valorsFinals;
         }
-        public static Llista<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
+        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
         {
-            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            List<Tvalue> llista = new List<Tvalue>(valors);
             bool valorEnLista = true;
             if (valorsNous != null)
             {
@@ -1813,17 +1807,17 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static Llista<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
+        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
         {
-            Llista<Tvalue> llista = new Llista<Tvalue>(valors);
+            List<Tvalue> llista = new List<Tvalue>(valors);
             if (valorsNous != null)
                 llista.AddRange(valorsNous);
             return llista;
 
         }
-        public static Llista<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static List<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
-            Llista<Tkey> llista = new Llista<Tkey>();
+            List<Tkey> llista = new List<Tkey>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
                 llista.Add(pair.Key);
             return llista;
@@ -1838,21 +1832,27 @@ namespace Gabriel.Cat.Extension
 
             return valors.ToArray();
         }
-        public static IColeccion<T> SubArray<T>(this IEnumerable<T> arrayB, long inicio)
+        public static IList<T> ToIist<T>(this IEnumerable<T> valors)
         {
-            return arrayB.SubArray(inicio, arrayB.Count() - inicio);
+
+            return valors.ToArray();
         }
-        public static IColeccion<T> SubArray<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
+
+        public static List<T> SubList<T>(this IEnumerable<T> arrayB, long inicio)
+        {
+            return arrayB.SubList(inicio, arrayB.Count() - inicio);
+        }
+        public static List<T> SubList<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
         {
             T[] array;
-            Llista<T> subArray;
+            List<T> subArray;
 
             if (inicio < 0 || longitud <= 0)
                 throw new IndexOutOfRangeException();
             array = arrayB.ToTaula();
             if (longitud + inicio > array.Length)
                 throw new IndexOutOfRangeException();
-            subArray = new Llista<T>();
+            subArray = new List<T>();
 
             for (long i = inicio, fin = inicio + longitud; i < fin; i++)
                 subArray.Add(array[i]);
@@ -1914,15 +1914,15 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable KeyValuePair
-        public static IEnumerable<TKey> FiltraKeys<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovador)
+        public static IReadOnlyList<TKey> FiltraKeys<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovador)
         {
-            return FiltraKeysOrValues(pairs, metodoComprovador, null).Cast<TKey>();
+            return FiltraKeysOrValues(pairs, metodoComprovador, null).Casting<TKey>();
         }
-        public static IEnumerable<TValue> FiltraValues<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TValue> metodoComprovador)
+        public static IReadOnlyList<TValue> FiltraValues<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TValue> metodoComprovador)
         {
-            return FiltraKeysOrValues(pairs, null, metodoComprovador).Cast<TValue>();
+            return FiltraKeysOrValues(pairs, null, metodoComprovador).Casting<TValue>();
         }
-        static IEnumerable FiltraKeysOrValues<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovadorKeys, ComprovaEventHandler<TValue> metodoComprovarValues)
+        static IReadOnlyList<object> FiltraKeysOrValues<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovadorKeys, ComprovaEventHandler<TValue> metodoComprovarValues)
         {
             if (metodoComprovadorKeys == null && metodoComprovarValues == null)
                 throw new ArgumentNullException();
@@ -1936,7 +1936,7 @@ namespace Gabriel.Cat.Extension
             }
             return filtro;
         }
-        public static IEnumerable<Tvalue> GetValues<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static IReadOnlyList<Tvalue> GetValues<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             List<Tvalue> llista = new List<Tvalue>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
@@ -2506,11 +2506,11 @@ namespace Gabriel.Cat.Extension
         {
             return bytes.Hash(new SHA256Managed());
         }
-        public static byte[][] Split(this byte[] array, byte byteSplit)
+        public static List<byte[]> Split(this byte[] array, byte byteSplit)
         {
             return Split(array, new byte[] { byteSplit });
         }
-        public static byte[][] Split(this byte[] array, byte[] bytesSplit)
+        public static List<byte[]> Split(this byte[] array, byte[] bytesSplit)
         {
             if (bytesSplit == null) throw new ArgumentNullException();
             List<byte[]> bytesSplited = new List<byte[]>();
@@ -2547,7 +2547,7 @@ namespace Gabriel.Cat.Extension
                 }
             }
             else bytesSplited.Add(array);//no hay bytesPara hacer split pues pongo toda
-            return bytesSplited.ToArray();
+            return bytesSplited;
         }
         public static void UnsafeMethod(this byte[] array, MetodoUnsafeArray metodo)
         {
@@ -2973,9 +2973,9 @@ namespace Gabriel.Cat.Extension
         #endregion
 
         #region Pointers
-        public static void CopyTo(this IntPtr ptr, byte[] destino)
+        public static void CopyTo(this IntPtr ptr, byte[] destino,int startIndex=0)
         {
-            System.Runtime.InteropServices.Marshal.Copy(ptr, destino, 0, destino.Length);
+            System.Runtime.InteropServices.Marshal.Copy(ptr, destino, startIndex, destino.Length);
         }
         public static void CopyTo(this byte[] source, IntPtr ptrDestino, int startIndex = 0)
         {
@@ -3040,23 +3040,16 @@ namespace Gabriel.Cat.Extension
         {
             return hash.ComputeHash(fs);
         }
-        private static String getHash(Stream fs, HashAlgorithm hash)
+        private static Hex getHash(Stream fs, HashAlgorithm hash)
         {//sacado de interncet
             Int64 currentPos = fs.Position;
-            string hashCalculated = null;
-            StringBuilder sb;
             byte[] hashBytes;
             try
             {
                 fs.Seek(0, SeekOrigin.Begin);
-                sb = new StringBuilder();
                 hashBytes = fs.Hash(hash);
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-                hashCalculated = sb.ToString();
-            }
+
+            }catch { hashBytes = new byte[] { }; }
             finally
             {
                 try
@@ -3067,7 +3060,7 @@ namespace Gabriel.Cat.Extension
                 {
                 }
             }
-            return hashCalculated;
+            return (Hex)hashBytes;
         }
         #endregion
         #region TypeExtension
