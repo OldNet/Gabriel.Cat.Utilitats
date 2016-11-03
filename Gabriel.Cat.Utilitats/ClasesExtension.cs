@@ -1687,7 +1687,7 @@ namespace Gabriel.Cat.Extension
 
         }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
-        public static List<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
+        public static IReadOnlyList<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
             if (comprovador == null)
                 throw new ArgumentNullException("El metodo para realizar la comparacion no puede ser null");
@@ -1699,7 +1699,7 @@ namespace Gabriel.Cat.Extension
             return valorsOk;
 
         }
-        public static List<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
+        public static IReadOnlyList<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
         {
             List<Tvalue> llistaOrdenada = new List<Tvalue>(valors);
             int posicionAzar;
@@ -1729,7 +1729,7 @@ namespace Gabriel.Cat.Extension
             }
             return bytes;
         }
-        public static List<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
+        public static IReadOnlyList<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
         {
             List<TResult> llista = new List<TResult>();
             foreach (Object obj in source)
@@ -1750,13 +1750,13 @@ namespace Gabriel.Cat.Extension
             return llista;
         }
         //filtra los IEnumerable que tienen este metodoConParametros con el where
-        public static List<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
+        public static IReadOnlyList<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             llista.Sort();
             return llista;
         }
-        public static List<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
+        public static IReadOnlyList<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             int compareTo = -1;
@@ -1777,13 +1777,13 @@ namespace Gabriel.Cat.Extension
                 return llista;
 
         }
-        public static List<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
+        public static IReadOnlyList<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
         {
             List<Tvalue> valorsFinals = new List<Tvalue>(valors);
             valorsFinals.Add(valorNou);
             return valorsFinals;
         }
-        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
+        public static IReadOnlyList<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             bool valorEnLista = true;
@@ -1807,7 +1807,7 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
+        public static IReadOnlyList<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             if (valorsNous != null)
@@ -1815,7 +1815,7 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static List<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static IReadOnlyList<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             List<Tkey> llista = new List<Tkey>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
@@ -1838,11 +1838,11 @@ namespace Gabriel.Cat.Extension
             return valors.ToArray();
         }
 
-        public static List<T> SubList<T>(this IEnumerable<T> arrayB, long inicio)
+        public static IReadOnlyList<T> SubList<T>(this IEnumerable<T> arrayB, long inicio)
         {
             return arrayB.SubList(inicio, arrayB.Count() - inicio);
         }
-        public static List<T> SubList<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
+        public static IReadOnlyList<T> SubList<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
         {
             T[] array;
             List<T> subArray;

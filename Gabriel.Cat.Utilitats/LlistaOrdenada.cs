@@ -20,7 +20,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Is a SortedList multitheread compatible (use Monitor on class)
     /// </summary>
-    public class LlistaOrdenada<TKey, TValue> : IDictionary<TKey, TValue>
+    public class LlistaOrdenada<TKey, TValue> : IDictionary<TKey, TValue>,IReadOnlyDictionary<TKey,TValue>
     {
         SortedList<TKey, TValue> llista;
         public event EventHandler Updated;
@@ -93,6 +93,22 @@ namespace Gabriel.Cat
             get
             {
                 return false;
+            }
+        }
+
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys
+        {
+            get
+            {
+                return Keys;
+            }
+        }
+
+        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values
+        {
+            get
+            {
+                return Values;
             }
         }
 

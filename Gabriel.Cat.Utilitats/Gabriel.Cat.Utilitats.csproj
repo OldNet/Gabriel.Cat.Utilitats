@@ -77,8 +77,6 @@
     <Compile Include="MiRandom.cs" />
     <Compile Include="Pila.cs" />
     <Compile Include="PointZ.cs" />
-    <Compile Include="Por Acabar\DiscoLogico v3.cs" />
-    <Compile Include="Por Acabar\DiscoLogico.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recursos.cs" />
     <Compile Include="Serializar.cs" />
