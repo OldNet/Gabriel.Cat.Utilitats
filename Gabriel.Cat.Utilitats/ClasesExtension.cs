@@ -2150,18 +2150,13 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region BinaryReader
-        public static byte[] ReadBytes(this BinaryReader br, uint longitud)
+        public static byte[] ReadBytes(this BinaryReader br, long longitud,bool fillSizeIfOverLoad = true)
         {
-            return br.ReadBytes(Convert.ToUInt64(longitud));
-        }
-        public static byte[] ReadBytes(this BinaryReader br, long longitud)
-        {
-            return br.ReadBytes(Convert.ToUInt64(longitud));
-        }
-        public static byte[] ReadBytes(this BinaryReader br, ulong longitud)
-        {
-            byte[] bytes = new byte[longitud];
-            for (ulong i = 0; i < longitud; i++)
+            byte[] bytes;
+            if (fillSizeIfOverLoad && br.BaseStream.Length - br.BaseStream.Position < longitud)
+                longitud = br.BaseStream.Length - br.BaseStream.Position;
+            bytes = new byte[longitud];
+            for (long i = 0; i < longitud&&!br.BaseStream.EndOfStream(); i++)
                 bytes[i] = br.ReadByte();
             return bytes;
         }
