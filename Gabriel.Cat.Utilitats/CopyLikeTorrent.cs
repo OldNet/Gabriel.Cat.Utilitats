@@ -74,6 +74,7 @@ namespace Gabriel.Cat
         {
             bool endCopySuccessful = false;
             //copy the file :D
+            FileCopyPorcessEventArgs fileProgress=null;
             FileStream fsIn;
             FileStream fsOut;
             BinaryReader brIn;
@@ -95,23 +96,30 @@ namespace Gabriel.Cat
                         endCopySuccessful = fsIn.Position == fsOut.Position;
                         brOut.Flush();//escribe los datos en la stream base
                         fsOut.Flush();//escribe los datos en el archivo
-                        if (HandleGlobalProgress && GlobalProgress != null)
-                            GlobalProgress(this, new FileCopyPorcessEventArgs(this, brOut.BaseStream.Position, brIn.BaseStream.Length));
-                        if(FileProgress!=null)
-                            FileProgress(this,new FileCopyPorcessEventArgs(this, brOut.BaseStream.Position, brIn.BaseStream.Length));
+                        if (FileProgress != null || HandleGlobalProgress && GlobalProgress != null)
+                        {
+                            fileProgress = new FileCopyPorcessEventArgs(this, brOut.BaseStream.Position, brIn.BaseStream.Length);
+                            if (HandleGlobalProgress && GlobalProgress != null)
+                                GlobalProgress(this, fileProgress);
+                            if (FileProgress != null)
+                                FileProgress(this, fileProgress);
+                        }
                     }
 
-                } while (!endCopySuccessful && (!fsIn.EndOfStream() || !fsOut.CanWrite));//mirar si origina excepcion si no existe...
+                } while (!endCopySuccessful && (!fsIn.EndOfStream() || !fsOut.CanWrite)&&!fileProgress.Cancel);//mirar si origina excepcion si no existe...
             }
             finally
             {
                 brIn.Close();
                 brOut.Close();
             }
+            if (fileProgress != null && fileProgress.Cancel&&File.Exists(Destination))
+                File.Delete(Destination);
             return endCopySuccessful;
         }
         public bool CopySync()
         {
+          
            return Copy().Result;
         }
 
@@ -131,11 +139,13 @@ namespace Gabriel.Cat
             File = file;
             Complete = complete;
             Total = total;
+            Cancel = false;
         }
 
         public CopyLikeTorrent File { get; private set; }
         public long Complete { get; private set; }
         public long Total { get; private set; }
         public double Progress { get { return Complete / (Total*1.0); } }
+        public bool Cancel { get; set; }
     }
 }
