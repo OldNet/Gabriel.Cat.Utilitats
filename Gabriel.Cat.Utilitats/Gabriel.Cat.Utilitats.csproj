@@ -63,6 +63,7 @@
     <Compile Include="Comparer.cs" />
     <Compile Include="CopyLikeTorrent.cs" />
     <Compile Include="Enumerador.cs" />
+    <Compile Include="File.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="GeneradorHex.cs" />
     <Compile Include="GeneradorID.cs" />
