@@ -1394,14 +1394,13 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
-        public static T DameElementoActual<T>(this T[] llista, Ordre escogerKey, int contador)
+        public static T DameElementoActual<T>(this T[] llista, Ordre escogerKey, long contador)
         {
-            T objSelected = default(T);
-            int posicio;
+            long posicio=0;
             switch (escogerKey)
             {
                 case Ordre.Consecutiu:
-                    objSelected = llista[contador % llista.Length];
+                   posicio=contador % llista.Length;
                     break;
                 case Ordre.ConsecutiuIAlInreves://repite el primero y el ultimo
                     posicio = contador / llista.Length;
@@ -1415,10 +1414,10 @@ namespace Gabriel.Cat.Extension
                         //esta subiendo
                         posicio = llista.Length - (contador % llista.Length) - 1;
                     }
-                    objSelected = llista[posicio];
+                
                     break;
             }
-            return objSelected;
+            return llista[posicio];
         }
         #endregion
         #region IEnumerable

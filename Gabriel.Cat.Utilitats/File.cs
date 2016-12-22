@@ -16,7 +16,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Copy and move files like a torrent
     /// </summary>
-   public class File
+   public class FileTorrent
     {
         /// <summary>
         /// Extensión archivo temporal mientras se copia en el destino
