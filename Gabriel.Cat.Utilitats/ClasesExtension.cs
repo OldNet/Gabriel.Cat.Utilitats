@@ -137,7 +137,6 @@ namespace Gabriel.Cat.Extension
 
         #region Extesion Vector
 
-
         /// <summary>
         /// Devuelve un vector usando el angulo para orientarlo
         /// </summary>

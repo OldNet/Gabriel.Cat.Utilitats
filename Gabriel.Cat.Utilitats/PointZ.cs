@@ -14,13 +14,13 @@ namespace Gabriel.Cat
         [FieldOffset(8)]
         int z;
 
-        public PointZ(int x, int y, int z)
+        public PointZ(int x=0, int y=0, int z=0)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
-        public PointZ(Point point, int z) : this(point.X, point.Y, z)
+        public PointZ(Point point, int z=0) : this(point.X, point.Y, z)
         {
 
         }

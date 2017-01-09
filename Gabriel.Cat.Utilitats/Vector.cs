@@ -33,7 +33,7 @@ namespace Gabriel.Cat
         [FieldOffset(13)]
         int finY;
 
-        public Vector(int inicioX, int inicioY, int finX, int finY,Sentido sentido=Sentido.Centro)
+        public Vector(int inicioX=0, int inicioY=0, int finX=0, int finY=0,Sentido sentido=Sentido.Centro)
         {
             this.inicioY = inicioY;
             this.inicioX = inicioX;
