@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,25 +19,28 @@ namespace Gabriel.Cat
         DiagonalDerechaAbajo = Derecha + Abajo,
         DiagonalDerechaArriba = Derecha + Arriba
     }
-    public class Vector
+    [StructLayout(LayoutKind.Explicit, Size = 17)]
+    public struct Vector
     {
+        [FieldOffset(0)]
         int inicioX;
+        [FieldOffset(4)]
         int inicioY;
+        [FieldOffset(8)]
         Sentido sentido;
+        [FieldOffset(9)]
         int finX;
+        [FieldOffset(13)]
         int finY;
-        public Vector()
-            : this(0, 0, 0, 0)
-        {
 
-        }
-        public Vector(int inicioX, int inicioY, int finX, int finY)
+        public Vector(int inicioX, int inicioY, int finX, int finY,Sentido sentido=Sentido.Centro)
         {
-            InicioY = inicioY;
-            InicioX = inicioX;
+            this.inicioY = inicioY;
+            this.inicioX = inicioX;
 
-            FinX = finX;
-            FinY = finY;
+            this.finX = finX;
+            this.finY = finY;
+            this.sentido = sentido;
         }
 
         public int InicioY

@@ -276,7 +276,7 @@ namespace Gabriel.Cat.Extension
         /// <param name="metodoTratarObjeto"></param>
         public static void Recorrer<T>(this T[,] matriz, Vector vector, ContinuaTratandoObjeto<T> metodoTratarObjeto)
         {
-            if (vector == null || metodoTratarObjeto == null)
+            if ( metodoTratarObjeto == null)
                 throw new ArgumentNullException();
             try
             {
