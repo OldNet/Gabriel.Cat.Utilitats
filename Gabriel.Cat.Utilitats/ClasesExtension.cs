@@ -2310,26 +2310,20 @@ namespace Gabriel.Cat.Extension
         {
             //me gustaria optimizarlo de alguna manera pero de momento no se...y tengo que pasarlo a string pj:"01010101";
             const int BITSBYTE = 8;
-            const char CERO = '0';
             bool[] bits = new bool[BITSBYTE];
-            string byteToBitsString = Convert.ToString(byteToBits,2).PadLeft(BITSBYTE,CERO);
             unsafe
             {
                 bool* ptrBits;
-                char* ptrBitsChars;
                 fixed(bool* ptBits=bits)
                 {
-                    ptrBits = ptBits+BITSBYTE-1;
-                    fixed(char* ptBitsChar=byteToBitsString)
-                    {
-                        ptrBitsChars = ptBitsChar;
+                    ptrBits = ptBits;
+                   
                         for(int i=0;i<BITSBYTE;i++)
                         {
-                            *ptrBits = *ptrBitsChars != CERO;
-                            ptrBits--;
-                            ptrBitsChars++;
+                            *ptrBits = (byteToBits&(1 << (i % 8))) != 0;
+                            ptrBits++;
                         }
-                    }
+                    
 
                 }
             }
