@@ -2308,56 +2308,130 @@ namespace Gabriel.Cat.Extension
 
         public static bool[] ToBits(this byte byteToBits)
         {
-            const byte LENGHTBYTE = 8;
-            BitArray bitsArray = new BitArray(byteToBits);
-            bool[] bits = new bool[LENGHTBYTE];
+            //me gustaria optimizarlo de alguna manera pero de momento no se...y tengo que pasarlo a string pj:"01010101";
+            const int BITSBYTE = 8;
+            const char CERO = '0';
+            bool[] bits = new bool[BITSBYTE];
+            string byteToBitsString = Convert.ToString(byteToBits,2).PadLeft(BITSBYTE,CERO);
             unsafe
             {
                 bool* ptrBits;
-                fixed (bool* ptBits = bits)
+                char* ptrBitsChars;
+                fixed(bool* ptBits=bits)
                 {
-                    ptrBits = ptBits;
-                    for (int i = 0; i < LENGHTBYTE; i++)
+                    ptrBits = ptBits+BITSBYTE-1;
+                    fixed(char* ptBitsChar=byteToBitsString)
                     {
-                        *ptrBits = bitsArray[i];
-                        ptrBits++;
+                        ptrBitsChars = ptBitsChar;
+                        for(int i=0;i<BITSBYTE;i++)
+                        {
+                            *ptrBits = *ptrBitsChars != CERO;
+                            ptrBits--;
+                            ptrBitsChars++;
+                        }
                     }
+
                 }
             }
             return bits;
         }
+        public static bool[] ToBits(this IList<byte> byteToBits)
+        { return byteToBits.ToArray().ToBits(); }
         public static bool[] ToBits(this IEnumerable<byte> byteToBits)
+        { return byteToBits.ToArray().ToBits(); }
+        public static bool[] ToBits(this byte[] byteToBits)
         {
-            BitArray bitsArray = new BitArray(byteToBits.ToArray());
-            bool[] bits = new bool[bitsArray.Length];
+            const int BITSBYTE = 8;
+            bool[] bits = new bool[byteToBits.Length * BITSBYTE];
+            bool[] bitsAuxByte;
+            //opero
             unsafe
             {
-                bool* ptrBits;
-                fixed (bool* ptBits = bits)
+                bool* ptrBits, ptrBitsAuxByte;
+                byte* ptrBytesToBits;
+                fixed(bool* ptBits=bits)
                 {
-                    ptrBits = ptBits;
-                    for (int i = 0; i < bitsArray.Length; i++)
+                    fixed (byte* ptBytesToBits=byteToBits)
                     {
-                        *ptrBits = bitsArray[i];
-                        ptrBits++;
+                        ptrBytesToBits = ptBytesToBits;
+                        ptrBits = ptBits;
+                        for (int i = 0, f = byteToBits.Length; i < f; i++)
+                        {
+                            bitsAuxByte = (*ptrBytesToBits).ToBits();
+                            ptrBytesToBits++;
+                            fixed(bool* ptBitsAuxByte=bitsAuxByte)
+                            {
+                                ptrBitsAuxByte = ptBitsAuxByte;
+                                for(int j=0;j<BITSBYTE;j++)
+                                {
+                                    *ptrBits = *ptrBitsAuxByte;
+                                    ptrBits++;
+                                    ptrBitsAuxByte++;
+                                }
+                            }
+                        }
                     }
                 }
             }
+
             return bits;
         }
 
         public static byte[] ToByteArray(this bool[] bits)
         {
-            int numBytes = bits.Length / 8;
-            if (bits.Length % 8 != 0)
-                numBytes++;
+            const int BITSBYTE = 8;
 
+            if (bits.Length % BITSBYTE != 0)
+                throw new ArgumentException();
+
+            int numBytes = bits.Length / BITSBYTE;
             byte[] bytes = new byte[numBytes];
-            bool[,] mbytes = bits.ToMatriu(8, DimensionMatriz.Columna);
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = mbytes.Fila(i).Reverse().ToArray().ToByte();
+            int index = 0;
+            
+            unsafe
+            {
+                byte* ptrBytes;
+                fixed(byte* ptBytes=bytes)
+                {
+                    ptrBytes = ptBytes;
+                    for(int i=0;i<numBytes;i++)
+                    {
+                        *ptrBytes = bits.SubArray(index, BITSBYTE).ToByte();
+                        index += BITSBYTE;
+                        ptrBytes++;
+                    }
+                }
+
+            }
+
             return bytes;
 
+        }
+        public static bool[] SubArray(this bool[] array,int startIndex,int length)
+        {
+            if (startIndex<0||startIndex + length > array.Length)
+                throw new ArgumentOutOfRangeException();
+            bool[] subArray = new bool[length];
+            unsafe
+            {
+                bool* ptrArray , ptrSubArray;
+                fixed (bool* ptArray = array)
+                {
+                    fixed (bool* ptSubArray = subArray)
+                    {
+                        ptrArray = ptArray;
+                        ptrSubArray = ptSubArray;
+                        ptrArray += startIndex;//asigno el inicio aqui :D
+                        for (int j = 0,f=length; j < length; j++)
+                        {
+                            *ptrSubArray = *ptrArray;
+                            ptrArray++;
+                            ptrSubArray++;
+                        }
+                    }
+                }
+            }
+            return subArray;
         }
         public static byte ToByte(this bool[] bits)
         {
@@ -2379,30 +2453,7 @@ namespace Gabriel.Cat.Extension
             }
             return byteBuild;
         }
-        public static byte[] ToByteArray(this BitArray bitsArray)
-        {
 
-            return bitsArray.ToBoolArray().ToByteArray();
-        }
-        public static bool[] ToBoolArray(this BitArray bitsArray)
-        {
-            bool[] bits = new bool[bitsArray.Count];
-
-            unsafe
-            {
-                bool* ptrBits;
-                fixed (bool* ptBits = bits)
-                {
-                    ptrBits = ptBits;
-                    for (int i = 0; i < bits.Length; i++)
-                    {
-                        *ptrBits = bitsArray[i];
-                        ptrBits++;
-                    }
-                }
-            }
-            return bits;
-        }
         public static object DeserializeObject<T>(this string toDeserialize) where T : ISerializable
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
@@ -2555,12 +2606,12 @@ namespace Gabriel.Cat.Extension
         {
             if (bytesSplit == null) throw new ArgumentNullException();
             List<byte[]> bytesSplited = new List<byte[]>();
-            Hex posicionArray;
-            Hex posicionArrayEncontrada;
+            int posicionArray;
+            int posicionArrayEncontrada;
             if (bytesSplit.Length != 0)
             {
 
-                posicionArray = array.BuscarArray(0, bytesSplit);
+                posicionArray =(int) array.BuscarArray(0, bytesSplit);
 
                 //opero
                 if (posicionArray > -1)
@@ -2569,7 +2620,7 @@ namespace Gabriel.Cat.Extension
                     posicionArray += bytesSplit.Length;
                     do
                     {
-                        posicionArrayEncontrada = array.BuscarArray(posicionArray, bytesSplit);
+                        posicionArrayEncontrada =(int) array.BuscarArray(posicionArray, bytesSplit);
                         if (posicionArrayEncontrada > -1)
                         {
                             bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
@@ -2616,13 +2667,13 @@ namespace Gabriel.Cat.Extension
             return indexOf;
         }
         #region SubArray with pointers me gustaria no repetir codigo haciendo un metodo generico con un filtro pero de momento el c# no me lo permite hacer...
-        public static byte[] SubArray(this byte[] array, Hex cantidad)
+        public static byte[] SubArray(this byte[] array, int cantidad)
         {
             return SubArray(array, 0, cantidad);
         }
-        public static  byte[] SubArray(this byte[] array, Hex inicio, Hex cantidad) 
+        public static  byte[] SubArray(this byte[] array, int inicio, int cantidad) 
         {
-            if (cantidad + inicio > array.LongLength)
+            if (inicio<0||cantidad + inicio > array.Length)
                 throw new ArgumentOutOfRangeException();
             byte[] subArray = new byte[cantidad];
             unsafe
@@ -2633,7 +2684,7 @@ namespace Gabriel.Cat.Extension
                     {
                         byte* ptArray = ptrArray, ptSubArray = ptrSubArray;
                         ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
+                        for (int j = 0; j < cantidad; j++)
                         {
                             *ptSubArray = *ptArray;
                             ptArray++;
