@@ -2308,14 +2308,41 @@ namespace Gabriel.Cat.Extension
 
         public static bool[] ToBits(this byte byteToBits)
         {
-            return new byte[] { byteToBits }.ToBits();
+            const byte LENGHTBYTE = 8;
+            BitArray bitsArray = new BitArray(byteToBits);
+            bool[] bits = new bool[LENGHTBYTE];
+            unsafe
+            {
+                bool* ptrBits;
+                fixed (bool* ptBits = bits)
+                {
+                    ptrBits = ptBits;
+                    for (int i = 0; i < LENGHTBYTE; i++)
+                    {
+                        *ptrBits = bitsArray[i];
+                        ptrBits++;
+                    }
+                }
+            }
+            return bits;
         }
         public static bool[] ToBits(this IEnumerable<byte> byteToBits)
         {
             BitArray bitsArray = new BitArray(byteToBits.ToArray());
             bool[] bits = new bool[bitsArray.Length];
-            for (int i = 0; i < bits.Length; i++)
-                bits[i] = bitsArray[i];
+            unsafe
+            {
+                bool* ptrBits;
+                fixed (bool* ptBits = bits)
+                {
+                    ptrBits = ptBits;
+                    for (int i = 0; i < bitsArray.Length; i++)
+                    {
+                        *ptrBits = bitsArray[i];
+                        ptrBits++;
+                    }
+                }
+            }
             return bits;
         }
 
@@ -2335,11 +2362,20 @@ namespace Gabriel.Cat.Extension
         public static byte ToByte(this bool[] bits)
         {
             byte byteBuild = new byte();
-            for (int i = 0; i < bits.Length; i++)
+            unsafe
             {
-                if (bits[i])
-                    byteBuild |= (byte)(1 << (7 - i));
+                bool* ptrBits;
+                fixed (bool* ptBits = bits)
+                {
+                    ptrBits = ptBits;
+                    for (int i = 0; i < bits.Length; i++)
+                    {
+                        if (*ptrBits)
+                           byteBuild |= (byte)(1 << (7 - i));
+                        ptrBits++;
 
+                    }
+                }
             }
             return byteBuild;
         }
@@ -2351,8 +2387,20 @@ namespace Gabriel.Cat.Extension
         public static bool[] ToBoolArray(this BitArray bitsArray)
         {
             bool[] bits = new bool[bitsArray.Count];
-            for (int i = 0; i < bits.Length; i++)
-                bits[i] = bitsArray[i];
+
+            unsafe
+            {
+                bool* ptrBits;
+                fixed (bool* ptBits = bits)
+                {
+                    ptrBits = ptBits;
+                    for (int i = 0; i < bits.Length; i++)
+                    {
+                        *ptrBits = bitsArray[i];
+                        ptrBits++;
+                    }
+                }
+            }
             return bits;
         }
         public static object DeserializeObject<T>(this string toDeserialize) where T : ISerializable
