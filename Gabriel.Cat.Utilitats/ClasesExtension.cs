@@ -2308,7 +2308,6 @@ namespace Gabriel.Cat.Extension
 
         public static bool[] ToBits(this byte byteToBits)
         {
-            //me gustaria optimizarlo de alguna manera pero de momento no se...y tengo que pasarlo a string pj:"01010101";
             const int BITSBYTE = 8;
             bool[] bits = new bool[BITSBYTE];
             unsafe
