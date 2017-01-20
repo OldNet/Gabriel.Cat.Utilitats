@@ -75,7 +75,10 @@ namespace Gabriel.Cat
                 else frameAlAcabar = frames.Count - 1;
             }
         }
-
+        public int FrameASaltarAnimacionCiclica
+        {
+            get;set;
+        }
         public int NumeroDeRepeticionesFijas
         {
             get
@@ -127,15 +130,23 @@ namespace Gabriel.Cat
                         FrameChanged(this, frames[ActualFrameIndex].Key);
                         Thread.Sleep(frames[ActualFrameIndex].Value);
                         ActualFrameIndex++;
+                        if (numeroDeRepeticiones > 0)
+                            if (ActualFrameIndex == FrameASaltarAnimacionCiclica)
+                                ActualFrameIndex++;
                     }
                     numeroDeRepeticiones++;
                 } while (numeroDeRepeticiones<numeroDeRepeticionesFijas||animarCiclicamente);
                 
-                  FrameChanged(this, frames[frameAlAcabar].Key);
+                  FrameChanged(this, frames[FrameAlAcabar].Key);
 
 
             });
             hiloAnimacion.Start();
+        }
+        public void Stop()
+        {
+            if (hiloAnimacion != null && hiloAnimacion.IsAlive)
+                hiloAnimacion.Suspend();
         }
         public void Finsh()
         {
