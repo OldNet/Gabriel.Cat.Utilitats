@@ -2453,7 +2453,35 @@ namespace Gabriel.Cat.Extension
             }
             return byteBuild;
         }
+        public static byte[] ReverseArray(this byte[] byteArrayToReverse)
+        {
+            byte[] byteArrayReversed = new byte[byteArrayToReverse.Length];
+            unsafe
+            {
+                
+                byte* ptrInverseBytesOut, ptrInverseBytesIn;
+                byteArrayReversed.UnsafeMethod((ptrBytesOut) =>
+                {
+                    byteArrayToReverse.UnsafeMethod((ptrBytesIn)=>
+                    {
+                        ptrInverseBytesIn = ptrBytesIn.PtrArrayFin;
+                        ptrInverseBytesOut = ptrBytesOut.PtrArrayFin;
 
+                        for(long i=0,f=ptrBytesIn.Length/2;i<f;i++)
+                        {
+                            *ptrBytesOut.PtrArray = *ptrInverseBytesIn;
+                            *ptrInverseBytesOut = *ptrBytesIn.PtrArray;
+                            ptrBytesIn.PtrArray++;
+                            ptrBytesOut.PtrArray++;
+                            ptrInverseBytesIn--;
+                            ptrInverseBytesOut--;
+                        }
+
+                    });
+                });
+            }
+            return byteArrayReversed;
+        }
         public static object DeserializeObject<T>(this string toDeserialize) where T : ISerializable
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));

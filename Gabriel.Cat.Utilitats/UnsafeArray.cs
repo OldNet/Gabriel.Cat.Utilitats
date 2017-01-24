@@ -40,7 +40,7 @@ namespace Gabriel.Cat
         }
         public byte* PtrArrayFin
         {
-            get { return PtrArrayInicial + Length; }
+            get { return PtrArrayInicial + Length-1; }
         }
         public static unsafe explicit operator byte* (UnsafeArray unsafeArray)
         {
