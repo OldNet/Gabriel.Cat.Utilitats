@@ -480,18 +480,32 @@ namespace Gabriel.Cat.Extension
             return valorEncontrado;
         }
         #endregion
-        #region LlistaOrdenada
-        public static void Add<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
+        #region IDictionary
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> llista, IList<IClauUnicaPerObjecte> values)
+           where TValue : IClauUnicaPerObjecte
+           where TKey : IComparable
+        {
+            for(int i=0;i<values.Count;i++)
+                 llista.Add(values[i]);
+        }
+        public static void Add<TKey, TValue>(this IDictionary<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
             llista.Add((TKey)value.Clau, (TValue)value);
         }
-        public static void AddOrReplace<TKey, TValue>(this LlistaOrdenada<TKey, TValue> llista, IClauUnicaPerObjecte value)
+        public static void AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
             where TKey : IComparable
         {
             llista.AddOrReplace((TKey)value.Clau, (TValue)value);
+        }
+        public static void AddOrReplace<TKey,TValue>(this IDictionary<TKey,TValue> diccionary,TKey key, TValue value)
+            where TKey : IComparable
+        {
+            if (!diccionary.ContainsKey(key))
+                diccionary.Add(key, value);
+            else diccionary[key] = value;
         }
         #endregion
         #region ICollection<T>Extension
