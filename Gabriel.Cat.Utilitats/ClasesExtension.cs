@@ -403,6 +403,10 @@ namespace Gabriel.Cat.Extension
             for (int i = 0; i < nousValors.Count; i++)
                 lst.Add((TKey1)nousValors[i].Clau,(TKey2) nousValors[i].Clau2,nousValors[i]);
         }
+        public static void Add<TKey1, TKey2, TValue>(this TwoKeysList<TKey1, TKey2, TValue> lst, TValue nouValor) where TKey1 : IComparable<TKey1> where TKey2 : IComparable<TKey2> where TValue : IDosClausUniquesPerObjecte
+        {
+                lst.Add((TKey1)nouValor.Clau, (TKey2)nouValor.Clau2, nouValor);
+        }
         public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T : IClauUnicaPerObjecte
         {
             ListaUnica<T> lista = new ListaUnica<T>();
