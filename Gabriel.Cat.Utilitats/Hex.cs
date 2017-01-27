@@ -81,7 +81,7 @@ namespace Gabriel.Cat
             }
         }
 
-        public IComparable Clau
+        IComparable IClauUnicaPerObjecte.Clau
         {
             get
             {

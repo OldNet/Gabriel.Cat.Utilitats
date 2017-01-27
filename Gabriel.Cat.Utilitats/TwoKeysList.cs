@@ -17,7 +17,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of TwoKeysList.
     /// </summary>
-    public class TwoKeysList<Tkey1, Tkey2, Tvalue> : IDictionary<TwoKeys<Tkey1, Tkey2>, Tvalue>
+    public class TwoKeysList<Tkey1, Tkey2, Tvalue> : IDictionary<TwoKeys<Tkey1, Tkey2>, Tvalue>, IEnumerable<KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>>
                                                         where Tkey1 : IComparable<Tkey1>
                                                         where Tkey2 : IComparable<Tkey2>
     {
@@ -115,17 +115,21 @@ namespace Gabriel.Cat
             llista2.Remove(key2);
             return removed;
         }
-        public Tvalue ObtainValueWithKey1(Tkey1 key)
+        public Tvalue GetValueWithKey1(Tkey1 key)
         {
             return llista1[key];
         }
-        public Tvalue ObtainValueWithKey2(Tkey2 key)
+        public Tvalue GetValueWithKey2(Tkey2 key)
         {
             return llista2[key];
         }
-        public Tkey1 ObtainTkey1WhithTkey2(Tkey2 key2)
+        public Tkey1 GetTkey1WhithTkey2(Tkey2 key2)
         {
             return llistaClau2[key2];
+        }
+        public Tkey2 GetTkey2WhithTkey1(Tkey1 key1)
+        {
+            return llistaClau1[key1];
         }
 
         public void ChangeKey2(Tkey2 key2Old, Tkey2 key2New)
@@ -152,10 +156,7 @@ namespace Gabriel.Cat
                 Add(key1New, key2, value);
             }
         }
-        public Tkey2 ObtainTkey2WhithTkey1(Tkey1 key1)
-        {
-            return llistaClau1[key1];
-        }
+        
         public void Clear()
         {
             llistaClau1.Clear();
@@ -201,17 +202,12 @@ namespace Gabriel.Cat
         {
             return llistaClau2.ContainsKey(key2);
         }
-      
-
-        #region IEnumerable implementation
-
-        public IEnumerator<KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TwoKeys<Tkey1,Tkey2>,Tvalue>> GetEnumerator()
         {
-            var keys = llistaClau1.ToArray();
-            Tvalue[] values = ValueToArray();
-            for (int i = 0; i < values.Length; i++)
-                yield return new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(keys[i].Key, keys[i].Value), values[i]);
+            foreach (KeyValuePair<Tkey1, Tkey2> keys in this.llistaClau1)
+                yield return new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(keys.Key, keys.Value), llista1[keys.Key]);
         }
+      
 
         public bool ContainsKey(TwoKeys<Tkey1, Tkey2> key)
         {
@@ -265,7 +261,7 @@ namespace Gabriel.Cat
 
 
 
-        #endregion
+      
     }
     public struct TwoKeys<Tkey1, Tkey2>
     {

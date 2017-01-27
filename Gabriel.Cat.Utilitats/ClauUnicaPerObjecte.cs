@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
-    public interface IClauUnicaPerObjecte
+    public interface IClauUnicaPerObjecte 
     {
         IComparable Clau { get; }
     }
     /// <summary>
     /// Sirve para usar clases y structs que son IComparable pero que no son IClauUnicaPerObjecte, hay conversiones implicitas a los tipos basicos
     /// </summary>
-    public class ClauUnicaPerObjecte : IClauUnicaPerObjecte
+    public class ClauUnicaPerObjecte: IClauUnicaPerObjecte
     {
         IComparable clau;
         public ClauUnicaPerObjecte(IComparable clau)
@@ -76,5 +76,9 @@ namespace Gabriel.Cat
 
         #endregion
 
+    }
+    public interface IDosClausUniquesPerObjecte:IClauUnicaPerObjecte
+    {
+        IComparable Clau2 { get; }
     }
 }

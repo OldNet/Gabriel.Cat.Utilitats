@@ -53,7 +53,7 @@ namespace Gabriel.Cat
                     }
                     }
  
-                return imagenes.ObtainValueWithKey2(hash);
+                return imagenes.GetValueWithKey2(hash);
 
 			}
 			set {

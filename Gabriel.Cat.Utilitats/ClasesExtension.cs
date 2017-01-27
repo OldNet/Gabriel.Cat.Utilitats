@@ -398,6 +398,11 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IClauUnicaPerObjecte
+        public static void AddRange<TKey1,TKey2,TValue>(this TwoKeysList<TKey1,TKey2,TValue> lst,IList<TValue> nousValors) where TKey1:IComparable<TKey1> where TKey2:IComparable<TKey2> where TValue:IDosClausUniquesPerObjecte
+        {
+            for (int i = 0; i < nousValors.Count; i++)
+                lst.Add((TKey1)nousValors[i].Clau,(TKey2) nousValors[i].Clau2,nousValors[i]);
+        }
         public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T : IClauUnicaPerObjecte
         {
             ListaUnica<T> lista = new ListaUnica<T>();
@@ -843,7 +848,7 @@ namespace Gabriel.Cat.Extension
             llistaFinal.AddRange(pathsFinals.Key1ValuePair());
             for (int i = 0; i < archivosDuplicados.Count; i++)
             {
-                llistaFinal.Add(new KeyValuePair<string, FileInfo>(pathsFinals.ObtainValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
+                llistaFinal.Add(new KeyValuePair<string, FileInfo>(pathsFinals.GetValueWithKey2(archivosDuplicados[i].IdUnicoRapido()).FullName, archivosDuplicados[i]));
             }
             return llistaFinal;
 
@@ -1500,7 +1505,7 @@ namespace Gabriel.Cat.Extension
                     llistaOrdenada.Add(element, element);
             return llistaOrdenada;
         }
-        public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
+        public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T:IClauUnicaPerObjecte
         {
             LlistaOrdenada<IComparable, T> sortedList = new LlistaOrdenada<IComparable, T>();
             foreach (T element in list)
