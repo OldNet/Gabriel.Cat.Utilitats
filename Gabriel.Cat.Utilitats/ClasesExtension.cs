@@ -19,7 +19,7 @@ using System.Reflection;
 using System.Drawing.Imaging;
 using System.Collections;
 using System.Runtime.ExceptionServices;
-
+//mirar si IEnumerable puede ser IList :) asi evito el foreach que gasta mucho :)
 namespace Gabriel.Cat.Extension
 {
     public delegate bool MetodoWhileEach<Tvalue>(Tvalue valor);
@@ -1715,19 +1715,19 @@ namespace Gabriel.Cat.Extension
 
         }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
-        public static IReadOnlyList<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
+        public static List<Tvalue> Filtra<Tvalue>(this IList<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
             if (comprovador == null)
                 throw new ArgumentNullException("El metodo para realizar la comparacion no puede ser null");
 
             List<Tvalue> valorsOk = new List<Tvalue>();
-            foreach (Tvalue valor in valors)
-                if (comprovador(valor))
-                    valorsOk.Add(valor);
+            for (int i = 0; i < valors.Count; i++)
+                if (comprovador(valors[i]))
+                    valorsOk.Add(valors[i]);
             return valorsOk;
 
         }
-        public static IReadOnlyList<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
+        public static List<Tvalue> Desordena<Tvalue>(this IEnumerable<Tvalue> valors)
         {
             List<Tvalue> llistaOrdenada = new List<Tvalue>(valors);
             int posicionAzar;
@@ -1757,7 +1757,7 @@ namespace Gabriel.Cat.Extension
             }
             return bytes;
         }
-        public static IReadOnlyList<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
+        public static List<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
         {
             List<TResult> llista = new List<TResult>();
             foreach (Object obj in source)
@@ -1778,13 +1778,13 @@ namespace Gabriel.Cat.Extension
             return llista;
         }
         //filtra los IEnumerable que tienen este metodoConParametros con el where
-        public static IReadOnlyList<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
+        public static List<Tvalue> Ordena<Tvalue>(this IEnumerable<Tvalue> valors) where Tvalue : IComparable<Tvalue>
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             llista.Sort();
             return llista;
         }
-        public static IReadOnlyList<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
+        public static List<Tvalue> Treu<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsATreure) where Tvalue : IComparable
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             int compareTo = -1;
@@ -1805,13 +1805,13 @@ namespace Gabriel.Cat.Extension
                 return llista;
 
         }
-        public static IReadOnlyList<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
+        public static List<Tvalue> AfegirValor<Tvalue>(this IEnumerable<Tvalue> valors, Tvalue valorNou)
         {
             List<Tvalue> valorsFinals = new List<Tvalue>(valors);
             valorsFinals.Add(valorNou);
             return valorsFinals;
         }
-        public static IReadOnlyList<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
+        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             bool valorEnLista = true;
@@ -1835,7 +1835,7 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static IReadOnlyList<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
+        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous)
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             if (valorsNous != null)
@@ -1843,7 +1843,7 @@ namespace Gabriel.Cat.Extension
             return llista;
 
         }
-        public static IReadOnlyList<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static List<Tkey> GetKeys<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             List<Tkey> llista = new List<Tkey>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
@@ -1866,34 +1866,34 @@ namespace Gabriel.Cat.Extension
             return valors.ToArray();
         }
 
-        public static IReadOnlyList<T> SubList<T>(this IEnumerable<T> arrayB, long inicio)
+        public static List<T> SubList<T>(this IList<T> arrayB, int inicio)
         {
             return arrayB.SubList(inicio, arrayB.Count() - inicio);
         }
-        public static IReadOnlyList<T> SubList<T>(this IEnumerable<T> arrayB, long inicio, long longitud)
+        public static List<T> SubList<T>(this IList<T> arrayB, int inicio, int longitud)
         {
-            T[] array;
+
             List<T> subArray;
 
             if (inicio < 0 || longitud <= 0)
                 throw new IndexOutOfRangeException();
-            array = arrayB.ToTaula();
-            if (longitud + inicio > array.Length)
+            if (longitud + inicio > arrayB.Count)
                 throw new IndexOutOfRangeException();
             subArray = new List<T>();
 
-            for (long i = inicio, fin = inicio + longitud; i < fin; i++)
-                subArray.Add(array[i]);
+            for (int i = inicio, fin = inicio + longitud; i < fin; i++)
+                subArray.Add(arrayB[i]);
+
             return subArray;
 
         }
         #endregion
         #region IEnumerable<T[]>
-        public static bool Contains<T>(this IEnumerable<T> list, IComparable objToFind)
+        public static bool Contains<T>(this IList<T> list, IComparable objToFind)
         {
             return !Equals(list.Busca(objToFind),default(T));
         }
-        public static T Busca<T>(this IEnumerable<T> list, IComparable objToFind)
+        public static T Busca<T>(this IList<T> list, IComparable objToFind)
         {
             bool contenida = false;
             object objToFindCasting = objToFind;
@@ -1901,43 +1901,42 @@ namespace Gabriel.Cat.Extension
             try
             {
                 bool isIComparable = list.ElementAt(0) is IComparable;
-                list.WhileEach((objToCompare) =>
+ 
+                for(int i=0;i<list.Count&&!contenida;i++)
                 {
                     if (isIComparable)
-                        contenida = (objToCompare as IComparable).CompareTo(objToFind) == (int)CompareTo.Iguales;
+                        contenida = (list[i] as IComparable).CompareTo(objToFind) == (int)CompareTo.Iguales;
                     else
-                        contenida = (object)objToCompare == objToFindCasting;
+                        contenida = (object)list[i] == objToFindCasting;
                     if (contenida)
-                        valueTrobat = objToCompare;
-                    return !contenida;
-                });
+                        valueTrobat = list[i];
+                }
             }
             catch
             {
             }
             return valueTrobat;
         }
-        public static T[,] ToMatriu<T>(this IEnumerable<T[]> listaTablas)
+        public static T[,] ToMatriu<T>(this IList<T[]> listaTablas)
         {
             T[,] toMatriuResult;
-            T[][] tablaLista = listaTablas.ToArray();
-            if (tablaLista.Length > 0)
-                toMatriuResult = new T[listaTablas.LongitudMasGrande(), tablaLista.Length];
+            if (listaTablas.Count > 0)
+                toMatriuResult = new T[listaTablas.LongitudMasGrande(), listaTablas.Count];
             else
                 toMatriuResult = new T[0, 0];
-            for (int y = 0; y < toMatriuResult.GetLength(DimensionMatriz.Y); y++)
-                if (tablaLista[y] != null)
-                    for (int x = 0; x < toMatriuResult.GetLength(DimensionMatriz.X); x++)
-                        toMatriuResult[x, y] = tablaLista[y][x];
+            for (int y = 0; y < listaTablas.Count; y++)
+                if (listaTablas[y] != null)
+                    for (int x = 0; x < listaTablas[y].Length; x++)
+                        toMatriuResult[x, y] = listaTablas[y][x];
             return toMatriuResult;
         }
-        public static int LongitudMasGrande<T>(this IEnumerable<T[]> listaTablas)
+        public static int LongitudMasGrande<T>(this IList<T[]> listaTablas)
         {
             int longitudMax = -1;
-            foreach (T[] tablaToCompare in listaTablas)
-                if (tablaToCompare != null)
-                    if (longitudMax < tablaToCompare.Length)
-                        longitudMax = tablaToCompare.Length;
+            for(int i=0;i<listaTablas.Count;i++)
+                if (listaTablas[i] != null)
+                    if (longitudMax < listaTablas[i].Length)
+                        longitudMax = listaTablas[i].Length;
             return longitudMax;
         }
         #endregion
