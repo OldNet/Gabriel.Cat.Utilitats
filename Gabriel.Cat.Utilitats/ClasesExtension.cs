@@ -398,6 +398,10 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IClauUnicaPerObjecte
+        public static void AddRange<TKey1, TKey2, TValue>(this TwoKeysList<TKey1, TKey2, TValue> lst, IEnumerable<TValue> nousValors) where TKey1 : IComparable<TKey1> where TKey2 : IComparable<TKey2> where TValue : IDosClausUniquesPerObjecte
+        {
+            AddRange(lst, nousValors.ToArray());
+        }
         public static void AddRange<TKey1,TKey2,TValue>(this TwoKeysList<TKey1,TKey2,TValue> lst,IList<TValue> nousValors) where TKey1:IComparable<TKey1> where TKey2:IComparable<TKey2> where TValue:IDosClausUniquesPerObjecte
         {
             for (int i = 0; i < nousValors.Count; i++)
@@ -490,6 +494,10 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IDictionary
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> llista, IEnumerable<IClauUnicaPerObjecte> values)
+          where TValue : IClauUnicaPerObjecte
+          where TKey : IComparable
+        { AddRange(llista, values.ToArray()); }
         public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> llista, IList<IClauUnicaPerObjecte> values)
            where TValue : IClauUnicaPerObjecte
            where TKey : IComparable
@@ -570,15 +578,24 @@ namespace Gabriel.Cat.Extension
                 file= null;
             return file;
         }
-        public static IReadOnlyList<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IList<string> filesSHA3, bool recursivo=false)
+        public static List<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IEnumerable<string> filesSHA3, bool recursivo = false)
+        {
+            return dir.IBuscoConHashOSHA256(filesSHA3.ToArray(), recursivo, false);
+        }
+       
+        public static List<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IList<string> filesSHA3, bool recursivo=false)
         {
             return dir.IBuscoConHashOSHA256(filesSHA3, recursivo, false);
         }
-        public static IReadOnlyList<FileInfo> BuscaConHash(this DirectoryInfo dir, IList<string> filesHash, bool recursivo=false)
+        public static List<FileInfo> BuscaConHash(this DirectoryInfo dir, IEnumerable<string> filesHash, bool recursivo = false)
+        {
+            return dir.IBuscoConHashOSHA256(filesHash.ToArray(), recursivo, true);
+        }
+        public static List<FileInfo> BuscaConHash(this DirectoryInfo dir, IList<string> filesHash, bool recursivo=false)
         {
             return dir.IBuscoConHashOSHA256(filesHash, recursivo, true);
         }
-        static IReadOnlyList<FileInfo> IBuscoConHashOSHA256(this DirectoryInfo dir, IList<string> hashes, bool recursivo, bool isHash)
+        static List<FileInfo> IBuscoConHashOSHA256(this DirectoryInfo dir, IList<string> hashes, bool recursivo, bool isHash)
         {
             //por probar :)
             List<DirectoryInfo> dirs = new List<DirectoryInfo>();
@@ -1416,6 +1433,7 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
+
         public static T DameElementoActual<T>(this IList<T> llista, Ordre escogerKey, int contador)
         {
            
@@ -1687,7 +1705,8 @@ namespace Gabriel.Cat.Extension
         {
             return (IEnumerator<Tvalue>)valors.GetEnumerator();
         }
-
+        public static Tvalue[,] ToMatriu<Tvalue>(this IEnumerable<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax = DimensionMatriz.Fila)
+        { return llista.ToArray().ToMatriu(numeroDimension,dimensionTamañoMax); }
         //poder hacer que se pueda poner los valores en el orden contrario, de izquierda a derecha o  al rebes o por culumnas en vez de por filas...(y=0,x=0,y=1,x=0...)
         public static Tvalue[,] ToMatriu<Tvalue>(this IList<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax=DimensionMatriz.Fila)
         {
@@ -1710,6 +1729,8 @@ namespace Gabriel.Cat.Extension
             return matriu;
 
         }
+        public static List<Tvalue> Filtra<Tvalue>(this IEnumerable<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
+        { return valors.ToArray().Filtra(comprovador); }
         //para los tipos genericos :) el tipo generico se define en el NombreMetodo<Tipo> y se usa en todo el metodoConParametros ;)
         public static List<Tvalue> Filtra<Tvalue>(this IList<Tvalue> valors, ComprovaEventHandler<Tvalue> comprovador)
         {
@@ -1861,10 +1882,18 @@ namespace Gabriel.Cat.Extension
 
             return valors.ToArray();
         }
+        public static List<T> SubList<T>(this IEnumerable<T> arrayB, int inicio)
+        {
+            return arrayB.ToArray().SubList(inicio);
+        }
 
         public static List<T> SubList<T>(this IList<T> arrayB, int inicio)
         {
             return arrayB.SubList(inicio, arrayB.Count() - inicio);
+        }
+        public static List<T> SubList<T>(this IEnumerable<T> arrayB, int inicio, int longitud)
+        {
+            return arrayB.ToArray().SubList(inicio,longitud);
         }
         public static List<T> SubList<T>(this IList<T> arrayB, int inicio, int longitud)
         {
@@ -1885,10 +1914,16 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable<T[]>
+        //por optimizar
+        public static bool Contains<T>(this IEnumerable<T> list, IComparable objToFind)
+        { return list.ToArray().Contains(objToFind); }
         public static bool Contains<T>(this IList<T> list, IComparable objToFind)
         {
             return !Equals(list.Busca(objToFind),default(T));
         }
+        //por optimizar
+        public static T Busca<T>(this IEnumerable<T> list, IComparable objToFind)
+        { return list.Busca(objToFind); }
         public static T Busca<T>(this IList<T> list, IComparable objToFind)
         {
             bool contenida = false;
@@ -1913,6 +1948,10 @@ namespace Gabriel.Cat.Extension
             }
             return valueTrobat;
         }
+        public static T[,] ToMatriu<T>(this IEnumerable<T[]> listaTablas)
+        {
+            return listaTablas.ToArray().ToMatriu();
+        }
         public static T[,] ToMatriu<T>(this IList<T[]> listaTablas)
         {
             T[,] toMatriuResult;
@@ -1928,6 +1967,10 @@ namespace Gabriel.Cat.Extension
                 toMatriuResult = new T[0, 0];
         
             return toMatriuResult;
+        }
+        public static int LongitudMasGrande<T>(this IEnumerable<T[]> listaTablas)
+        {
+            return listaTablas.ToArray().LongitudMasGrande();
         }
         public static int LongitudMasGrande<T>(this IList<T[]> listaTablas)
         {
