@@ -1687,17 +1687,13 @@ namespace Gabriel.Cat.Extension
         {
             return (IEnumerator<Tvalue>)valors.GetEnumerator();
         }
-        public static Tvalue[,] ToMatriu<Tvalue>(this IEnumerable<Tvalue> valores, int filas)
-        {
-            return ToMatriu(valores, filas, DimensionMatriz.Fila);
-        }
+
         //poder hacer que se pueda poner los valores en el orden contrario, de izquierda a derecha o  al rebes o por culumnas en vez de por filas...(y=0,x=0,y=1,x=0...)
-        public static Tvalue[,] ToMatriu<Tvalue>(this IEnumerable<Tvalue> valores, int numeroDimension, DimensionMatriz dimensionTamañoMax)
+        public static Tvalue[,] ToMatriu<Tvalue>(this IList<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax=DimensionMatriz.Fila)
         {
             if (numeroDimension < 1)
                 throw new Exception("Como minimo 1 " + dimensionTamañoMax.ToString());
 
-            Llista<Tvalue> llista = new Llista<Tvalue>(valores);
             int numeroOtraDimension = (llista.Count / (numeroDimension * 1.0)) > (llista.Count / numeroDimension) ? (llista.Count / numeroDimension) + 1 : (llista.Count / numeroDimension);
             int contador = 0;
             Tvalue[,] matriu;
@@ -1921,13 +1917,16 @@ namespace Gabriel.Cat.Extension
         {
             T[,] toMatriuResult;
             if (listaTablas.Count > 0)
+            {
                 toMatriuResult = new T[listaTablas.LongitudMasGrande(), listaTablas.Count];
+                for (int y = 0; y < listaTablas.Count; y++)
+                    if (listaTablas[y] != null)
+                        for (int x = 0; x < listaTablas[y].Length; x++)
+                            toMatriuResult[x, y] = listaTablas[y][x];
+            }
             else
                 toMatriuResult = new T[0, 0];
-            for (int y = 0; y < listaTablas.Count; y++)
-                if (listaTablas[y] != null)
-                    for (int x = 0; x < listaTablas[y].Length; x++)
-                        toMatriuResult[x, y] = listaTablas[y][x];
+        
             return toMatriuResult;
         }
         public static int LongitudMasGrande<T>(this IList<T[]> listaTablas)
