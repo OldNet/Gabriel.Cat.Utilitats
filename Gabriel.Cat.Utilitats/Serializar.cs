@@ -270,10 +270,30 @@ namespace Gabriel.Cat
 		}
 
 		public	static byte[] GetBytes(string str)
-		{//sacado de http://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
+		{
 			byte[] bytes = new byte[str.Length * sizeof(char)];
-			System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-			return bytes;
+            unsafe
+            {
+                char* ptrStr, ptrBytes;
+                fixed(char* ptStr=str)
+                {
+                    fixed(byte* ptBytes=bytes)
+                    {
+                        ptrStr =ptStr;
+                        ptrBytes =(char*) ptBytes;
+                        for(int i=0,f=str.Length;i<f;i++)
+                        {
+                            *ptrBytes = *ptrStr;
+                            ptrStr++;
+                            ptrBytes++;
+                        }
+                        
+
+                    }
+                }
+            }
+
+            return bytes;
 		}
 
 
@@ -510,10 +530,29 @@ namespace Gabriel.Cat
 
 
 		public static string ToString(byte[] bytes)
-		{//sacado de http://stackoverflow.com/questions/16072709/converting-string-to-byte-array-in-c-sharp
+		{
 			char[] chars = new char[bytes.Length / sizeof(char)];
-			System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
-			return new string(chars);
+            unsafe
+            {
+                char* ptrStr, ptrBytes;
+                fixed (char* ptStr = chars)
+                {
+                    fixed (byte* ptBytes = bytes)
+                    {
+                        ptrStr = ptStr;
+                        ptrBytes =(char*) ptBytes;
+                        for (long i = 0, f = chars.Length; i < f; i++)
+                        {
+                             *ptrStr=*ptrBytes;
+                            ptrStr++;
+                            ptrBytes++;
+                        }
+
+
+                    }
+                }
+            }
+            return new string(chars);
 		}
         #endregion
 
