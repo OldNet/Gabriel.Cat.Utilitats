@@ -531,6 +531,8 @@ namespace Gabriel.Cat
 
 		public static string ToString(byte[] bytes)
 		{
+            if (bytes.Length % 2 != 0)
+                throw new ArgumentException("los caracteres ocupan 2 bytes y tiene que ser por lo tanto par la longitud y es '"+bytes.Length+"'");
 			char[] chars = new char[bytes.Length / sizeof(char)];
             unsafe
             {
