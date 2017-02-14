@@ -3273,6 +3273,8 @@ namespace Gabriel.Cat.Extension
         {
             if (charDouble.Length % 2 != 0)
                 throw new ArgumentException();
+            if (bChar + 0xF > byte.MaxValue)
+                throw new ArgumentOutOfRangeException("bChar");
             char[] char4;
             unsafe
             {
@@ -3285,6 +3287,8 @@ namespace Gabriel.Cat.Extension
         {
             if (charDouble.Length % 4 != 0)
                 throw new ArgumentException();
+            if (bChar + 0xF > byte.MaxValue)
+                throw new ArgumentOutOfRangeException("bChar");
             char[] char4;
             unsafe
             {
@@ -3324,6 +3328,8 @@ namespace Gabriel.Cat.Extension
         {
             if (char4.Length % 2 != 0)
                 throw new ArgumentException();
+            if (bChar + 0xF > byte.MaxValue)
+                throw new ArgumentOutOfRangeException("bChar");
             char[] charsSingel;
             unsafe
             {
@@ -3336,6 +3342,8 @@ namespace Gabriel.Cat.Extension
         {
             if (chars4.Length % 4 != 0)
                 throw new ArgumentException();
+            if (bChar + 0xF > byte.MaxValue)
+                throw new ArgumentOutOfRangeException("bChar");
             char[] charsSingel;
             unsafe
             {
