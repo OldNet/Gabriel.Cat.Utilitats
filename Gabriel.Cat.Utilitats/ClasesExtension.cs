@@ -275,7 +275,7 @@ namespace Gabriel.Cat.Extension
         /// <param name="metodoTratarObjeto"></param>
         public static void Recorrer<T>(this T[,] matriz, Vector vector, ContinuaTratandoObjeto<T> metodoTratarObjeto)
         {
-            if ( metodoTratarObjeto == null)
+            if (metodoTratarObjeto == null)
                 throw new ArgumentNullException();
             try
             {
@@ -402,14 +402,14 @@ namespace Gabriel.Cat.Extension
         {
             AddRange(lst, nousValors.ToArray());
         }
-        public static void AddRange<TKey1,TKey2,TValue>(this TwoKeysList<TKey1,TKey2,TValue> lst,IList<TValue> nousValors) where TKey1:IComparable<TKey1> where TKey2:IComparable<TKey2> where TValue:IDosClausUniquesPerObjecte
+        public static void AddRange<TKey1, TKey2, TValue>(this TwoKeysList<TKey1, TKey2, TValue> lst, IList<TValue> nousValors) where TKey1 : IComparable<TKey1> where TKey2 : IComparable<TKey2> where TValue : IDosClausUniquesPerObjecte
         {
             for (int i = 0; i < nousValors.Count; i++)
-                lst.Add((TKey1)nousValors[i].Clau,(TKey2) nousValors[i].Clau2,nousValors[i]);
+                lst.Add((TKey1)nousValors[i].Clau, (TKey2)nousValors[i].Clau2, nousValors[i]);
         }
         public static void Add<TKey1, TKey2, TValue>(this TwoKeysList<TKey1, TKey2, TValue> lst, TValue nouValor) where TKey1 : IComparable<TKey1> where TKey2 : IComparable<TKey2> where TValue : IDosClausUniquesPerObjecte
         {
-                lst.Add((TKey1)nouValor.Clau, (TKey2)nouValor.Clau2, nouValor);
+            lst.Add((TKey1)nouValor.Clau, (TKey2)nouValor.Clau2, nouValor);
         }
         public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T : IClauUnicaPerObjecte
         {
@@ -502,8 +502,8 @@ namespace Gabriel.Cat.Extension
            where TValue : IClauUnicaPerObjecte
            where TKey : IComparable
         {
-            for(int i=0;i<values.Count;i++)
-                 llista.Add(values[i]);
+            for (int i = 0; i < values.Count; i++)
+                llista.Add(values[i]);
         }
         public static void Add<TKey, TValue>(this IDictionary<TKey, TValue> llista, IClauUnicaPerObjecte value)
             where TValue : IClauUnicaPerObjecte
@@ -517,7 +517,7 @@ namespace Gabriel.Cat.Extension
         {
             llista.AddOrReplace((TKey)value.Clau, (TValue)value);
         }
-        public static void AddOrReplace<TKey,TValue>(this IDictionary<TKey,TValue> diccionary,TKey key, TValue value)
+        public static void AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> diccionary, TKey key, TValue value)
             where TKey : IComparable
         {
             if (!diccionary.ContainsKey(key))
@@ -534,7 +534,7 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region DirectoriInfoExtension
-        public static IReadOnlyList<KeyValuePair<DirectoryInfo, FileInfo[]>> GetFiles(this DirectoryInfo dir, bool recursive=false)
+        public static IReadOnlyList<KeyValuePair<DirectoryInfo, FileInfo[]>> GetFiles(this DirectoryInfo dir, bool recursive = false)
         {//windows si da error no se puede omit por lo tanto te quedas sin los archivos que puedes coger...es por eso que hago mi metodo...
             List<KeyValuePair<DirectoryInfo, FileInfo[]>> carpetasConSusArchivos = new List<KeyValuePair<DirectoryInfo, FileInfo[]>>();
             IReadOnlyList<DirectoryInfo> subDirs;
@@ -556,7 +556,7 @@ namespace Gabriel.Cat.Extension
             return carpetasConSusArchivos;
         }
         #region BuscaConHash
-        public static FileInfo BuscaConHash(this DirectoryInfo dir, string fileHash, bool recursivo=false)
+        public static FileInfo BuscaConHash(this DirectoryInfo dir, string fileHash, bool recursivo = false)
         {
 
             IReadOnlyList<FileInfo> files = BuscaConHash(dir, new string[] { fileHash }, recursivo);
@@ -567,23 +567,23 @@ namespace Gabriel.Cat.Extension
                 file = null;
             return file;
         }
-        public static FileInfo BuscaConSHA256(this DirectoryInfo dir, string fileHash, bool recursivo=false)
+        public static FileInfo BuscaConSHA256(this DirectoryInfo dir, string fileHash, bool recursivo = false)
         {
 
             IReadOnlyList<FileInfo> files = BuscaConSHA256(dir, new string[] { fileHash }, recursivo);
             FileInfo file;
             if (files.Count > 0)
-                file= files[0];
+                file = files[0];
             else
-                file= null;
+                file = null;
             return file;
         }
         public static List<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IEnumerable<string> filesSHA3, bool recursivo = false)
         {
             return dir.IBuscoConHashOSHA256(filesSHA3.ToArray(), recursivo, false);
         }
-       
-        public static List<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IList<string> filesSHA3, bool recursivo=false)
+
+        public static List<FileInfo> BuscaConSHA256(this DirectoryInfo dir, IList<string> filesSHA3, bool recursivo = false)
         {
             return dir.IBuscoConHashOSHA256(filesSHA3, recursivo, false);
         }
@@ -591,7 +591,7 @@ namespace Gabriel.Cat.Extension
         {
             return dir.IBuscoConHashOSHA256(filesHash.ToArray(), recursivo, true);
         }
-        public static List<FileInfo> BuscaConHash(this DirectoryInfo dir, IList<string> filesHash, bool recursivo=false)
+        public static List<FileInfo> BuscaConHash(this DirectoryInfo dir, IList<string> filesHash, bool recursivo = false)
         {
             return dir.IBuscoConHashOSHA256(filesHash, recursivo, true);
         }
@@ -1210,8 +1210,8 @@ namespace Gabriel.Cat.Extension
                 bmp = null;//si no existe
             else
             {
-               bmp=Icon.ExtractAssociatedIcon(file.FullName).ToBitmap();
-                
+                bmp = Icon.ExtractAssociatedIcon(file.FullName).ToBitmap();
+
             }
             return bmp;
         }
@@ -1267,11 +1267,11 @@ namespace Gabriel.Cat.Extension
                 FileStream stream = file.GetStream();
                 sha3 = stream.Sha256Hash();
                 stream.Close();
-         
+
 
             }
             else
-                sha3= null;
+                sha3 = null;
             return sha3;
         }
         public static bool SHA3Equals(this FileInfo file, FileInfo file2)
@@ -1297,7 +1297,7 @@ namespace Gabriel.Cat.Extension
                 stream.Close();
             }
             else
-                hash= null;
+                hash = null;
             return hash;
         }
         public static bool HashEquals(this FileInfo file, string hash)
@@ -1436,8 +1436,8 @@ namespace Gabriel.Cat.Extension
 
         public static T DameElementoActual<T>(this IList<T> llista, Ordre escogerKey, int contador)
         {
-           
-            int posicio=0;
+
+            int posicio = 0;
             if (contador < 0)
             {
                 contador *= -1;
@@ -1446,10 +1446,10 @@ namespace Gabriel.Cat.Extension
             switch (escogerKey)
             {
                 case Ordre.Consecutiu:
-                   posicio=contador % llista.Count;
+                    posicio = contador % llista.Count;
                     break;
                 case Ordre.ConsecutiuIAlInreves://repite el primero y el ultimo
-                   
+
                     posicio = contador / llista.Count;
                     if (posicio % 2 == 0)
                     {
@@ -1461,14 +1461,14 @@ namespace Gabriel.Cat.Extension
                         //esta subiendo
                         posicio = llista.Count - (contador % llista.Count) - 1;
                     }
-                
+
                     break;
             }
             return llista[posicio];
         }
         #endregion
         #region IEnumerable
-        public static bool ContainsAny<T>(this IEnumerable<T> list,IEnumerable<T> elementsToFindOne) where T:IComparable<T>
+        public static bool ContainsAny<T>(this IEnumerable<T> list, IEnumerable<T> elementsToFindOne) where T : IComparable<T>
         {
             bool contains = false;
             SortedList<T, T> dicElements = elementsToFindOne.ToSortedList();
@@ -1527,7 +1527,7 @@ namespace Gabriel.Cat.Extension
                     llistaOrdenada.Add(element, element);
             return llistaOrdenada;
         }
-        public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T:IClauUnicaPerObjecte
+        public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
         {
             LlistaOrdenada<IComparable, T> sortedList = new LlistaOrdenada<IComparable, T>();
             foreach (T element in list)
@@ -1706,9 +1706,9 @@ namespace Gabriel.Cat.Extension
             return (IEnumerator<Tvalue>)valors.GetEnumerator();
         }
         public static Tvalue[,] ToMatriu<Tvalue>(this IEnumerable<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax = DimensionMatriz.Fila)
-        { return llista.ToArray().ToMatriu(numeroDimension,dimensionTamañoMax); }
+        { return llista.ToArray().ToMatriu(numeroDimension, dimensionTamañoMax); }
         //poder hacer que se pueda poner los valores en el orden contrario, de izquierda a derecha o  al rebes o por culumnas en vez de por filas...(y=0,x=0,y=1,x=0...)
-        public static Tvalue[,] ToMatriu<Tvalue>(this IList<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax=DimensionMatriz.Fila)
+        public static Tvalue[,] ToMatriu<Tvalue>(this IList<Tvalue> llista, int numeroDimension, DimensionMatriz dimensionTamañoMax = DimensionMatriz.Fila)
         {
             if (numeroDimension < 1)
                 throw new Exception("Como minimo 1 " + dimensionTamañoMax.ToString());
@@ -1828,13 +1828,13 @@ namespace Gabriel.Cat.Extension
             valorsFinals.Add(valorNou);
             return valorsFinals;
         }
-        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents=false) where Tvalue : IComparable
+        public static List<Tvalue> AfegirValors<Tvalue>(this IEnumerable<Tvalue> valors, IEnumerable<Tvalue> valorsNous, bool noPosarValorsJaExistents = false) where Tvalue : IComparable
         {
             List<Tvalue> llista = new List<Tvalue>(valors);
             bool valorEnLista = true;
             if (valorsNous != null)
             {
-              
+
                 if (valorsNous != null)
                     foreach (Tvalue valor in valorsNous)
                     {
@@ -1847,7 +1847,7 @@ namespace Gabriel.Cat.Extension
                             llista.Add(valor);
                         }
                     }
-             
+
             }
             return llista;
 
@@ -1893,7 +1893,7 @@ namespace Gabriel.Cat.Extension
         }
         public static List<T> SubList<T>(this IEnumerable<T> arrayB, int inicio, int longitud)
         {
-            return arrayB.ToArray().SubList(inicio,longitud);
+            return arrayB.ToArray().SubList(inicio, longitud);
         }
         public static List<T> SubList<T>(this IList<T> arrayB, int inicio, int longitud)
         {
@@ -1919,7 +1919,7 @@ namespace Gabriel.Cat.Extension
         { return list.ToArray().Contains(objToFind); }
         public static bool Contains<T>(this IList<T> list, IComparable objToFind)
         {
-            return !Equals(list.Busca(objToFind),default(T));
+            return !Equals(list.Busca(objToFind), default(T));
         }
         //por optimizar
         public static T Busca<T>(this IEnumerable<T> list, IComparable objToFind)
@@ -1932,8 +1932,8 @@ namespace Gabriel.Cat.Extension
             try
             {
                 bool isIComparable = list.ElementAt(0) is IComparable;
- 
-                for(int i=0;i<list.Count&&!contenida;i++)
+
+                for (int i = 0; i < list.Count && !contenida; i++)
                 {
                     if (isIComparable)
                         contenida = (list[i] as IComparable).CompareTo(objToFind) == (int)CompareTo.Iguales;
@@ -1965,7 +1965,7 @@ namespace Gabriel.Cat.Extension
             }
             else
                 toMatriuResult = new T[0, 0];
-        
+
             return toMatriuResult;
         }
         public static int LongitudMasGrande<T>(this IEnumerable<T[]> listaTablas)
@@ -1975,7 +1975,7 @@ namespace Gabriel.Cat.Extension
         public static int LongitudMasGrande<T>(this IList<T[]> listaTablas)
         {
             int longitudMax = -1;
-            for(int i=0;i<listaTablas.Count;i++)
+            for (int i = 0; i < listaTablas.Count; i++)
                 if (listaTablas[i] != null)
                     if (longitudMax < listaTablas[i].Length)
                         longitudMax = listaTablas[i].Length;
@@ -2219,13 +2219,13 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region BinaryReader
-        public static byte[] ReadBytes(this BinaryReader br, long longitud,bool fillSizeIfOverLoad = true)
+        public static byte[] ReadBytes(this BinaryReader br, long longitud, bool fillSizeIfOverLoad = true)
         {
             byte[] bytes;
             if (fillSizeIfOverLoad && br.BaseStream.Length - br.BaseStream.Position < longitud)
                 longitud = br.BaseStream.Length - br.BaseStream.Position;
             bytes = new byte[longitud];
-            for (long i = 0; i < longitud&&!br.BaseStream.EndOfStream(); i++)
+            for (long i = 0; i < longitud && !br.BaseStream.EndOfStream(); i++)
                 bytes[i] = br.ReadByte();
             return bytes;
         }
@@ -2384,16 +2384,16 @@ namespace Gabriel.Cat.Extension
             unsafe
             {
                 bool* ptrBits;
-                fixed(bool* ptBits=bits)
+                fixed (bool* ptBits = bits)
                 {
                     ptrBits = ptBits;
-                   
-                        for(int i=0;i<BITSBYTE;i++)
-                        {
-                            *ptrBits = (byteToBits&(1 << (i % 8))) != 0;
-                            ptrBits++;
-                        }
-                    
+
+                    for (int i = 0; i < BITSBYTE; i++)
+                    {
+                        *ptrBits = (byteToBits & (1 << (i % 8))) != 0;
+                        ptrBits++;
+                    }
+
 
                 }
             }
@@ -2413,9 +2413,9 @@ namespace Gabriel.Cat.Extension
             {
                 bool* ptrBits, ptrBitsAuxByte;
                 byte* ptrBytesToBits;
-                fixed(bool* ptBits=bits)
+                fixed (bool* ptBits = bits)
                 {
-                    fixed (byte* ptBytesToBits=byteToBits)
+                    fixed (byte* ptBytesToBits = byteToBits)
                     {
                         ptrBytesToBits = ptBytesToBits;
                         ptrBits = ptBits;
@@ -2423,10 +2423,10 @@ namespace Gabriel.Cat.Extension
                         {
                             bitsAuxByte = (*ptrBytesToBits).ToBits();
                             ptrBytesToBits++;
-                            fixed(bool* ptBitsAuxByte=bitsAuxByte)
+                            fixed (bool* ptBitsAuxByte = bitsAuxByte)
                             {
                                 ptrBitsAuxByte = ptBitsAuxByte;
-                                for(int j=0;j<BITSBYTE;j++)
+                                for (int j = 0; j < BITSBYTE; j++)
                                 {
                                     *ptrBits = *ptrBitsAuxByte;
                                     ptrBits++;
@@ -2451,14 +2451,14 @@ namespace Gabriel.Cat.Extension
             int numBytes = bits.Length / BITSBYTE;
             byte[] bytes = new byte[numBytes];
             int index = 0;
-            
+
             unsafe
             {
                 byte* ptrBytes;
-                fixed(byte* ptBytes=bytes)
+                fixed (byte* ptBytes = bytes)
                 {
                     ptrBytes = ptBytes;
-                    for(int i=0;i<numBytes;i++)
+                    for (int i = 0; i < numBytes; i++)
                     {
                         *ptrBytes = bits.SubArray(index, BITSBYTE).ToByte();
                         index += BITSBYTE;
@@ -2471,14 +2471,14 @@ namespace Gabriel.Cat.Extension
             return bytes;
 
         }
-        public static bool[] SubArray(this bool[] array,int startIndex,int length)
+        public static bool[] SubArray(this bool[] array, int startIndex, int length)
         {
-            if (startIndex<0||startIndex + length > array.Length)
+            if (startIndex < 0 || startIndex + length > array.Length)
                 throw new ArgumentOutOfRangeException();
             bool[] subArray = new bool[length];
             unsafe
             {
-                bool* ptrArray , ptrSubArray;
+                bool* ptrArray, ptrSubArray;
                 fixed (bool* ptArray = array)
                 {
                     fixed (bool* ptSubArray = subArray)
@@ -2486,7 +2486,7 @@ namespace Gabriel.Cat.Extension
                         ptrArray = ptArray;
                         ptrSubArray = ptSubArray;
                         ptrArray += startIndex;//asigno el inicio aqui :D
-                        for (int j = 0,f=length; j < length; j++)
+                        for (int j = 0, f = length; j < length; j++)
                         {
                             *ptrSubArray = *ptrArray;
                             ptrArray++;
@@ -2509,7 +2509,7 @@ namespace Gabriel.Cat.Extension
                     for (int i = 0; i < bits.Length; i++)
                     {
                         if (*ptrBits)
-                           byteBuild |= (byte)(1 << (7 - i));
+                            byteBuild |= (byte)(1 << (7 - i));
                         ptrBits++;
 
                     }
@@ -2522,16 +2522,16 @@ namespace Gabriel.Cat.Extension
             byte[] byteArrayReversed = new byte[byteArrayToReverse.Length];
             unsafe
             {
-                
+
                 byte* ptrInverseBytesOut, ptrInverseBytesIn;
                 byteArrayReversed.UnsafeMethod((ptrBytesOut) =>
                 {
-                    byteArrayToReverse.UnsafeMethod((ptrBytesIn)=>
+                    byteArrayToReverse.UnsafeMethod((ptrBytesIn) =>
                     {
                         ptrInverseBytesIn = ptrBytesIn.PtrArrayFin;
                         ptrInverseBytesOut = ptrBytesOut.PtrArrayFin;
 
-                        for(long i=0,f=ptrBytesIn.Length/2;i<f;i++)
+                        for (long i = 0, f = ptrBytesIn.Length / 2; i < f; i++)
                         {
                             *ptrBytesOut.PtrArray = *ptrInverseBytesIn;
                             *ptrInverseBytesOut = *ptrBytesIn.PtrArray;
@@ -2703,7 +2703,7 @@ namespace Gabriel.Cat.Extension
             if (bytesSplit.Length != 0)
             {
 
-                posicionArray =(int) array.BuscarArray(0, bytesSplit);
+                posicionArray = (int)array.BuscarArray(0, bytesSplit);
 
                 //opero
                 if (posicionArray > -1)
@@ -2712,7 +2712,7 @@ namespace Gabriel.Cat.Extension
                     posicionArray += bytesSplit.Length;
                     do
                     {
-                        posicionArrayEncontrada =(int) array.BuscarArray(posicionArray, bytesSplit);
+                        posicionArrayEncontrada = (int)array.BuscarArray(posicionArray, bytesSplit);
                         if (posicionArrayEncontrada > -1)
                         {
                             bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
@@ -2763,9 +2763,9 @@ namespace Gabriel.Cat.Extension
         {
             return SubArray(array, 0, cantidad);
         }
-        public static  byte[] SubArray(this byte[] array, int inicio, int cantidad) 
+        public static byte[] SubArray(this byte[] array, int inicio, int cantidad)
         {
-            if (inicio<0||cantidad + inicio > array.Length)
+            if (inicio < 0 || cantidad + inicio > array.Length)
                 throw new ArgumentOutOfRangeException();
             byte[] subArray = new byte[cantidad];
             unsafe
@@ -3117,11 +3117,11 @@ namespace Gabriel.Cat.Extension
             {
                 fixed (byte* ptrArray = array)
                     for (int i = 0, f = array.Length / 2, j = array.Length - 1; i < f; i++, j--)
-                {
-                    aux = ptrArray[i];
-                    ptrArray[i] = ptrArray[j];
-                    ptrArray[j] = aux;
-                }
+                    {
+                        aux = ptrArray[i];
+                        ptrArray[i] = ptrArray[j];
+                        ptrArray[j] = aux;
+                    }
             }
         }
         public static string Hash(this byte[] obj)
@@ -3155,9 +3155,227 @@ namespace Gabriel.Cat.Extension
             return Equals(obj1.SHA3(), obj2.SHA3());
         }
         #endregion
+        #region char[] & string
+        public static string OneCharToTwoChars(this string chars)
+        {
+            if (chars.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] charsDouble;
+            unsafe
+            {
+                fixed (char* ptCharsDouble = chars)
+                    charsDouble = OneCharToTwoChars(ptCharsDouble, chars.Length);
+            }
+            return new string(charsDouble);
+        }
+        public static char[] OneCharToTwoChars(this char[] charsDouble)
+        {
+            if (charsDouble.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] charsSingel;
+            unsafe
+            {
+                fixed (char* ptCharsDouble = charsDouble)
+                    charsSingel = OneCharToTwoChars(ptCharsDouble, charsDouble.Length);
+            }
+            return charsSingel;
+        }
+         static unsafe char[] OneCharToTwoChars(char* ptChars,int longitud)
+        {
+            char[] charsDouble = new char[longitud * 2];
+            unsafe
+            {
+                byte* ptrChars;
+                char* ptrCharsDouble;
+               
+                    fixed (char* ptCharsDouble = charsDouble)
+                    {
+                        ptrChars = (byte*)ptChars;
+                        ptrCharsDouble = ptCharsDouble;
+                        for (int i = 0; i < charsDouble.Length; i++)
+                        {
+                            *ptrCharsDouble = (char)*ptrChars;
+                            ptrChars++;
+                            ptrCharsDouble++;
+                        }
 
+                    }
+                
+            }
+            return charsDouble;
+        }
+        public static string TwoCharsToOneChar(this string charsDouble)
+        {
+            if (charsDouble.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] charsSingel;
+            unsafe
+            {
+                fixed (char* ptCharsDouble = charsDouble)
+                    charsSingel = TwoCharsToOneChar(ptCharsDouble, charsDouble.Length);
+            }
+            return new string(charsSingel);
+        }
+        public static char[] TwoCharsToOneChar(this char[] charsDouble)
+        {
+            if (charsDouble.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] charsSingel;
+            unsafe
+            {
+                fixed (char* ptCharsDouble = charsDouble)
+                    charsSingel = TwoCharsToOneChar(ptCharsDouble, charsDouble.Length);
+            }
+            return charsSingel;
+        }
+        static unsafe char[] TwoCharsToOneChar(char* ptrCharsDouble, int lengthCharsDouble)
+        {
+           
+            char[] charsSingel = new char[lengthCharsDouble / 2];
+
+            byte* ptrChars;
+
+            fixed (char* ptChars = charsSingel)
+            {
+
+                ptrChars = (byte*)ptChars;
+
+                for (int i = 0; i < lengthCharsDouble; i++)
+                {
+                    *ptrChars = (byte)*ptrCharsDouble;
+                    ptrChars++;
+                    ptrCharsDouble++;
+                }
+
+
+            }
+
+            return charsSingel;
+        }
+
+        public static string OneCharToFourChars(this string charOne,byte bChar=97)
+        {
+            return TwoCharToFourChars(charOne.OneCharToTwoChars(),bChar);
+        }
+        public static string FourCharsOneChar(this string charOne, byte bChar = 97)
+        {
+            return TwoCharsToOneChar(charOne.FourCharsToTwoChar(bChar));
+        }
+        public static char[] OneCharToFourChars(this char[] charOne, byte bChar = 97)
+        {
+            return TwoCharToFourChars(charOne.OneCharToTwoChars(), bChar);
+        }
+        public static char[] FourCharsOneChar(this char[] charOne, byte bChar = 97)
+        {
+            return TwoCharsToOneChar(charOne.FourCharsToTwoChar(bChar));
+        }
+        public static string TwoCharToFourChars(this string charDouble, byte bChar = 97)
+        {
+            if (charDouble.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] char4;
+            unsafe
+            {
+                fixed (char* ptCharDouble = charDouble)
+                    char4 = TwoCharToFourChars(ptCharDouble, charDouble.Length, bChar);
+            }
+            return new string(char4);
+        }
+        public static char[] TwoCharToFourChars(this char[] charDouble, byte bChar = 97)
+        {
+            if (charDouble.Length % 4 != 0)
+                throw new ArgumentException();
+            char[] char4;
+            unsafe
+            {
+                fixed (char* ptCharDouble = charDouble)
+                    char4 = TwoCharToFourChars(ptCharDouble, charDouble.Length, bChar);
+            }
+            return char4;
+        }
+        static unsafe char[] TwoCharToFourChars(char* ptCharDouble, int lengthCharDouble, byte bChar)
+        {
+
+            char[] char4 = new char[lengthCharDouble * 2];
+
+            char* ptrChars4;
+            fixed (char* ptChars4 = char4)
+            {
+
+                ptrChars4 = ptChars4;
+
+                for (int i = 0; i < lengthCharDouble; i++)
+                //tengo el caracter que tengo que dividir en 2 es un caracter 0x00-0xFF y tengo que partilo y sumarle bChar para que sea un caracter aceptable y no (char)0;
+                //seria pj: 0xF4 -> F y 4 -> F+bChar y 4+bChar :) y eso serian dos caracteres :D
+                {//    *ptrBits = (byteToBits & (1 << (i % 8))) != 0;
+                    *ptrChars4 =(char) ((((byte)*ptCharDouble)>>4) + bChar);
+                    ptrChars4++;
+                    *ptrChars4 = (char) (( (byte)*ptCharDouble - (( (byte)*ptCharDouble >> 4 )<<4) ) + bChar);
+                    ptrChars4++;
+                    ptCharDouble++;
+                }
+
+
+            }
+
+            return char4;
+        }
+        public static string FourCharsToTwoChar(this string char4,byte bChar=97)
+        {
+            if (char4.Length % 2 != 0)
+                throw new ArgumentException();
+            char[] charsSingel;
+            unsafe
+            {
+                fixed (char* ptChars4 = char4)
+                    charsSingel = FourCharsToTwoChar(ptChars4, char4.Length,bChar);
+            }
+            return new string(charsSingel);
+        }
+        public static char[] FourCharsToTwoChar(this char[] chars4, byte bChar = 97)
+        {
+            if (chars4.Length % 4 != 0)
+                throw new ArgumentException();
+            char[] charsSingel;
+            unsafe
+            {
+                fixed (char* ptChars4 = chars4)
+                    charsSingel = FourCharsToTwoChar(ptChars4, chars4.Length,bChar);
+            }
+            return charsSingel;
+        }
+        static unsafe char[] FourCharsToTwoChar(char* ptrChars4, int lengthChars4, byte bChar)
+        {
+           
+            char[] charsDouble = new char[lengthChars4 / 2];
+
+            char* ptrDoubleChars;
+
+            fixed (char* ptChars = charsDouble)
+            {
+
+                ptrDoubleChars = ptChars;
+
+                for (int i = 0; i < charsDouble.Length; i++)
+             //tenemos 2 chars que son 2 bytes y hay que restarles a cada uno bChar y luego unirlos en uno
+             //pj: 0x4ç65,0x70 -> 0x65-bChar,0x70-bChar -> y el resultado formará un byte :)
+                {//    *ptrBits = (byteToBits & (1 << (i % 8))) != 0;
+                    *ptrDoubleChars =(char) ((((byte)*ptrChars4)-bChar)<<4);
+                    ptrChars4++;
+
+                    *ptrDoubleChars += (char)(((byte)*ptrChars4) - bChar);
+                    ptrDoubleChars++;
+                    ptrChars4++;
+                }
+
+
+            }
+
+            return charsDouble;
+        }
+        #endregion
         #region Pointers
-        public static void CopyTo(this IntPtr ptr, byte[] destino,int startIndex=0)
+        public static void CopyTo(this IntPtr ptr, byte[] destino, int startIndex = 0)
         {
             System.Runtime.InteropServices.Marshal.Copy(ptr, destino, startIndex, destino.Length);
         }
@@ -3182,7 +3400,7 @@ namespace Gabriel.Cat.Extension
 
                 bytes.UnsafeMethod((ptBytes) =>
                 {
-                    for (long i = 0,fParcial=lenght,fTotal=stream.Length; i < fParcial && i<fTotal ; i++)
+                    for (long i = 0, fParcial = lenght, fTotal = stream.Length; i < fParcial && i < fTotal; i++)
                     {
                         *ptBytes.PtrArray = ((byte)stream.ReadByte());
                         ptBytes.PtrArray++;
@@ -3233,7 +3451,8 @@ namespace Gabriel.Cat.Extension
                 fs.Seek(0, SeekOrigin.Begin);
                 hashBytes = fs.Hash(hash);
 
-            }catch { hashBytes = new byte[] { }; }
+            }
+            catch { hashBytes = new byte[] { }; }
             finally
             {
                 try
