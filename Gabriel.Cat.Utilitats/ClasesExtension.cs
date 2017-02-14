@@ -3158,8 +3158,7 @@ namespace Gabriel.Cat.Extension
         #region char[] & string
         public static string OneCharToTwoChars(this string chars)
         {
-            if (chars.Length % 2 != 0)
-                throw new ArgumentException();
+          
             char[] charsDouble;
             unsafe
             {
@@ -3170,8 +3169,7 @@ namespace Gabriel.Cat.Extension
         }
         public static char[] OneCharToTwoChars(this char[] charsDouble)
         {
-            if (charsDouble.Length % 2 != 0)
-                throw new ArgumentException();
+           
             char[] charsSingel;
             unsafe
             {
@@ -3285,7 +3283,7 @@ namespace Gabriel.Cat.Extension
         }
         public static char[] TwoCharToFourChars(this char[] charDouble, byte bChar = 97)
         {
-            if (charDouble.Length % 4 != 0)
+            if (charDouble.Length % 2 != 0)
                 throw new ArgumentException();
             if (bChar + 0xF > byte.MaxValue)
                 throw new ArgumentOutOfRangeException("bChar");
@@ -3326,7 +3324,7 @@ namespace Gabriel.Cat.Extension
         }
         public static string FourCharsToTwoChar(this string char4,byte bChar=97)
         {
-            if (char4.Length % 2 != 0)
+            if (char4.Length % 4 != 0)
                 throw new ArgumentException();
             if (bChar + 0xF > byte.MaxValue)
                 throw new ArgumentOutOfRangeException("bChar");
