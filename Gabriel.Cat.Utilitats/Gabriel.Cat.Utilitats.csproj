@@ -71,7 +71,6 @@
     <Compile Include="Hex.cs" />
     <Compile Include="IClonable.cs" />
     <Compile Include="ImagenConRuta.cs" />
-    <Compile Include="ListaUnica.cs" />
     <Compile Include="Llista.cs" />
     <Compile Include="LlistaOrdenada.cs" />
     <Compile Include="Log.cs" />

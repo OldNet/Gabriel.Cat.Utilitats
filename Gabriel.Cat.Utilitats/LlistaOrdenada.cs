@@ -13,6 +13,43 @@ using System.Threading;
 
 namespace Gabriel.Cat
 {
+    public struct ForContinue
+    {
+        int incrementOrDecrement;
+        bool finished;
+        public ForContinue(int incrementOrDecrement=1,bool finished=false)
+        {
+            this.incrementOrDecrement = incrementOrDecrement;
+            this.finished = finished;
+        }
+        public int IncrementOrDecrement
+        {
+            get
+            {
+                return incrementOrDecrement;
+            }
+
+           private set
+            {
+                incrementOrDecrement = value;
+            }
+        }
+
+        public bool Finished
+        {
+            get
+            {
+                return finished;
+            }
+
+          private  set
+            {
+                finished = value;
+            }
+        }
+    }
+
+    public delegate ForContinue ForMethodLlistaOrdenada<TKey, TValue>(int actualIndex, TKey key, TValue value);
     public delegate bool ConfirmacionEventHandler<TSender, TKey, TValue>(TSender sender, TKey key, TValue value);
     public delegate bool ConfirmationEventHandler<TSender, TKey>(TSender sender, TKey arg);
     public delegate bool ConfirmacionCambioClaveEventHandler<TSender, TKey>(TSender sender, TKey keyAnt,TKey keyNew);
@@ -22,7 +59,8 @@ namespace Gabriel.Cat
     /// </summary>
     public class LlistaOrdenada<TKey, TValue> : IDictionary<TKey, TValue>,IReadOnlyDictionary<TKey,TValue>
     {
-        SortedList<TKey, TValue> llista;
+        protected  SortedList<TKey, TValue> llistaOrdenada;
+        protected List<TKey> llista;
         public event EventHandler Updated;
         ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> AddConfirmation;
         ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> RemoveConfirmation;
@@ -33,9 +71,13 @@ namespace Gabriel.Cat
         public event EventHandler Removed;
         public LlistaOrdenada()
         {
-            llista = new SortedList<TKey, TValue>();
+            llistaOrdenada = new SortedList<TKey, TValue>();
+            llista = new List<TKey>();
 
         }
+
+
+
         public LlistaOrdenada(ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> metodoAddConfirmacion, ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoRemoveConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoClearConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoUpdateConfirmation, ConfirmacionCambioClaveEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoChangeKeyConfirmation) : this()
         {
             AddConfirmation = metodoAddConfirmacion;
@@ -44,11 +86,11 @@ namespace Gabriel.Cat
             UpdateConfirmatin = metodoUpdateConfirmation;
             ChangeKeyConfirmation = metodoChangeKeyConfirmation;
         }
-        public LlistaOrdenada(IEnumerable<KeyValuePair<TKey, TValue>> llistaOrdenada) : this()
+        public LlistaOrdenada(IList<KeyValuePair<TKey, TValue>> llistaOrdenada) : this()
         {
             AddRange(llistaOrdenada);
         }
-        public LlistaOrdenada(IEnumerable<KeyValuePair<TKey, TValue>> llistaOrdenada, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> metodoAddConfirmacion, ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoRemoveConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoClearConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoUpdateConfirmation, ConfirmacionCambioClaveEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoChangeKeyConfirmation) : this(metodoAddConfirmacion, metodoRemoveConfirmation, metodoClearConfirmation,metodoUpdateConfirmation,metodoChangeKeyConfirmation)
+        public LlistaOrdenada(IList<KeyValuePair<TKey, TValue>> llistaOrdenada, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> metodoAddConfirmacion, ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoRemoveConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoClearConfirmation, ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> metodoUpdateConfirmation, ConfirmacionCambioClaveEventHandler<LlistaOrdenada<TKey, TValue>, TKey> metodoChangeKeyConfirmation) : this(metodoAddConfirmacion, metodoRemoveConfirmation, metodoClearConfirmation,metodoUpdateConfirmation,metodoChangeKeyConfirmation)
         {
             AddRange(llistaOrdenada);
         }
@@ -57,9 +99,9 @@ namespace Gabriel.Cat
             get
             {
                 int count;
-                Monitor.Enter(llista);
-                count = llista.Count;
-                Monitor.Exit(llista);
+                Monitor.Enter(llistaOrdenada);
+                count = llistaOrdenada.Count;
+                Monitor.Exit(llistaOrdenada);
                 return count;
             }
         }
@@ -70,7 +112,7 @@ namespace Gabriel.Cat
             {
                 ICollection<TKey> keys;
                 Monitor.Enter(llista);
-                keys = llista.KeysToArray();
+                keys = llista.ToArray();
                 Monitor.Exit(llista);
                 return keys;
             }
@@ -81,9 +123,9 @@ namespace Gabriel.Cat
             get
             {
                 ICollection<TValue> values;
-                Monitor.Enter(llista);
-                values = llista.ValuesToArray();
-                Monitor.Exit(llista);
+                Monitor.Enter(llistaOrdenada);
+                values = llistaOrdenada.ValuesToArray();
+                Monitor.Exit(llistaOrdenada);
                 return values;
             }
         }
@@ -116,37 +158,26 @@ namespace Gabriel.Cat
         {
             get
             {
-                TValue value;
-                try
-                {
-                    Monitor.Enter(llista);
-                    if (llista.ContainsKey(key))
-                        value = llista[key];
-                    else value = default(TValue);
-                }
-                finally
-                {
-                    Monitor.Exit(llista);
-                }
-                return value;
+                return GetValue(key);
             }
             set
             {
-                bool actualizar = UpdateConfirmatin == null || UpdateConfirmatin(this);
-                if (actualizar)
-                    try
-                    {
-                        Monitor.Enter(llista);
-                        if (llista.ContainsKey(key))
-                            llista[key] = value;
-                    }
-                    finally
-                    {
-                        Monitor.Exit(llista);
-                        if (Updated != null)
-                            Updated(this, new EventArgs());
-                    }
+                SetValue(key, value);
 
+            }
+        }
+
+
+
+        public TValue this[int index]
+        {
+            get
+            {
+                return GetValueAt(index);
+            }
+            set
+            {
+                SetValueAt(index, value);
             }
         }
         public void Add(TKey key, TValue value)
@@ -155,14 +186,15 @@ namespace Gabriel.Cat
             if (añadir)
                 try
                 {
-                    Monitor.Enter(llista);
+                    Monitor.Enter(llistaOrdenada);
 
-                    llista.Add(key, value);
+                    llistaOrdenada.Add(key, value);
+                    llista.Add(key);
 
                 }
                 finally
                 {
-                    Monitor.Exit(llista);
+                    Monitor.Exit(llistaOrdenada);
 
                     if (Updated != null)
                         Updated(this, new EventArgs());
@@ -171,10 +203,26 @@ namespace Gabriel.Cat
 
                 }
         }
-        public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> llista)
+        public void AddRange(IList<KeyValuePair<TKey, TValue>> llista,bool throwException=false)
         {
-            foreach (KeyValuePair<TKey, TValue> un in llista)
-                AddOrReplace(un.Key, un.Value);
+            if (llista == null)
+                throw new ArgumentNullException();
+            for (int i = 0; i < llista.Count; i++)
+                try
+                {
+                    Add(llista[i].Key, llista[i].Value);
+                }catch
+                {
+                    if (throwException)
+                        throw;
+                }
+        }
+        public void AddOrReplaceRange(IList<KeyValuePair<TKey, TValue>> llista)
+        {
+            if (llista == null)
+                throw new ArgumentNullException();
+            for (int i = 0; i < llista.Count; i++)
+                AddOrReplace(llista[i].Key, llista[i].Value);
         }
         public void ChangeKey(TKey keyAnt, TKey keyNew)
         {
@@ -195,13 +243,14 @@ namespace Gabriel.Cat
             if (fer)
                 try
                 {
-                    Monitor.Enter(llista);
-                    fer = llista.Remove(key);
+                    Monitor.Enter(llistaOrdenada);
+                    llista.Remove(key);
+                    fer = llistaOrdenada.Remove(key);
                 }
                 catch { fer = false; }
                 finally
                 {
-                    Monitor.Exit(llista);
+                    Monitor.Exit(llistaOrdenada);
                     if (fer)
                     {
                         if (Updated != null)
@@ -212,13 +261,14 @@ namespace Gabriel.Cat
                 }
             return fer;
         }
-        public bool[] RemoveRange(IEnumerable<TKey> keysToRemove)
+        public bool[] RemoveRange(IList<TKey> keysToRemove)
         {
-            List<bool> seHaPodidoHacer = new List<bool>();
-            if (keysToRemove != null)
-                foreach (TKey key in keysToRemove)
-                    seHaPodidoHacer.Add(Remove(key));
-            return seHaPodidoHacer.ToTaula();
+            if (keysToRemove == null)
+                throw new ArgumentNullException();
+            bool[] seHaPodidoHacer = new bool[keysToRemove.Count];
+            for(int i=0;i<keysToRemove.Count;i++)
+                seHaPodidoHacer[i]=Remove(keysToRemove[i]);
+            return seHaPodidoHacer;
         }
 
         public void Clear()
@@ -226,17 +276,18 @@ namespace Gabriel.Cat
             if (Removed == null || ClearConfirmation(this))
                 try
                 {
-                    Monitor.Enter(llista);
+                    Monitor.Enter(llistaOrdenada);
 
                     {
 
+                        llistaOrdenada.Clear();
                         llista.Clear();
 
                     }
                 }
                 finally
                 {
-                    Monitor.Exit(llista);
+                    Monitor.Exit(llistaOrdenada);
 
                     if (Updated != null)
                         Updated(this, new EventArgs());
@@ -250,25 +301,26 @@ namespace Gabriel.Cat
             bool hecho = false;
             try
             {
-                Monitor.Enter(llista);
-                if (llista.ContainsKey(clau))
+                Monitor.Enter(llistaOrdenada);
+                if (llistaOrdenada.ContainsKey(clau))
                 {
-                    Monitor.Exit(llista);//para poder usarlo en durante el método de validación
+                    Monitor.Exit(llistaOrdenada);//para poder usarlo en durante el método de validación
                     if (UpdateConfirmatin == null || UpdateConfirmatin(this))
                     {
-                        Monitor.Enter(llista);
-                        llista[clau] = nouValor;
+                        Monitor.Enter(llistaOrdenada);
+                        llistaOrdenada[clau] = nouValor;
                         hecho = true;
 
                     }
                 }
                 else
                 {
-                    Monitor.Exit(llista);//para poder usarlo en durante el método de validación
+                    Monitor.Exit(llistaOrdenada);//para poder usarlo en durante el método de validación
                     if (AddConfirmation == null || AddConfirmation(this, clau, nouValor))
                     {
-                        Monitor.Enter(llista);
-                        llista.Add(clau, nouValor);
+                        Monitor.Enter(llistaOrdenada);
+                        llistaOrdenada.Add(clau, nouValor);
+                        llista.Add(clau);
                         if (Added != null)
                             Added(this, new EventArgs());
                         hecho = true;
@@ -280,7 +332,7 @@ namespace Gabriel.Cat
             {
                 try
                 {
-                    Monitor.Exit(llista);
+                    Monitor.Exit(llistaOrdenada);
                 }
                 finally
                 {
@@ -296,17 +348,17 @@ namespace Gabriel.Cat
         public bool ContainsKey(TKey key)
         {
             bool existeix;
-            Monitor.Enter(llista);
-            existeix = llista.ContainsKey(key);
-            Monitor.Exit(llista);
+            Monitor.Enter(llistaOrdenada);
+            existeix = llistaOrdenada.ContainsKey(key);
+            Monitor.Exit(llistaOrdenada);
             return existeix;
         }
         public bool ContainsValue(TValue value)
         {
             bool existeix;
-            Monitor.Enter(llista);
-            existeix = llista.ContainsValue(value);
-            Monitor.Exit(llista);
+            Monitor.Enter(llistaOrdenada);
+            existeix = llistaOrdenada.ContainsValue(value);
+            Monitor.Exit(llistaOrdenada);
             return existeix;
         }
 
@@ -315,10 +367,10 @@ namespace Gabriel.Cat
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             Llista<KeyValuePair<TKey, TValue>> parelles = new Llista<KeyValuePair<TKey, TValue>>();
-            Monitor.Enter(llista);
-            foreach (KeyValuePair<TKey, TValue> par in llista)
-                parelles.Add(par);
-            Monitor.Exit(llista);
+            Monitor.Enter(llistaOrdenada);
+            for(int i=0;i<llista.Count;i++)
+                parelles.Add(new KeyValuePair<TKey, TValue>(llista[i],llistaOrdenada[llista[i]]));
+            Monitor.Exit(llistaOrdenada);
             return parelles.GetEnumerator();
         }
 
@@ -327,17 +379,105 @@ namespace Gabriel.Cat
             return GetEnumerator();
         }
 
-        public bool TryGetValue(TKey key, out TValue value)
+        bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)
         {
-            bool exist= ContainsKey(key);
+            return TryGetValue(key, out value);
+        }
+        bool IReadOnlyDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)
+        {
+            return TryGetValue(key, out value);
+        }
+        private bool TryGetValue(TKey key, out TValue value)
+        {
+            bool exist = ContainsKey(key);
 
             if (exist)
-                value = this[key];
+                value = GetValue(key);
             else
                 value = default(TValue);
-            
+
             return exist;
         }
+        public TKey GetKey(int index)
+        {
+            TKey key;
+            try
+            {
+                Monitor.Enter(llista);
+                key = llista[index];
+
+            }
+            catch { throw; }
+            finally
+            {
+                Monitor.Exit(llista);
+            }
+            return key;
+        }
+        public TValue GetValue(TKey key)
+        {
+            TValue value;
+          try
+            {
+                Monitor.Enter(llistaOrdenada);
+                value = llistaOrdenada[key];
+            }catch
+            {
+                throw;
+            }
+            finally
+            {
+                Monitor.Exit(llistaOrdenada);
+            }
+            return value;
+        }
+        public void SetValue(TKey key, TValue value)
+        {
+            bool actualizar = UpdateConfirmatin == null || UpdateConfirmatin(this);
+            if (actualizar)
+                try
+                {
+                    Monitor.Enter(llistaOrdenada);
+                    if (llistaOrdenada.ContainsKey(key))
+                        llistaOrdenada[key] = value;
+                }
+                finally
+                {
+                    Monitor.Exit(llistaOrdenada);
+                    if (Updated != null && llistaOrdenada.ContainsKey(key))
+                        Updated(this, new EventArgs());
+                }
+        }
+        public TValue GetValueAt(int index)
+        {
+            TValue value;
+            try
+            {
+                Monitor.Enter(llista);
+                value = this[llista[index]];
+            }
+            catch { throw; }
+            finally
+            {
+                Monitor.Exit(llista);
+            }
+            return value;
+        }
+        public void SetValueAt(int index,TValue value)
+        {
+           
+            try
+            {
+                Monitor.Enter(llista);
+                this[llista[index]] = value;
+            }
+            catch { throw; }
+            finally
+            {
+                Monitor.Exit(llista);
+            }
+        }
+
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
@@ -351,16 +491,51 @@ namespace Gabriel.Cat
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            Monitor.Enter(llista);
-            ((IDictionary<TKey, TValue>)llista).CopyTo(array, arrayIndex);
-            Monitor.Exit(llista);
+            Monitor.Enter(llistaOrdenada);
+            ((IDictionary<TKey, TValue>)llistaOrdenada).CopyTo(array, arrayIndex);
+            Monitor.Exit(llistaOrdenada);
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
             return Remove(item.Key);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="methodInnerFor"></param>
+        /// <param name="leftToRight"> i ;lt llista.Count or i ;gt= 0 </llista.Count> </param>
+        public void For(ForMethodLlistaOrdenada<TKey,TValue> methodInnerFor,bool leftToRight=true)
+        {
+            if (methodInnerFor == null)
+                throw new ArgumentNullException("methodInnerFor");
+            ForContinue nextStep = new ForContinue() ;
+            try
+            {
+                Monitor.Enter(llista);
+                Monitor.Enter(llistaOrdenada);
+                if (leftToRight)
+                {
+                    for (int i = 0; i < llista.Count && !nextStep.Finished; i += nextStep.IncrementOrDecrement)
+                    {
+                        nextStep = methodInnerFor(i, llista[i], llistaOrdenada[llista[i]]);
+                    }
 
+                }
+                else
+                {
+                    for (int i = llista.Count - 1; i >= 0 && !nextStep.Finished; i -= nextStep.IncrementOrDecrement)
+                    {
+                        nextStep = methodInnerFor(i, llista[i], llistaOrdenada[llista[i]]);
+                    }
+                }
+            }catch { throw; }
+            finally
+            {
+                Monitor.Exit(llista);
+                Monitor.Exit(llistaOrdenada);
+            }
+        }
 
 
         #endregion
@@ -369,18 +544,52 @@ namespace Gabriel.Cat
         {
             int indexOf;
             Monitor.Enter(llista);
-            indexOf = llista.IndexOfKey(key);
+            indexOf = llista.IndexOf(key);
             Monitor.Exit(llista);
             return indexOf;
         }
 
-        public int IndexOfValue(TValue value)
+    }
+    public class LlistaOrdenada<T>:LlistaOrdenada<IComparable,T> where T:IClauUnicaPerObjecte
+    {
+        public void Add(T value)
         {
-            int indexOf;
-            Monitor.Enter(llista);
-            indexOf = llista.IndexOfValue(value);
-            Monitor.Exit(llista);
-            return indexOf;
+            base.Add(value.Clau, value);
+        }
+        public void AddRange(IList<T> values,bool throwException=false)
+        {
+            if (values == null)
+                throw new ArgumentNullException();
+            for (int i = 0; i < values.Count; i++)
+                try
+                {
+                    base.Add(values[i].Clau, values[i]);
+                }
+                catch { if (throwException) throw; }
+        }
+        public void AddOrReplaceRange(IList<T> values, bool throwException = false)
+        {
+            if (values == null)
+                throw new ArgumentNullException();
+            for (int i = 0; i < values.Count; i++)
+                try
+                {
+                    base.AddOrReplace(values[i].Clau, values[i]);
+                }
+                catch { if (throwException) throw; }
+        }
+        public bool Remove(T value)
+        {
+            return base.Remove(value.Clau);
+        }
+        public bool[] Remove(IList<T> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException();
+            bool[] resultRemove = new bool[values.Count];
+            for (int i = 0; i < values.Count; i++)
+                resultRemove[i]=  base.Remove(values[i].Clau);
+            return resultRemove;
         }
     }
 

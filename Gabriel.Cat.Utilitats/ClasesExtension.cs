@@ -411,12 +411,7 @@ namespace Gabriel.Cat.Extension
         {
             lst.Add((TKey1)nouValor.Clau, (TKey2)nouValor.Clau2, nouValor);
         }
-        public static ListaUnica<T> ToListaUnica<T>(this IEnumerable<T> enumeracion) where T : IClauUnicaPerObjecte
-        {
-            ListaUnica<T> lista = new ListaUnica<T>();
-            lista.AddRange(enumeracion);
-            return lista;
-        }
+
         #endregion
         //cuando necesito escribir todos los caracteres en un xml y no quiero complicarme :)
         #region NormalizarXml

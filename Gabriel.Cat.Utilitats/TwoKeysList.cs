@@ -14,6 +14,7 @@ using System.Collections;
 
 namespace Gabriel.Cat
 {
+    public delegate ForContinue ForMethodTwoKeysList<Tkey1, Tkey2, Tvalue>(int index, Tkey1 key1, Tkey2 key2, Tvalue value);
     /// <summary>
     /// Description of TwoKeysList.
     /// </summary>
@@ -77,12 +78,27 @@ namespace Gabriel.Cat
         public Tvalue this[Tkey1 key1]
         {
             get { return llista1[key1]; }
-            set { llista1[key1] = value; }
+            set {
+
+                llista1[key1] = value;
+                llista2[llistaClau1[key1]] = value;
+            }
         }
         public Tvalue this[Tkey2 key2]
         {
             get { return llista2[key2]; }
-            set { llista2[key2] = value; }
+            set {
+                llista2[key2] = value;
+                llista1[llistaClau2[key2]] = value;
+            }
+        }
+        public Tvalue this[int index]
+        {
+            get { return llista1[index]; }
+            set
+            {
+                this[llista1.GetKey(index)] = value;
+            }
         }
         public void Add(Tkey1 key1, Tkey2 key2, Tvalue value)
         {
@@ -114,6 +130,18 @@ namespace Gabriel.Cat
             removed = llista1.Remove(key1);
             llista2.Remove(key2);
             return removed;
+        }
+        public Tvalue GetValueAt(int index)
+        {
+            return llista1.GetValueAt(index);
+        }
+        public Tkey1 GetTKey1At(int index)
+        {
+            return llistaClau2.GetValueAt(index);
+        }
+        public Tkey2 GetTKey2At(int index)
+        {
+            return llistaClau1.GetValueAt(index);
         }
         public Tvalue GetValueWithKey1(Tkey1 key)
         {
@@ -204,8 +232,14 @@ namespace Gabriel.Cat
         }
         public IEnumerator<KeyValuePair<TwoKeys<Tkey1,Tkey2>,Tvalue>> GetEnumerator()
         {
-            foreach (KeyValuePair<Tkey1, Tkey2> keys in this.llistaClau1)
-                yield return new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(keys.Key, keys.Value), llista1[keys.Key]);
+            KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[] enumerator = new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[llista1.Count];
+            ForContinue nextStep = new ForContinue();
+            For((i, tkey1, tkey2, tvalue) =>
+            {
+                enumerator[i]= new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(tkey1, tkey2), tvalue);
+                return nextStep;
+            });
+            return enumerator.ObtieneEnumerador();
         }
       
 
@@ -224,9 +258,9 @@ namespace Gabriel.Cat
             return Remove1(key.Key1);
         }
 
-        public bool TryGetValue(TwoKeys<Tkey1, Tkey2> key, out Tvalue value)
+        bool IDictionary<TwoKeys<Tkey1, Tkey2>,Tvalue>.TryGetValue(TwoKeys<Tkey1, Tkey2> key, out Tvalue value)
         {
-            return llista1.TryGetValue(key.Key1, out value);
+            return   ((IDictionary <Tkey1,Tvalue>)llista1).TryGetValue(key.Key1, out value);
         }
 
         public void Add(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue> item)
@@ -239,12 +273,13 @@ namespace Gabriel.Cat
             return llista1.ContainsKey(item.Key.Key1);
         }
 
-        public void CopyTo(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[] array, int arrayIndex)
+        public void CopyTo(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[] array, int arrayIndex=0)
         {
-           
-            this.WhileEach((item) => {
-                array[arrayIndex++] = item;
-                return array.Length == arrayIndex;
+            ForContinue nextStep= new ForContinue();
+            For((i, tkey1, tkey2, tvalue) =>
+            {
+                array[arrayIndex++] = new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(tkey1, tkey2), tvalue);
+                return nextStep;
             });
         }
 
@@ -258,7 +293,17 @@ namespace Gabriel.Cat
             return GetEnumerator();
         }
 
-
+        public void For(ForMethodTwoKeysList<Tkey1,Tkey2,Tvalue> methodInnerFor,bool leftToRight=true)
+        {
+            try
+            {
+                llistaClau1.For((i, tkey1, tkey2) =>
+                {
+                    return methodInnerFor(i, tkey1, tkey2, llista1[tkey1]);
+                });  
+            }catch { throw; }
+           
+        }
 
 
       
