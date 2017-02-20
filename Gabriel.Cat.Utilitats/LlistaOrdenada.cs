@@ -144,7 +144,7 @@ namespace Gabriel.Cat
                         ChangePosicion(IndexOfKey(value.Key), index);
                     }
                 }
-                else InsertAt(index, value.Key, value.Value);
+                else Insert(index, value.Key, value.Value);
             }
         }
 
@@ -312,10 +312,10 @@ namespace Gabriel.Cat
 			llista.Insert(posToInsert, key);
 			Monitor.Exit(llista);
 		}
-		public void InsertAt(int index, TKey key, TValue value)
+		public void Insert(int index, TKey key, TValue value)
 		{
 			Add(key, value);
-			ChangePosicion(Count - 1, index);
+			ChangePosicion(IndexOfKey(key), index);//si pongo como posActual Count-1 puedo tener problemas si se usan threads y hay cola para el add
 		}
 		public bool ContainsKey(TKey key)
 		{
@@ -509,7 +509,7 @@ namespace Gabriel.Cat
 		void IList<KeyValuePair<TKey, TValue>>.Insert(int index, KeyValuePair<TKey, TValue> item)
 		{
 
-			InsertAt(index,item.Key,item.Value);
+			Insert(index,item.Key,item.Value);
 		}
 	
     	public	void RemoveAt(int index)

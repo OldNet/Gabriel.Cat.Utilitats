@@ -1862,6 +1862,13 @@ namespace Gabriel.Cat.Extension
                 llista.Add(pair.Key);
             return llista;
         }
+        public static Tkey[] GetKeys<Tkey, Tvalue>(this IList<KeyValuePair<Tkey, Tvalue>> pairs)
+        {
+            Tkey[] llista = new Tkey[pairs.Count];
+            for (int i = 0; i < pairs.Count; i++)
+                llista[i] = (pairs[i].Key);
+            return llista;
+        }
         public static T[] ToTaula<T>(this IEnumerable<T> valors)
         {
 
@@ -1986,7 +1993,7 @@ namespace Gabriel.Cat.Extension
         {
             return FiltraKeysOrValues(pairs, null, metodoComprovador).Casting<TValue>();
         }
-        static IReadOnlyList<object> FiltraKeysOrValues<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovadorKeys, ComprovaEventHandler<TValue> metodoComprovarValues)
+        static List<Object> FiltraKeysOrValues<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovadorKeys, ComprovaEventHandler<TValue> metodoComprovarValues)
         {
             if (metodoComprovadorKeys == null && metodoComprovarValues == null)
                 throw new ArgumentNullException();
@@ -2000,11 +2007,18 @@ namespace Gabriel.Cat.Extension
             }
             return filtro;
         }
-        public static IReadOnlyList<Tvalue> GetValues<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
+        public static List<Tvalue> GetValues<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             List<Tvalue> llista = new List<Tvalue>();
             foreach (KeyValuePair<Tkey, Tvalue> pair in pairs)
                 llista.Add(pair.Value);
+            return llista;
+        }
+        public static Tvalue[] GetValues<Tkey, Tvalue>(this IList<KeyValuePair<Tkey, Tvalue>> pairs)
+        {
+            Tvalue[] llista = new Tvalue[pairs.Count];
+           for(int i=0;i<pairs.Count;i++)
+                llista[i]=(pairs[i].Value);
             return llista;
         }
         public static Tvalue[] ValuesToArray<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)

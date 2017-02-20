@@ -18,27 +18,27 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of TwoKeysList.
     /// </summary>
-    public class TwoKeysList<Tkey1, Tkey2, Tvalue> : IDictionary<TwoKeys<Tkey1, Tkey2>, Tvalue>, IEnumerable<KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>>
-                                                        where Tkey1 : IComparable<Tkey1>
-                                                        where Tkey2 : IComparable<Tkey2>
+    public class TwoKeysList<TKey1, TKey2, TValue> : IDictionary<TwoKeys<TKey1, TKey2>, TValue>, IEnumerable<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IReadOnlyList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IColeccion<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>
+                                                        where TKey1 : IComparable<TKey1>
+                                                        where TKey2 : IComparable<TKey2>
     {
 
-        LlistaOrdenada<Tkey1, Tvalue> llista1;
-        LlistaOrdenada<Tkey2, Tvalue> llista2;
-        LlistaOrdenada<Tkey2, Tkey1> llistaClau2;
-        LlistaOrdenada<Tkey1, Tkey2> llistaClau1;
+        LlistaOrdenada<TKey1, TValue> llista1;
+        LlistaOrdenada<TKey2, TValue> llista2;
+        LlistaOrdenada<TKey2, TKey1> llistaClau2;
+        LlistaOrdenada<TKey1, TKey2> llistaClau1;
         public TwoKeysList()
         {
-            llista1 = new LlistaOrdenada<Tkey1, Tvalue>();
-            llista2 = new LlistaOrdenada<Tkey2, Tvalue>();
-            llistaClau1 = new LlistaOrdenada<Tkey1, Tkey2>();
-            llistaClau2 = new LlistaOrdenada<Tkey2, Tkey1>();
+            llista1 = new LlistaOrdenada<TKey1, TValue>();
+            llista2 = new LlistaOrdenada<TKey2, TValue>();
+            llistaClau1 = new LlistaOrdenada<TKey1, TKey2>();
+            llistaClau2 = new LlistaOrdenada<TKey2, TKey1>();
 
         }
         public int Count
         { get { return llistaClau1.Count; } }
 
-        public ICollection<TwoKeys<Tkey1, Tkey2>> Keys
+        public ICollection<TwoKeys<TKey1, TKey2>> Keys
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Gabriel.Cat
             }
         }
 
-        public ICollection<Tvalue> Values
+        public ICollection<TValue> Values
         {
             get
             {
@@ -62,7 +62,22 @@ namespace Gabriel.Cat
             }
         }
 
-        public Tvalue this[TwoKeys<Tkey1, Tkey2> key]
+
+
+        public KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> this[int index]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public TValue this[TwoKeys<TKey1, TKey2> key]
         {
             get
             {
@@ -75,32 +90,27 @@ namespace Gabriel.Cat
                 llista2[llistaClau1[key.Key1]] = value;
             }
         }
-        public Tvalue this[Tkey1 key1]
+        public TValue this[TKey1 key1]
         {
             get { return llista1[key1]; }
-            set {
+            set
+            {
 
                 llista1[key1] = value;
                 llista2[llistaClau1[key1]] = value;
             }
         }
-        public Tvalue this[Tkey2 key2]
+        public TValue this[TKey2 key2]
         {
             get { return llista2[key2]; }
-            set {
+            set
+            {
                 llista2[key2] = value;
                 llista1[llistaClau2[key2]] = value;
             }
         }
-        public Tvalue this[int index]
-        {
-            get { return llista1[index].Value; }
-            set
-            {
-                this[llista1.GetKey(index)] = value;
-            }
-        }
-        public void Add(Tkey1 key1, Tkey2 key2, Tvalue value)
+
+        public void Add(TKey1 key1, TKey2 key2, TValue value)
         {
             if (llista1.ContainsKey(key1))
                 throw new Exception("Esta duplicada la clave1 para el valor");
@@ -111,9 +121,9 @@ namespace Gabriel.Cat
             llistaClau1.Add(key1, key2);
             llistaClau2.Add(key2, key1);
         }
-        public bool Remove1(Tkey1 key1)
+        public bool Remove1(TKey1 key1)
         {
-            Tkey2 key2 = llistaClau1[key1];
+            TKey2 key2 = llistaClau1[key1];
             bool removed;
             llistaClau1.Remove(key1);
             llistaClau2.Remove(key2);
@@ -121,9 +131,9 @@ namespace Gabriel.Cat
             llista2.Remove(key2);
             return removed;
         }
-        public bool Remove2(Tkey2 key2)
+        public bool Remove2(TKey2 key2)
         {
-            Tkey1 key1 = llistaClau2[key2];
+            TKey1 key1 = llistaClau2[key2];
             bool removed;
             llistaClau1.Remove(key1);
             llistaClau2.Remove(key2);
@@ -131,60 +141,60 @@ namespace Gabriel.Cat
             llista2.Remove(key2);
             return removed;
         }
-        public Tvalue GetValueAt(int index)
+        public TValue GetValueAt(int index)
         {
             return llista1.GetValueAt(index);
         }
-        public Tkey1 GetTKey1At(int index)
+        public TKey1 GetTKey1At(int index)
         {
             return llistaClau2.GetValueAt(index);
         }
-        public Tkey2 GetTKey2At(int index)
+        public TKey2 GetTKey2At(int index)
         {
             return llistaClau1.GetValueAt(index);
         }
-        public Tvalue GetValueWithKey1(Tkey1 key)
+        public TValue GetValueWithKey1(TKey1 key)
         {
             return llista1[key];
         }
-        public Tvalue GetValueWithKey2(Tkey2 key)
+        public TValue GetValueWithKey2(TKey2 key)
         {
             return llista2[key];
         }
-        public Tkey1 GetTkey1WhithTkey2(Tkey2 key2)
+        public TKey1 GetTkey1WhithTkey2(TKey2 key2)
         {
             return llistaClau2[key2];
         }
-        public Tkey2 GetTkey2WhithTkey1(Tkey1 key1)
+        public TKey2 GetTkey2WhithTkey1(TKey1 key1)
         {
             return llistaClau1[key1];
         }
 
-        public void ChangeKey2(Tkey2 key2Old, Tkey2 key2New)
+        public void ChangeKey2(TKey2 key2Old, TKey2 key2New)
         {
             if (key2Old.CompareTo(key2New) != 0)
             {
                 if (ContainsKey2(key2New))
                     throw new Exception("new key2 is already in use");
-                Tkey1 key1 = llistaClau2[key2Old];
-                Tvalue value = llista2[key2Old];
+                TKey1 key1 = llistaClau2[key2Old];
+                TValue value = llista2[key2Old];
                 Remove2(key2Old);
                 Add(key1, key2New, value);
             }
         }
-        public void ChangeKey1(Tkey1 key1Old, Tkey1 key1New)
+        public void ChangeKey1(TKey1 key1Old, TKey1 key1New)
         {
             if (key1Old.CompareTo(key1New) != 0)
             {
                 if (ContainsKey1(key1New))
                     throw new Exception("new key1 is already in use");
-                Tkey2 key2 = llistaClau1[key1Old];
-                Tvalue value = llista1[key1Old];
+                TKey2 key2 = llistaClau1[key1Old];
+                TValue value = llista1[key1Old];
                 Remove1(key1Old);
                 Add(key1New, key2, value);
             }
         }
-        
+
         public void Clear()
         {
             llistaClau1.Clear();
@@ -192,121 +202,157 @@ namespace Gabriel.Cat
             llistaClau2.Clear();
             llista1.Clear();
         }
-      
-        public Tvalue[] ValueToArray()
+
+        public TValue[] ValueToArray()
         {
-            return llista1.GetValues().ToTaula();
-            ;
+            return llista1.GetValues();
+          
         }
-        public Tkey1[] Key1ToArray()
+        public TKey1[] Key1ToArray()
         {
-            return llistaClau1.GetKeys().ToTaula();
+            return llistaClau1.GetKeys();
         }
-        public Tkey2[] Key2ToArray()
+        public TKey2[] Key2ToArray()
         {
-            return llistaClau2.GetKeys().ToTaula();
+            return llistaClau2.GetKeys();
         }
-        public KeyValuePair<Tkey1, Tvalue>[] Key1ValuePair()
+        public KeyValuePair<TKey1, TValue>[] Key1ValuePair()
         {
             return llista1.ToArray();
         }
-        public KeyValuePair<Tkey2, Tvalue>[] Key2ValuePair()
+        public KeyValuePair<TKey2, TValue>[] Key2ValuePair()
         {
             return llista2.ToArray();
         }
-        public TwoKeys<Tkey1, Tkey2>[] KeysToArray()
+        public TwoKeys<TKey1, TKey2>[] KeysToArray()
         {
-            KeyValuePair<Tkey1, Tkey2>[] keys = llistaClau1.ToArray();
-            TwoKeys<Tkey1, Tkey2>[] twoKeys = new TwoKeys<Tkey1, Tkey2>[keys.Length];
+            KeyValuePair<TKey1, TKey2>[] keys = llistaClau1.ToArray();
+            TwoKeys<TKey1, TKey2>[] twoKeys = new TwoKeys<TKey1, TKey2>[keys.Length];
             for (int i = 0; i < keys.Length; i++)
-                twoKeys[i] = new TwoKeys<Tkey1, Tkey2>(keys[i].Key, keys[i].Value);
+                twoKeys[i] = new TwoKeys<TKey1, TKey2>(keys[i].Key, keys[i].Value);
             return twoKeys;
         }
-        public bool ContainsKey1(Tkey1 key1)
+        public bool ContainsKey1(TKey1 key1)
         {
             return llistaClau1.ContainsKey(key1);
         }
-        public bool ContainsKey2(Tkey2 key2)
+        public bool ContainsKey2(TKey2 key2)
         {
             return llistaClau2.ContainsKey(key2);
         }
-        public IEnumerator<KeyValuePair<TwoKeys<Tkey1,Tkey2>,Tvalue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>> GetEnumerator()
         {
-            KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[] enumerator = new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[llista1.Count];
+            KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>[] enumerator = new KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>[llista1.Count];
             ForContinue nextStep = new ForContinue();
             For((i, tkey1, tkey2, tvalue) =>
             {
-                enumerator[i]= new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(tkey1, tkey2), tvalue);
+                enumerator[i] = new KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>(new TwoKeys<TKey1, TKey2>(tkey1, tkey2), tvalue);
                 return nextStep;
             });
             return enumerator.ObtieneEnumerador();
         }
-      
 
-        public bool ContainsKey(TwoKeys<Tkey1, Tkey2> key)
+
+        public bool ContainsKey(TwoKeys<TKey1, TKey2> key)
         {
             return llistaClau1.ContainsKey(key.Key1) && llistaClau2.ContainsKey(key.Key2);
         }
 
-        public void Add(TwoKeys<Tkey1, Tkey2> key, Tvalue value)
+        public void Add(TwoKeys<TKey1, TKey2> key, TValue value)
         {
             Add(key.Key1, key.Key2, value);
         }
 
-        public bool Remove(TwoKeys<Tkey1, Tkey2> key)
+        public bool Remove(TwoKeys<TKey1, TKey2> key)
         {
             return Remove1(key.Key1);
         }
 
-        bool IDictionary<TwoKeys<Tkey1, Tkey2>,Tvalue>.TryGetValue(TwoKeys<Tkey1, Tkey2> key, out Tvalue value)
+        bool IDictionary<TwoKeys<TKey1, TKey2>, TValue>.TryGetValue(TwoKeys<TKey1, TKey2> key, out TValue value)
         {
-            return   ((IDictionary <Tkey1,Tvalue>)llista1).TryGetValue(key.Key1, out value);
+            return ((IDictionary<TKey1, TValue>)llista1).TryGetValue(key.Key1, out value);
         }
 
-        public void Add(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue> item)
+        public void Add(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> item)
         {
             Add(item.Key, item.Value);
         }
 
-        public bool Contains(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue> item)
+        public bool Contains(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> item)
         {
             return llista1.ContainsKey(item.Key.Key1);
         }
 
-        public void CopyTo(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>[] array, int arrayIndex=0)
+        private void CopyTo(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>[] array, int arrayIndex = 0)
         {
-            ForContinue nextStep= new ForContinue();
+            ForContinue nextStep = new ForContinue();
             For((i, tkey1, tkey2, tvalue) =>
             {
-                array[arrayIndex++] = new KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue>(new TwoKeys<Tkey1, Tkey2>(tkey1, tkey2), tvalue);
+                array[arrayIndex++] = new KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>(new TwoKeys<TKey1, TKey2>(tkey1, tkey2), tvalue);
                 return nextStep;
             });
         }
 
-        public bool Remove(KeyValuePair<TwoKeys<Tkey1, Tkey2>, Tvalue> item)
+        public void RemoveAt(int index)
         {
-           return Remove1(item.Key.Key1);
+            Remove1(GetTKey1At(index));
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public bool Remove(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> item)
         {
-            return GetEnumerator();
+            return Remove1(item.Key.Key1);
         }
 
-        public void For(ForMethodTwoKeysList<Tkey1,Tkey2,Tvalue> methodInnerFor,bool leftToRight=true)
+
+
+        public void For(ForMethodTwoKeysList<TKey1, TKey2, TValue> methodInnerFor, bool leftToRight = true)
         {
             try
             {
                 llistaClau1.For((i, tkey1, tkey2) =>
                 {
                     return methodInnerFor(i, tkey1, tkey2, llista1[tkey1]);
-                });  
-            }catch { throw; }
-           
+                });
+            }
+            catch { throw; }
+
+        }
+
+        public int IndexOf(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> item)
+        {
+            return IndexOf(item.Key.Key1);
+        }
+        public int IndexOf(TKey1 key)
+        {
+            return llistaClau1.IndexOfKey(key);
+        }
+        public int IndexOf(TKey2 key)
+        {
+            return IndexOf(llistaClau2[key]);
+        }
+
+        public void Insert(int index, KeyValuePair<TwoKeys<TKey1, TKey2>, TValue> item)
+        {
+            Add(item.Key, item.Value);
+            llistaClau1.ChangePosicion(llistaClau1.IndexOfKey(item.Key.Key1), index);
+        }
+        public void ChangePosicion(int posActual, int posNueva)
+        {
+            llistaClau1.ChangePosicion(posActual, posNueva);
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
 
-      
+        void ICollection<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>.CopyTo(KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>[] array, int arrayIndex)
+        {
+            CopyTo(array, arrayIndex);
+        }
+
+
+
     }
     public struct TwoKeys<Tkey1, Tkey2>
     {
