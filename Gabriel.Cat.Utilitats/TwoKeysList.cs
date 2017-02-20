@@ -94,7 +94,7 @@ namespace Gabriel.Cat
         }
         public Tvalue this[int index]
         {
-            get { return llista1[index]; }
+            get { return llista1[index].Value; }
             set
             {
                 this[llista1.GetKey(index)] = value;

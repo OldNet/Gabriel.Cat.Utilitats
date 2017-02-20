@@ -44,7 +44,7 @@ namespace Gabriel.Cat
             int colorInt = color.ToArgb();
             Point location;
             if (pointLocatedByColorList.ContainsKey(colorInt))
-                location = pointLocatedByColorList[colorInt];
+                location = pointLocatedByColorList[colorInt].Value;
             else
                 location = GetPoint(colorInt);
             return location;
@@ -58,7 +58,7 @@ namespace Gabriel.Cat
             Point location = default(Point);
             bool encontrado = false;
             if (pointLocatedByColorList.ContainsKey(colorInt))
-                location = pointLocatedByColorList[colorInt];
+                location = pointLocatedByColorList[colorInt].Value;
             else
             {
                 bytesColor = Serializar.GetBytes(colorInt);

@@ -293,9 +293,9 @@ namespace Gabriel.Cat
 		public static void QuitaOAbortaFaena(Tiket<TipoTrabajo> faenaHaAbortar)
 		{
 			if (feanasHaciendose.ContainsKey(faenaHaAbortar.IdUnico)) {
-				hilosFaenas.Remove(feanasHaciendose[faenaHaAbortar.IdUnico].Key.Name);
+				hilosFaenas.Remove(feanasHaciendose[faenaHaAbortar.IdUnico].Value.Key.Name);
 				try {
-					feanasHaciendose[faenaHaAbortar.IdUnico].Key.Abort();
+					feanasHaciendose[faenaHaAbortar.IdUnico].Value.Key.Abort();
 				} catch {
 				}
 				feanasHaciendose.Remove(faenaHaAbortar.IdUnico);
