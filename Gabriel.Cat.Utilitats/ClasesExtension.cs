@@ -1985,11 +1985,11 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region IEnumerable KeyValuePair
-        public static IReadOnlyList<TKey> FiltraKeys<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovador)
+        public static List<TKey> FiltraKeys<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TKey> metodoComprovador)
         {
             return FiltraKeysOrValues(pairs, metodoComprovador, null).Casting<TKey>();
         }
-        public static IReadOnlyList<TValue> FiltraValues<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TValue> metodoComprovador)
+        public static List<TValue> FiltraValues<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> pairs, ComprovaEventHandler<TValue> metodoComprovador)
         {
             return FiltraKeysOrValues(pairs, null, metodoComprovador).Casting<TValue>();
         }
