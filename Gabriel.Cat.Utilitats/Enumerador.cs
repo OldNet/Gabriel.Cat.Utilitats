@@ -16,7 +16,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Clase para heredar y hacer enumeraciones con tipos genericos
 	/// </summary>
-	public abstract class Enumerador<Tkey,Tvalue> where Tkey:IComparable
+	public abstract class Enumerador<Tkey,Tvalue>:ObjectAutoId where Tkey:IComparable
 	{
 		
 		private readonly Tvalue _value;

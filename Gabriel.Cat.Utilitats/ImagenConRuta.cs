@@ -14,9 +14,9 @@ using System.IO;
 namespace Gabriel.Cat
 {
 	/// <summary>
-	/// Description of ImagenConRuta.
+	/// Sirve para no cargar mas de una vez la misma imagen
 	/// </summary>
-	public class ImagenConRuta : IEquatable<ImagenConRuta>,IComparable<ImagenConRuta>
+	public class ImagenConRuta :ObjectAutoId, IEquatable<ImagenConRuta>,IComparable<ImagenConRuta>
 	{
 		string ruta;
         string hash;

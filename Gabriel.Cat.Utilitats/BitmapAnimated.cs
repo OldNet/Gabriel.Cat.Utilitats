@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Gabriel.Cat
 {
     public delegate void BitmapAnimatedFrameChangedEventHanlder(BitmapAnimated bmpAnimated,Bitmap frameActual);
-  public  class BitmapAnimated
+  public  class BitmapAnimated:ObjectAutoId
     {
        Llista<KeyValuePair<Bitmap, int>> frames;
         bool animarCiclicamente;

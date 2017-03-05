@@ -6,7 +6,7 @@ using System.Threading;
 namespace Gabriel.Cat.Extension
 {
     public delegate void TemporizadorEventHandler(Temporizador temporizador);
-   public class Temporizador
+   public class Temporizador:ObjectAutoId
     {
        public TemporizadorEventHandler Elapsed;
        Thread hiloEjecucion;

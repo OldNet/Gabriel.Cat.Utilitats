@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
-    public class Filter
+    public class Filter:ObjectAutoId
     {
         static char[] splitChar;
         public static char[] SplitChar

@@ -14,7 +14,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Description of GeneradorID.
 	/// </summary>
-	public  class GeneradorID<TValue>
+	public  class GeneradorID<TValue>:ObjectAutoId
 	{
 		public MetodoGeneradorID MetodoSiguiente;
 		public MetodoGeneradorID MetodoAnterior;

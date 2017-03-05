@@ -8,7 +8,8 @@ using Gabriel.Cat.Extension;
 
 namespace Gabriel.Cat
 {
-   public class CopyLikeTorrent
+    //no esta acabada
+   internal class CopyLikeTorrent
     {
         //version de clase y de objeto
         /// <summary>
@@ -132,7 +133,7 @@ namespace Gabriel.Cat
             return Copy(source,destination,buffer).Result;
         }
     }
-    public class FileCopyPorcessEventArgs:EventArgs
+    internal class FileCopyPorcessEventArgs:EventArgs
     {
         public FileCopyPorcessEventArgs(CopyLikeTorrent file, long complete, long total)
         {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Gabriel.Cat
 {
 
-    public class BitmapPointerLocated
+    public class BitmapPointerLocated:ObjectAutoId
     {
         Bitmap imagen;
         LlistaOrdenada<int, Point> pointLocatedByColorList;

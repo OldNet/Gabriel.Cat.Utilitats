@@ -9,7 +9,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Clase tipus que serveix per millorar String al utilitzar StringBuilder :)
 	/// </summary>
-	public  class text : IEnumerable<char>,IComparable,IComparable<text>,IClauUnicaPerObjecte
+	public  class text :ObjectAutoId, IEnumerable<char>,IComparable,IComparable<text>,IClauUnicaPerObjecte
 	{
 		StringBuilder tString;
 		private text()

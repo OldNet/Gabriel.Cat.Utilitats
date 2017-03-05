@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
-    public class Coleccion<T> : IColeccion<T>
+    public class Coleccion<T> :ObjectAutoId, IColeccion<T>
     {
 
         IList<T> lst;

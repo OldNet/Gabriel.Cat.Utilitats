@@ -23,7 +23,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Is a SortedList multitheread compatible (use Monitor on class)
 	/// </summary>
-	public class LlistaOrdenada<TKey, TValue> : IDictionary<TKey, TValue>,IReadOnlyDictionary<TKey,TValue>, IList<KeyValuePair<TKey,TValue>>, IReadOnlyList<KeyValuePair<TKey,TValue>>, IColeccion<KeyValuePair<TKey,TValue>>
+	public class LlistaOrdenada<TKey, TValue> :ObjectAutoId ,IDictionary<TKey, TValue>,IReadOnlyDictionary<TKey,TValue>, IList<KeyValuePair<TKey,TValue>>, IReadOnlyList<KeyValuePair<TKey,TValue>>, IColeccion<KeyValuePair<TKey,TValue>>
 	{
 		protected  SortedList<TKey, TValue> llistaOrdenada;
 		protected List<TKey> llista;

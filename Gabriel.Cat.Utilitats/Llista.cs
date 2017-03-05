@@ -18,7 +18,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of Llista.
     /// </summary>
-    public class Llista<T> : IList<T>, IReadOnlyList<T>, IColeccion<T>
+    public class Llista<T> :ObjectAutoId, IList<T>, IReadOnlyList<T>, IColeccion<T>
     {
         List<T> llista;
         Semaphore semafor;

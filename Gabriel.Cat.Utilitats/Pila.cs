@@ -15,7 +15,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Description of Pila.
 	/// </summary>
-	public class Pila<T>:IList<T>,IColeccion<T>
+	public class Pila<T>:ObjectAutoId,IList<T>,IColeccion<T>
 	{
         bool throwExceptionIfEmpty = false;
 		Llista<T> pila;

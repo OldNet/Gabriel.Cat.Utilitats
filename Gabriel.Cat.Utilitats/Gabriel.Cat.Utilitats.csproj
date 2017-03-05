@@ -77,6 +77,7 @@
     <Compile Include="Log.cs" />
     <Compile Include="MiPool.cs" />
     <Compile Include="MiRandom.cs" />
+    <Compile Include="ObjectAutoId.cs" />
     <Compile Include="Pila.cs" />
     <Compile Include="PointZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

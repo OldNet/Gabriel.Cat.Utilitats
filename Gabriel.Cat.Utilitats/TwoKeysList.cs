@@ -18,7 +18,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of TwoKeysList.
     /// </summary>
-    public class TwoKeysList<TKey1, TKey2, TValue> : IDictionary<TwoKeys<TKey1, TKey2>, TValue>, IEnumerable<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IReadOnlyList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IColeccion<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>
+    public class TwoKeysList<TKey1, TKey2, TValue> : ObjectAutoId, IDictionary<TwoKeys<TKey1, TKey2>, TValue>, IEnumerable<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IReadOnlyList<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>, IColeccion<KeyValuePair<TwoKeys<TKey1, TKey2>, TValue>>
                                                         where TKey1 : IComparable<TKey1>
                                                         where TKey2 : IComparable<TKey2>
     {

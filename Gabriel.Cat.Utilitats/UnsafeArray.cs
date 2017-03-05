@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Gabriel.Cat
 {
     public delegate void MetodoUnsafeArray(UnsafeArray unsafeArray);
-    public unsafe class UnsafeArray
+    public unsafe class UnsafeArray:ObjectAutoId
     {
         public byte* PtrArray;
         public readonly byte* PtrArrayInicial;

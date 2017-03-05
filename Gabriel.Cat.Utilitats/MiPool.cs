@@ -22,7 +22,7 @@ namespace Gabriel.Cat
 	/// <summary>
 	/// Description of MiPool.
 	/// </summary>
-	public class MiPool<TipoTrabajo>
+	public class MiPool<TipoTrabajo>:ObjectAutoId
 	{
 		//clase
 		static int maxThreadsStatic = 5;
@@ -343,7 +343,7 @@ namespace Gabriel.Cat
 
 	}
     public delegate void TiketEventHandler<Trabajo>(Tiket<Trabajo> tiket,EventArgs args);
-	public class Tiket<TipoTrabajo> : IComparable<Tiket<TipoTrabajo>>, IClauUnicaPerObjecte
+	public class Tiket<TipoTrabajo> :ObjectAutoId, IComparable<Tiket<TipoTrabajo>>, IClauUnicaPerObjecte
 	{
 		public enum PrioridadEnum
 		{
