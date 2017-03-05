@@ -74,6 +74,7 @@
     <Compile Include="ImagenConRuta.cs" />
     <Compile Include="Llista.cs" />
     <Compile Include="LlistaOrdenada.cs" />
+    <Compile Include="LlistaOrdenadaPerGrups.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="MiPool.cs" />
     <Compile Include="MiRandom.cs" />
