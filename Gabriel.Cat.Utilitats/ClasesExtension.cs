@@ -2017,8 +2017,8 @@ namespace Gabriel.Cat.Extension
         public static Tvalue[] GetValues<Tkey, Tvalue>(this IList<KeyValuePair<Tkey, Tvalue>> pairs)
         {
             Tvalue[] llista = new Tvalue[pairs.Count];
-           for(int i=0;i<pairs.Count;i++)
-                llista[i]=(pairs[i].Value);
+            for (int i = 0; i < pairs.Count; i++)
+                llista[i] = (pairs[i].Value);
             return llista;
         }
         public static Tvalue[] ValuesToArray<Tkey, Tvalue>(this IEnumerable<KeyValuePair<Tkey, Tvalue>> pairs)
@@ -3047,53 +3047,57 @@ namespace Gabriel.Cat.Extension
         {
 
             if (arrayAEncontrar == null)
-                throw new ArgumentNullException("bytesAEncontrar");
+                throw new ArgumentNullException("arrayAEncontrar");
             if (offsetInicio < 0 || offsetInicio + arrayAEncontrar.LongLength > datos.LongLength)
                 throw new ArgumentOutOfRangeException();
+            if(arrayAEncontrar.Length==0)
+            	throw new ArgumentException("Empty array");
+            
             const long DIRECCIONNOENCONTRADO = -1;
             long direccionBytes = DIRECCIONNOENCONTRADO;
             long posibleDireccion = DIRECCIONNOENCONTRADO;
-            long posicionBytesAEncontrar = 0;
+            long numBytesEncontrados = 0;
             //busco la primera aparicion de esos bytes a partir del offset dado como parametro
             unsafe
             {
-                fixed (byte* ptrBytesDatos = datos, ptrBytesAEcontrar = arrayAEncontrar)
+                fixed (byte* ptBytesDatos = datos, ptBytesAEcontrar = arrayAEncontrar)
                 {
-                    byte* ptBytesDatos = ptrBytesDatos;
-                    byte* ptBytesAEcontrar = ptrBytesAEcontrar;
-                    for (long i = offsetInicio, finDatos = datos.LongLength, finArrayAEncontrar = arrayAEncontrar.LongLength, posicionFinArrayAEcontrar = finArrayAEncontrar - 1; i < finDatos && direccionBytes == DIRECCIONNOENCONTRADO && i + (finArrayAEncontrar - 1 - posicionBytesAEncontrar) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    byte* ptrBytesDatos = ptBytesDatos+offsetInicio;//posiciono al principio de la busqueda
+                    byte* ptrBytesAEcontrar = ptBytesAEcontrar;
+                    for (long i = offsetInicio, finDatos = datos.LongLength, totalBytesArrayAEncontrar = arrayAEncontrar.LongLength;direccionBytes == DIRECCIONNOENCONTRADO && i < finDatos  && i + (totalBytesArrayAEncontrar - 1 - numBytesEncontrados) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
                     {
-                        if (*ptBytesDatos == *ptBytesAEcontrar)
-                        {//si no es el siguiente va al otro pero si es el primero se lo salta como si fuese malo...
+                        if (*ptrBytesDatos == *ptrBytesAEcontrar)
+                        {
+                            numBytesEncontrados++;
+                            //si no es el siguiente va al otro pero si es el primero se lo salta como si fuese malo...
                             if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
+                            {
                                 posibleDireccion = i;//le pongo el inicio
-                            else if (posicionBytesAEncontrar == posicionFinArrayAEcontrar)//si es la última vez
+
+                            }
+                            else if (numBytesEncontrados == totalBytesArrayAEncontrar)//si es la última vez
                                 direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
 
-                            ptBytesAEcontrar++;
-                            posicionBytesAEncontrar++;
-                        }
-                        else
-                        {
-                            posibleDireccion = DIRECCIONNOENCONTRADO;
-                            ptBytesAEcontrar = ptrBytesAEcontrar;//reinicio la posicion
-                            posicionBytesAEncontrar = 0;
-                            if (*ptBytesDatos == *ptBytesAEcontrar)
-                            {//si no es el siguiente va al otro pero si es el primero se lo salta como si fuese malo...asi lo arreglo :D
-                                if (posibleDireccion == DIRECCIONNOENCONTRADO)//si es la primera vez que entra
-                                    posibleDireccion = i;//le pongo el inicio
-                                else if (posicionBytesAEncontrar == posicionFinArrayAEcontrar)//si es la última vez
-                                    direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
+                            ptrBytesAEcontrar++;
 
-                                ptBytesAEcontrar++;
-                                posicionBytesAEncontrar++;
-                            }
+
+
                         }
-                        ptBytesDatos++;
+                        else if (numBytesEncontrados > 0)
+                        {
+                            //si no es reinicio la búsqueda
+                            ptrBytesAEcontrar = ptBytesAEcontrar;
+                            numBytesEncontrados = 0;
+                            posibleDireccion = DIRECCIONNOENCONTRADO;
+
+                        }
+
+                        ptrBytesDatos++;
 
                     }
                 }
             }
+            
             return direccionBytes;
         }
         public static void Remove(this byte[] datos, Hex offsetInicio, Hex longitud, byte byteEnBlanco = 0x0)
@@ -3167,7 +3171,7 @@ namespace Gabriel.Cat.Extension
         #region char[] & string
         public static string OneCharToTwoChars(this string chars)
         {
-          
+
             char[] charsDouble;
             unsafe
             {
@@ -3178,7 +3182,7 @@ namespace Gabriel.Cat.Extension
         }
         public static char[] OneCharToTwoChars(this char[] charsDouble)
         {
-           
+
             char[] charsSingel;
             unsafe
             {
@@ -3187,27 +3191,27 @@ namespace Gabriel.Cat.Extension
             }
             return charsSingel;
         }
-         static unsafe char[] OneCharToTwoChars(char* ptChars,int longitud)
+        static unsafe char[] OneCharToTwoChars(char* ptChars, int longitud)
         {
             char[] charsDouble = new char[longitud * 2];
             unsafe
             {
                 byte* ptrChars;
                 char* ptrCharsDouble;
-               
-                    fixed (char* ptCharsDouble = charsDouble)
-                    {
-                        ptrChars = (byte*)ptChars;
-                        ptrCharsDouble = ptCharsDouble;
-                        for (int i = 0; i < charsDouble.Length; i++)
-                        {
-                            *ptrCharsDouble = (char)*ptrChars;
-                            ptrChars++;
-                            ptrCharsDouble++;
-                        }
 
+                fixed (char* ptCharsDouble = charsDouble)
+                {
+                    ptrChars = (byte*)ptChars;
+                    ptrCharsDouble = ptCharsDouble;
+                    for (int i = 0; i < charsDouble.Length; i++)
+                    {
+                        *ptrCharsDouble = (char)*ptrChars;
+                        ptrChars++;
+                        ptrCharsDouble++;
                     }
-                
+
+                }
+
             }
             return charsDouble;
         }
@@ -3237,7 +3241,7 @@ namespace Gabriel.Cat.Extension
         }
         static unsafe char[] TwoCharsToOneChar(char* ptrCharsDouble, int lengthCharsDouble)
         {
-           
+
             char[] charsSingel = new char[lengthCharsDouble / 2];
 
             byte* ptrChars;
@@ -3260,9 +3264,9 @@ namespace Gabriel.Cat.Extension
             return charsSingel;
         }
 
-        public static string OneCharToFourChars(this string charOne,byte bChar=97)
+        public static string OneCharToFourChars(this string charOne, byte bChar = 97)
         {
-            return TwoCharToFourChars(charOne.OneCharToTwoChars(),bChar);
+            return TwoCharToFourChars(charOne.OneCharToTwoChars(), bChar);
         }
         public static string FourCharsOneChar(this string charOne, byte bChar = 97)
         {
@@ -3319,9 +3323,9 @@ namespace Gabriel.Cat.Extension
                 //tengo el caracter que tengo que dividir en 2 es un caracter 0x00-0xFF y tengo que partilo y sumarle bChar para que sea un caracter aceptable y no (char)0;
                 //seria pj: 0xF4 -> F y 4 -> F+bChar y 4+bChar :) y eso serian dos caracteres :D
                 {//    *ptrBits = (byteToBits & (1 << (i % 8))) != 0;
-                    *ptrChars4 =(char) ((((byte)*ptCharDouble)>>4) + bChar);
+                    *ptrChars4 = (char)((((byte)*ptCharDouble) >> 4) + bChar);
                     ptrChars4++;
-                    *ptrChars4 = (char) (( (byte)*ptCharDouble - (( (byte)*ptCharDouble >> 4 )<<4) ) + bChar);
+                    *ptrChars4 = (char)(((byte)*ptCharDouble - (((byte)*ptCharDouble >> 4) << 4)) + bChar);
                     ptrChars4++;
                     ptCharDouble++;
                 }
@@ -3331,7 +3335,7 @@ namespace Gabriel.Cat.Extension
 
             return char4;
         }
-        public static string FourCharsToTwoChar(this string char4,byte bChar=97)
+        public static string FourCharsToTwoChar(this string char4, byte bChar = 97)
         {
             if (char4.Length % 4 != 0)
                 throw new ArgumentException();
@@ -3341,7 +3345,7 @@ namespace Gabriel.Cat.Extension
             unsafe
             {
                 fixed (char* ptChars4 = char4)
-                    charsSingel = FourCharsToTwoChar(ptChars4, char4.Length,bChar);
+                    charsSingel = FourCharsToTwoChar(ptChars4, char4.Length, bChar);
             }
             return new string(charsSingel);
         }
@@ -3355,13 +3359,13 @@ namespace Gabriel.Cat.Extension
             unsafe
             {
                 fixed (char* ptChars4 = chars4)
-                    charsSingel = FourCharsToTwoChar(ptChars4, chars4.Length,bChar);
+                    charsSingel = FourCharsToTwoChar(ptChars4, chars4.Length, bChar);
             }
             return charsSingel;
         }
         static unsafe char[] FourCharsToTwoChar(char* ptrChars4, int lengthChars4, byte bChar)
         {
-           
+
             char[] charsDouble = new char[lengthChars4 / 2];
 
             char* ptrDoubleChars;
@@ -3372,10 +3376,10 @@ namespace Gabriel.Cat.Extension
                 ptrDoubleChars = ptChars;
 
                 for (int i = 0; i < charsDouble.Length; i++)
-             //tenemos 2 chars que son 2 bytes y hay que restarles a cada uno bChar y luego unirlos en uno
-             //pj: 0x4ç65,0x70 -> 0x65-bChar,0x70-bChar -> y el resultado formará un byte :)
+                //tenemos 2 chars que son 2 bytes y hay que restarles a cada uno bChar y luego unirlos en uno
+                //pj: 0x4ç65,0x70 -> 0x65-bChar,0x70-bChar -> y el resultado formará un byte :)
                 {//    *ptrBits = (byteToBits & (1 << (i % 8))) != 0;
-                    *ptrDoubleChars =(char) ((((byte)*ptrChars4)-bChar)<<4);
+                    *ptrDoubleChars = (char)((((byte)*ptrChars4) - bChar) << 4);
                     ptrChars4++;
 
                     *ptrDoubleChars += (char)(((byte)*ptrChars4) - bChar);
