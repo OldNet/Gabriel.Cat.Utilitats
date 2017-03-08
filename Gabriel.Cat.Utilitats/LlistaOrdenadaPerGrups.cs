@@ -25,6 +25,10 @@ namespace Gabriel.Cat
                 return (TValue[])diccionari[key].Values;
             }
         }
+        public int Count(TKey key)
+        {
+            return diccionari[key].Count;
+        }
         public void Add(TKey key, IList<TValue> values)
         {
             if (key == null)
@@ -126,6 +130,10 @@ namespace Gabriel.Cat
             for (int i = 0; i < diccionari.Count && !encontrado; i++)
                 encontrado = diccionari.GetValueAt(i).ContainsKey(value.IdAuto);
             return encontrado;
+        }
+        public TValue GetValueAt(TKey key,int index)
+        {
+            return diccionari[key].GetValueAt(index);
         }
     }
 }
