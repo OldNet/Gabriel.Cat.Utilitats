@@ -2540,7 +2540,7 @@ namespace Gabriel.Cat.Extension
                         ptrInverseBytesIn = ptrBytesIn.PtrArrayFin;
                         ptrInverseBytesOut = ptrBytesOut.PtrArrayFin;
 
-                        for (long i = 0, f = ptrBytesIn.Length / 2; i < f; i++)
+                        for (int i = 0, f =(int) ptrBytesIn.Length / 2; i < f; i++) 
                         {
                             *ptrBytesOut.PtrArray = *ptrInverseBytesIn;
                             *ptrInverseBytesOut = *ptrBytesIn.PtrArray;
@@ -2712,7 +2712,7 @@ namespace Gabriel.Cat.Extension
             if (bytesSplit.Length != 0)
             {
 
-                posicionArray = (int)array.BuscarArray(0, bytesSplit);
+                posicionArray = (int)array.SearchArray(0, bytesSplit);
 
                 //opero
                 if (posicionArray > -1)
@@ -2721,7 +2721,7 @@ namespace Gabriel.Cat.Extension
                     posicionArray += bytesSplit.Length;
                     do
                     {
-                        posicionArrayEncontrada = (int)array.BuscarArray(posicionArray, bytesSplit);
+                        posicionArrayEncontrada = (int)array.SearchArray(posicionArray, bytesSplit);
                         if (posicionArrayEncontrada > -1)
                         {
                             bytesSplited.Add(array.SubArray(posicionArray, posicionArrayEncontrada));
@@ -2746,28 +2746,28 @@ namespace Gabriel.Cat.Extension
         {
             UnsafeArray.Usar(array, metodo);
         }
-        public static Hex IndexByte(this byte[] array, byte byteAEcontrar)
+        public static int IndexByte(this byte[] array, byte byteAEcontrar)
         {
             return IndexByte(array, 0, byteAEcontrar);
         }
-        public static Hex IndexByte(this byte[] array, Hex offsetInicio, byte byteAEcontrar)
+        public static int IndexByte(this byte[] array, int offsetInicio, byte byteAEcontrar)
         {
-            const long NOENCONTRADO = -1;
-            long indexOf = NOENCONTRADO;
-            long inicio = offsetInicio;//por si peta que no sea con el fixed
+            const int NOENCONTRADO = -1;
+            int indexOf = NOENCONTRADO;
+            int inicio = offsetInicio;//por si peta que no sea con el fixed
             unsafe
             {
                 array.UnsafeMethod((unsArray) =>
                 {
 
-                    for (long i = inicio; i < unsArray.Length && indexOf == NOENCONTRADO; i++)
+                    for (int i = inicio; i < unsArray.Length && indexOf == NOENCONTRADO; i++)
                         if (unsArray[i] == byteAEcontrar)
                             indexOf = i;
                 });
             }
             return indexOf;
         }
-        #region SubArray with pointers me gustaria no repetir codigo haciendo un metodo generico con un filtro pero de momento el c# no me lo permite hacer...
+
         public static byte[] SubArray(this byte[] array, int cantidad)
         {
             return SubArray(array, 0, cantidad);
@@ -2797,207 +2797,7 @@ namespace Gabriel.Cat.Extension
             return subArray;
         }
 
-        public static char[] SubArray(this char[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static char[] SubArray(this char[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            char[] subArray = new char[cantidad];
-            unsafe
-            {
-                fixed (char* ptrArray = array)
-                {
-                    fixed (char* ptrSubArray = subArray)
-                    {
-                        char* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
 
-        public static int[] SubArray(this int[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static int[] SubArray(this int[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            int[] subArray = new int[cantidad];
-            unsafe
-            {
-                fixed (int* ptrArray = array)
-                {
-                    fixed (int* ptrSubArray = subArray)
-                    {
-                        int* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-
-        public static uint[] SubArray(this uint[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static uint[] SubArray(this uint[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            uint[] subArray = new uint[cantidad];
-            unsafe
-            {
-                fixed (uint* ptrArray = array)
-                {
-                    fixed (uint* ptrSubArray = subArray)
-                    {
-                        uint* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-
-        public static short[] SubArray(this short[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static short[] SubArray(this short[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            short[] subArray = new short[cantidad];
-            unsafe
-            {
-                fixed (short* ptrArray = array)
-                {
-                    fixed (short* ptrSubArray = subArray)
-                    {
-                        short* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-        public static ushort[] SubArray(this ushort[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static ushort[] SubArray(this ushort[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            ushort[] subArray = new ushort[cantidad];
-            unsafe
-            {
-                fixed (ushort* ptrArray = array)
-                {
-                    fixed (ushort* ptrSubArray = subArray)
-                    {
-                        ushort* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-        public static long[] SubArray(this long[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static long[] SubArray(this long[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            long[] subArray = new long[cantidad];
-            unsafe
-            {
-                fixed (long* ptrArray = array)
-                {
-                    fixed (long* ptrSubArray = subArray)
-                    {
-                        long* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-        public static ulong[] SubArray(this ulong[] array, Hex cantidad)
-        {
-            return SubArray(array, 0, cantidad);
-        }
-        public static ulong[] SubArray(this ulong[] array, Hex inicio, Hex cantidad)
-        {
-            if (cantidad + inicio > array.LongLength)
-                throw new ArgumentOutOfRangeException();
-            ulong[] subArray = new ulong[cantidad];
-            unsafe
-            {
-                fixed (ulong* ptrArray = array)
-                {
-                    fixed (ulong* ptrSubArray = subArray)
-                    {
-                        ulong* ptArray = ptrArray, ptSubArray = ptrSubArray;
-                        ptArray += inicio;//asigno el inicio aqui :D
-                        for (long j = 0; j < cantidad; j++)
-                        {
-                            *ptSubArray = *ptArray;
-                            ptArray++;
-                            ptSubArray++;
-                        }
-                    }
-                }
-            }
-            return subArray;
-        }
-
-        #endregion
         public static byte[] AddArray(this byte[] array, params byte[][] arraysToAdd)
         {
 
@@ -3038,12 +2838,12 @@ namespace Gabriel.Cat.Extension
             }
             return bytesResult;
         }
-        public static Hex BuscarArray(this byte[] datos, byte[] arrayAEncontrar)
+        public static int SearchArray(this byte[] datos, byte[] arrayAEncontrar)
         {
-            return BuscarArray(datos, 0, arrayAEncontrar);
+            return SearchArray(datos, 0, arrayAEncontrar);
         }
 
-        public static Hex BuscarArray(this byte[] datos, Hex offsetInicio, byte[] arrayAEncontrar)
+        public static int SearchArray(this byte[] datos, int offsetInicio, byte[] arrayAEncontrar)
         {
 
             if (arrayAEncontrar == null)
@@ -3053,10 +2853,10 @@ namespace Gabriel.Cat.Extension
             if(arrayAEncontrar.Length==0)
             	throw new ArgumentException("Empty array");
             
-            const long DIRECCIONNOENCONTRADO = -1;
-            long direccionBytes = DIRECCIONNOENCONTRADO;
-            long posibleDireccion = DIRECCIONNOENCONTRADO;
-            long numBytesEncontrados = 0;
+            const int DIRECCIONNOENCONTRADO = -1;
+            int direccionBytes = DIRECCIONNOENCONTRADO;
+            int posibleDireccion = DIRECCIONNOENCONTRADO;
+            int numBytesEncontrados = 0;
             //busco la primera aparicion de esos bytes a partir del offset dado como parametro
             unsafe
             {
@@ -3064,7 +2864,7 @@ namespace Gabriel.Cat.Extension
                 {
                     byte* ptrBytesDatos = ptBytesDatos+offsetInicio;//posiciono al principio de la busqueda
                     byte* ptrBytesAEcontrar = ptBytesAEcontrar;
-                    for (long i = offsetInicio, finDatos = datos.LongLength, totalBytesArrayAEncontrar = arrayAEncontrar.LongLength;direccionBytes == DIRECCIONNOENCONTRADO && i < finDatos  && i + (totalBytesArrayAEncontrar - 1 - numBytesEncontrados) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    for (int i = offsetInicio, finDatos = datos.Length, totalBytesArrayAEncontrar = arrayAEncontrar.Length;direccionBytes == DIRECCIONNOENCONTRADO && i < finDatos  && i + (totalBytesArrayAEncontrar - 1 - numBytesEncontrados) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
                     {
                         if (*ptrBytesDatos == *ptrBytesAEcontrar)
                         {
