@@ -2900,7 +2900,7 @@ namespace Gabriel.Cat.Extension
             
             return direccionBytes;
         }
-        public static void Remove(this byte[] datos, Hex offsetInicio, Hex longitud, byte byteEnBlanco = 0x0)
+        public static void Remove(this byte[] datos, int offsetInicio, int longitud, byte byteEnBlanco = 0x0)
         {
             if (offsetInicio < 0 || longitud < 0 || datos.LongLength < offsetInicio + longitud)
                 throw new ArgumentException();
@@ -2910,7 +2910,7 @@ namespace Gabriel.Cat.Extension
                 {
                     byte* ptbytesRom = ptrbytesRom;
                     ptbytesRom += offsetInicio;
-                    for (long i = 0, f = longitud; i < f; i++)
+                    for (int i = 0, f = longitud; i < f; i++)
                     {
                         *ptbytesRom = byteEnBlanco;
                         ptbytesRom++;
@@ -2918,9 +2918,9 @@ namespace Gabriel.Cat.Extension
                 }
             }
         }
-        public static void SetArray(this byte[] datos, Hex offsetIncioArrayDatos, byte[] arrayAPoner)
+        public static void SetArray(this byte[] datos, int offsetIncioArrayDatos, byte[] arrayAPoner)
         {
-            Buffer.BlockCopy(arrayAPoner, 0, datos, (int)offsetIncioArrayDatos, arrayAPoner.Length);
+            Buffer.BlockCopy(arrayAPoner, 0, datos, offsetIncioArrayDatos, arrayAPoner.Length);
         }
         public static void Invertir(this byte[] array)
         {
