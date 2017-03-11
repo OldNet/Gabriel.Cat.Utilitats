@@ -954,8 +954,8 @@ namespace Gabriel.Cat.Extension
                 imgRandom.TrataBytes((MetodoTratarBytePointer)((bytesImg) =>
                 {
                     const int PRIMERODEFAULT = 13;//al ser un numero Primo no hay problemas
-                    Color[] cuadrados;
-                    Color colorActual;
+                    System.Drawing.Color[] cuadrados;
+                    System.Drawing. Color colorActual;
                     int a = 3, r = 0, g = 1, b = 2;
                     int lenght = imgRandom.LengthBytes();
                     int pixel = imgRandom.IsArgb() ? 4 : 3;
@@ -1000,11 +1000,11 @@ namespace Gabriel.Cat.Extension
             return imgRandom;
         }
 
-        private static Color[] DamePixeles(int numPixeles)
+        private static System.Drawing.Color[] DamePixeles(int numPixeles)
         {
-            Color[] pixeles = new Color[numPixeles];
+            System.Drawing.Color[] pixeles = new System.Drawing.Color[numPixeles];
             for (int i = 0; i < pixeles.Length; i++)
-                pixeles[i] = Color.FromArgb(MiRandom.Next());
+                pixeles[i] = System.Drawing.Color.FromArgb(MiRandom.Next());
             return pixeles;
         }
 
@@ -1147,7 +1147,7 @@ namespace Gabriel.Cat.Extension
         }
         #endregion
         #region ColorMatrizExtension
-        public static Bitmap ToBitmap(this Color[,] matrizColor)
+        public static Bitmap ToBitmap(this System.Drawing.Color[,] matrizColor)
         {
             Bitmap bmp = new Bitmap(matrizColor.GetLength(DimensionMatriz.X), matrizColor.GetLength(DimensionMatriz.Y));
             byte[] bytesImg = bmp.GetBytes();
@@ -1164,15 +1164,15 @@ namespace Gabriel.Cat.Extension
             bmp.SetBytes(bytesImg);
             return bmp;
         }
-        public static Color[,] ToColorMatriz(this Bitmap bmp)
+        public static System.Drawing.Color[,] ToColorMatriz(this Bitmap bmp)
         {
-            Color[,] colorArray = new Color[bmp.Width, bmp.Height];
+            System.Drawing.Color[,] colorArray = new System.Drawing.Color[bmp.Width, bmp.Height];
             byte[] bytesImg = bmp.GetBytes();
             int posicion = 0;
             for (int y = 0, yFinal = colorArray.GetLength(DimensionMatriz.Y); y < yFinal; y++)
                 for (int x = 0, xFinal = colorArray.GetLength(DimensionMatriz.X); x < xFinal; x++)
                 {
-                    colorArray[x, y] = Color.FromArgb(bytesImg[posicion], bytesImg[posicion + 1], bytesImg[posicion + 2], bytesImg[posicion + 3]);
+                    colorArray[x, y] = System.Drawing.Color.FromArgb(bytesImg[posicion], bytesImg[posicion + 1], bytesImg[posicion + 2], bytesImg[posicion + 3]);
                     posicion += 4;
                 }
             return colorArray;
@@ -2525,6 +2525,33 @@ namespace Gabriel.Cat.Extension
                 }
             }
             return byteBuild;
+        }
+        public static bool ArrayEqual(this byte[] arrayLeft,byte[] arrayRight,int inicioArrayLeft=0,int inicioArrayRight=0,int length=-1)
+        {
+        	if(inicioArrayLeft<0||inicioArrayRight<0||length>-1&&inicioArrayLeft+length>=arrayLeft.Length&&inicioArrayRight+length>=arrayRight.Length)
+        		throw new ArgumentOutOfRangeException();
+        	bool equals=arrayRight!=null;
+        	if(equals)
+        	{
+        		unsafe{
+        			byte* ptrArrayLeft,ptrArrayRight;
+        			fixed(byte* ptArrayLeft=arrayLeft,ptArrayRight=arrayRight)
+        			{
+        				ptrArrayLeft=ptArrayLeft+inicioArrayLeft;
+        				ptrArrayRight=ptArrayRight+inicioArrayRight;
+        				
+        				for(int i=0,f=arrayLeft.Length-inicioArrayLeft>arrayRight.Length-inicioArrayRight?arrayRight.Length-inicioArrayRight:arrayLeft.Length-inicioArrayLeft;equals&&(i<f&&length==-1||i<length);i++)
+        				{
+        					equals=*ptrArrayLeft==*ptrArrayRight;
+        					ptrArrayLeft++;
+        					ptrArrayRight++;
+        				}
+        			}
+        		
+        		}
+        	}
+        	return equals;
+        	
         }
         public static byte[] ReverseArray(this byte[] byteArrayToReverse)
         {

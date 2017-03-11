@@ -60,6 +60,7 @@
     <Compile Include="ClasesExtension.cs" />
     <Compile Include="ClauUnicaPerObjecte.cs" />
     <Compile Include="Coleccion.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="CopyLikeTorrent.cs" />
     <Compile Include="Enumerador.cs" />

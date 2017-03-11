@@ -247,7 +247,7 @@ namespace Gabriel.Cat
 		}
 
         //aqui empieza la serializacion de cada tipo
-		public static byte[] GetBytes(Color color)
+		public static byte[] GetBytes(System.Drawing.Color color)
 		{
 			return new byte[] { color.A, color.R, color.G, color.B };
 		}
@@ -451,11 +451,11 @@ namespace Gabriel.Cat
 
 	
 		#region Desserializar Medida Fija
-		public static Color ToColor(byte[] bytesObj)
+		public static System.Drawing.Color ToColor(byte[] bytesObj)
 		{
 			if (bytesObj.Length != 4)
 				throw new ArgumentException("Un color consta de 4 bytes ARGB");
-			return Color.FromArgb(bytesObj[0], bytesObj[1], bytesObj[2], bytesObj[3]);
+			return System.Drawing.Color.FromArgb(bytesObj[0], bytesObj[1], bytesObj[2], bytesObj[3]);
 		}
 		public static PointZ ToPointZ(byte[] bytesObj)
 		{

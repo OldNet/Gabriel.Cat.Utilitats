@@ -39,7 +39,7 @@ namespace Gabriel.Cat
                 colorLocatedByPointerList.Clear();
             }
         }
-        public Point GetPoint(Color color)
+        public Point GetPoint(System.Drawing.Color color)
         {
             int colorInt = color.ToArgb();
             Point location;
@@ -74,7 +74,7 @@ namespace Gabriel.Cat
                     throw new ArgumentOutOfRangeException("El color no esta dentro de la imagen!");
                 else { pointLocatedByColorList.Add(colorInt, location);
                     if (!colorLocatedByPointerList.ContainsKey(new PointZ(location, 0)))
-                        colorLocatedByPointerList.Add(new PointZ(location, 0), Color.FromArgb(colorInt));
+                        colorLocatedByPointerList.Add(new PointZ(location, 0), System.Drawing.Color.FromArgb(colorInt));
                 }
 
             }
@@ -82,7 +82,7 @@ namespace Gabriel.Cat
         }
         public Color GetColor(Point point)
         {
-            Color color;
+            System.Drawing.Color color;
             PointZ location = new PointZ(point, 0);
             if (colorLocatedByPointerList.ContainsKey(location))
                 color = colorLocatedByPointerList[location];
