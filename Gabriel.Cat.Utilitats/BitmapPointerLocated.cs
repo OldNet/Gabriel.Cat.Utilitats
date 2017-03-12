@@ -13,7 +13,7 @@ namespace Gabriel.Cat
     {
         Bitmap imagen;
         LlistaOrdenada<int, Point> pointLocatedByColorList;
-        LlistaOrdenada<PointZ, Color> colorLocatedByPointerList;
+        LlistaOrdenada<PointZ, System.Drawing.Color> colorLocatedByPointerList;
         byte[] bytesImg;
 
 
@@ -21,7 +21,7 @@ namespace Gabriel.Cat
         public BitmapPointerLocated(Bitmap img)
         {
             pointLocatedByColorList = new LlistaOrdenada<int, Point>();
-            colorLocatedByPointerList = new LlistaOrdenada<PointZ, Color>();
+            colorLocatedByPointerList = new LlistaOrdenada<PointZ, System.Drawing.Color>();
             Bmp = img;
 
         }
