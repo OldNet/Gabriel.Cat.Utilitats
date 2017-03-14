@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gabriel.Cat
 {
-    public  class ObjectAutoId:IClauUnicaPerObjecte,IComparable,IComparable<ObjectAutoId>
+    public  class ObjectAutoId:IClauUnicaPerObjecte,IComparable<ObjectAutoId>
     {
         static Semaphore semaphorId = new Semaphore(1, 1);
         static long genA = 0;
@@ -40,7 +40,7 @@ namespace Gabriel.Cat
             }
         }
 
-        public IComparable Clau
+        IComparable IClauUnicaPerObjecte.Clau
         {
             get
             {
@@ -48,12 +48,7 @@ namespace Gabriel.Cat
             }
         }
 
-        public int CompareTo(object obj)
-        {
-            return CompareTo(obj as ObjectAutoId);
-        }
-
-        public int CompareTo(ObjectAutoId other)
+        int IComparable<ObjectAutoId>.CompareTo(ObjectAutoId other)
         {
             int compareTo = other == null ? (int)Gabriel.Cat.CompareTo.Inferior : partA.CompareTo(other.partA);
             if ((int)Gabriel.Cat.CompareTo.Iguales == compareTo)
