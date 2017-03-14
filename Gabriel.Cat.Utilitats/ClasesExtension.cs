@@ -1428,7 +1428,15 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
-
+        public static void SetIList<T>(this IList<T> listToSet,IList<T> source,int startIndexListToSet=0,int startIndexSource=0,int endIndexSource=-1)
+        {
+        	if(source==null)
+        		throw new ArgumentNullException();
+        	if(startIndexSource<0||source.Count<startIndexSource|| endIndexSource>0&&(source.Count<endIndexSource||listToSet.Count<startIndexListToSet+(endIndexSource-startIndexSource)))
+        	   throw new ArgumentOutOfRangeException();
+        	for(int i=startIndexListToSet,j=startIndexSource;i<source.Count&&(endIndexSource==-1||j<endIndexSource);i++,j++)
+        		listToSet[i]=source[j];
+        }
         public static T DameElementoActual<T>(this IList<T> llista, Ordre escogerKey, int contador)
         {
 
