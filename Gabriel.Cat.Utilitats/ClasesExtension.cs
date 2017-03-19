@@ -955,7 +955,7 @@ namespace Gabriel.Cat.Extension
                 {
                     const int PRIMERODEFAULT = 13;//al ser un numero Primo no hay problemas
                     System.Drawing.Color[] cuadrados;
-                    System.Drawing. Color colorActual;
+                    System.Drawing.Color colorActual;
                     int a = 3, r = 0, g = 1, b = 2;
                     int lenght = imgRandom.LengthBytes();
                     int pixel = imgRandom.IsArgb() ? 4 : 3;
@@ -1428,14 +1428,14 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
-        public static void SetIList<T>(this IList<T> listToSet,IList<T> source,int startIndexListToSet=0,int startIndexSource=0,int endIndexSource=-1)
+        public static void SetIList<T>(this IList<T> listToSet, IList<T> source, int startIndexListToSet = 0, int startIndexSource = 0, int endIndexSource = -1)
         {
-        	if(source==null)
-        		throw new ArgumentNullException();
-        	if(startIndexSource<0||source.Count<startIndexSource|| endIndexSource>0&&(source.Count<endIndexSource||listToSet.Count<startIndexListToSet+(endIndexSource-startIndexSource)))
-        	   throw new ArgumentOutOfRangeException();
-        	for(int i=startIndexListToSet,j=startIndexSource;i<source.Count&&(endIndexSource==-1||j<endIndexSource);i++,j++)
-        		listToSet[i]=source[j];
+            if (source == null)
+                throw new ArgumentNullException();
+            if (startIndexSource < 0 || source.Count < startIndexSource || endIndexSource > 0 && (source.Count < endIndexSource || listToSet.Count < startIndexListToSet + (endIndexSource - startIndexSource)))
+                throw new ArgumentOutOfRangeException();
+            for (int i = startIndexListToSet, j = startIndexSource; i < source.Count && (endIndexSource == -1 || j < endIndexSource); i++, j++)
+                listToSet[i] = source[j];
         }
         public static T DameElementoActual<T>(this IList<T> llista, Ordre escogerKey, int contador)
         {
@@ -2534,32 +2534,33 @@ namespace Gabriel.Cat.Extension
             }
             return byteBuild;
         }
-        public static bool ArrayEqual(this byte[] arrayLeft,byte[] arrayRight,int inicioArrayLeft=0,int inicioArrayRight=0,int length=-1)
+        public static bool ArrayEqual(this byte[] arrayLeft, byte[] arrayRight, int inicioArrayLeft = 0, int inicioArrayRight = 0, int length = -1)
         {
-        	if(inicioArrayLeft<0||inicioArrayRight<0||length>-1&&inicioArrayLeft+length>=arrayLeft.Length&&inicioArrayRight+length>=arrayRight.Length)
-        		throw new ArgumentOutOfRangeException();
-        	bool equals=arrayRight!=null;
-        	if(equals)
-        	{
-        		unsafe{
-        			byte* ptrArrayLeft,ptrArrayRight;
-        			fixed(byte* ptArrayLeft=arrayLeft,ptArrayRight=arrayRight)
-        			{
-        				ptrArrayLeft=ptArrayLeft+inicioArrayLeft;
-        				ptrArrayRight=ptArrayRight+inicioArrayRight;
-        				
-        				for(int i=0,f=arrayLeft.Length-inicioArrayLeft>arrayRight.Length-inicioArrayRight?arrayRight.Length-inicioArrayRight:arrayLeft.Length-inicioArrayLeft;equals&&(i<f&&length==-1||i<length);i++)
-        				{
-        					equals=*ptrArrayLeft==*ptrArrayRight;
-        					ptrArrayLeft++;
-        					ptrArrayRight++;
-        				}
-        			}
-        		
-        		}
-        	}
-        	return equals;
-        	
+            if (inicioArrayLeft < 0 || inicioArrayRight < 0 || length > -1 && inicioArrayLeft + length >= arrayLeft.Length && inicioArrayRight + length >= arrayRight.Length)
+                throw new ArgumentOutOfRangeException();
+            bool equals = arrayRight != null;
+            if (equals)
+            {
+                unsafe
+                {
+                    byte* ptrArrayLeft, ptrArrayRight;
+                    fixed (byte* ptArrayLeft = arrayLeft, ptArrayRight = arrayRight)
+                    {
+                        ptrArrayLeft = ptArrayLeft + inicioArrayLeft;
+                        ptrArrayRight = ptArrayRight + inicioArrayRight;
+
+                        for (int i = 0, f = arrayLeft.Length - inicioArrayLeft > arrayRight.Length - inicioArrayRight ? arrayRight.Length - inicioArrayRight : arrayLeft.Length - inicioArrayLeft; equals && (i < f && length == -1 || i < length); i++)
+                        {
+                            equals = *ptrArrayLeft == *ptrArrayRight;
+                            ptrArrayLeft++;
+                            ptrArrayRight++;
+                        }
+                    }
+
+                }
+            }
+            return equals;
+
         }
         public static byte[] ReverseArray(this byte[] byteArrayToReverse)
         {
@@ -2575,7 +2576,7 @@ namespace Gabriel.Cat.Extension
                         ptrInverseBytesIn = ptrBytesIn.PtrArrayFin;
                         ptrInverseBytesOut = ptrBytesOut.PtrArrayFin;
 
-                        for (int i = 0, f =(int) ptrBytesIn.Length / 2; i < f; i++) 
+                        for (int i = 0, f = (int)ptrBytesIn.Length / 2; i < f; i++)
                         {
                             *ptrBytesOut.PtrArray = *ptrInverseBytesIn;
                             *ptrInverseBytesOut = *ptrBytesIn.PtrArray;
@@ -2802,7 +2803,40 @@ namespace Gabriel.Cat.Extension
             }
             return indexOf;
         }
+        public static int SearchBlock(this byte[] array, int offsetInicial, int lengthBlock, byte byteBlock = 0x0)
+        {
+            if (offsetInicial < 0 || lengthBlock < 0)
+                throw new ArgumentOutOfRangeException();
+            const int NOENCONTRADO = -1;
+            int posicionFinal = NOENCONTRADO;
+            int cantiadaBytesActual = 0;
+            unsafe
+            {
+                byte* ptrArray;
+                array.UnsafeMethod((ptArray) =>
+                {
+                    ptrArray = ptArray.PtrArray + offsetInicial;
+                    for (int i = offsetInicial; posicionFinal == NOENCONTRADO && i + (lengthBlock - cantiadaBytesActual) < array.Length; i++)
+                    {
+                        if (*ptrArray == byteBlock)
+                        {
+                            cantiadaBytesActual++;
+                            if (cantiadaBytesActual > lengthBlock)
+                                posicionFinal = i - lengthBlock;
 
+                        }
+                        else
+                        {
+                            cantiadaBytesActual = 0;
+                        }
+                        ptrArray++;
+                    }
+
+                });
+
+            }
+            return posicionFinal;
+        }
         public static byte[] SubArray(this byte[] array, int cantidad)
         {
             return SubArray(array, 0, cantidad);
@@ -2885,9 +2919,9 @@ namespace Gabriel.Cat.Extension
                 throw new ArgumentNullException("arrayAEncontrar");
             if (offsetInicio < 0 || offsetInicio + arrayAEncontrar.LongLength > datos.LongLength)
                 throw new ArgumentOutOfRangeException();
-            if(arrayAEncontrar.Length==0)
-            	throw new ArgumentException("Empty array");
-            
+            if (arrayAEncontrar.Length == 0)
+                throw new ArgumentException("Empty array");
+
             const int DIRECCIONNOENCONTRADO = -1;
             int direccionBytes = DIRECCIONNOENCONTRADO;
             int posibleDireccion = DIRECCIONNOENCONTRADO;
@@ -2897,9 +2931,9 @@ namespace Gabriel.Cat.Extension
             {
                 fixed (byte* ptBytesDatos = datos, ptBytesAEcontrar = arrayAEncontrar)
                 {
-                    byte* ptrBytesDatos = ptBytesDatos+offsetInicio;//posiciono al principio de la busqueda
+                    byte* ptrBytesDatos = ptBytesDatos + offsetInicio;//posiciono al principio de la busqueda
                     byte* ptrBytesAEcontrar = ptBytesAEcontrar;
-                    for (int i = offsetInicio, finDatos = datos.Length, totalBytesArrayAEncontrar = arrayAEncontrar.Length;direccionBytes == DIRECCIONNOENCONTRADO && i < finDatos  && i + (totalBytesArrayAEncontrar - 1 - numBytesEncontrados) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
+                    for (int i = offsetInicio, finDatos = datos.Length, totalBytesArrayAEncontrar = arrayAEncontrar.Length; direccionBytes == DIRECCIONNOENCONTRADO && i < finDatos && i + (totalBytesArrayAEncontrar - 1 - numBytesEncontrados) < finDatos/*si los bytes que quedan por ver se pueden llegar a ver continuo sino paro*/; i++)
                     {
                         if (*ptrBytesDatos == *ptrBytesAEcontrar)
                         {
@@ -2932,7 +2966,7 @@ namespace Gabriel.Cat.Extension
                     }
                 }
             }
-            
+
             return direccionBytes;
         }
         public static void Remove(this byte[] datos, int offsetInicio, int longitud, byte byteEnBlanco = 0x0)
@@ -2955,7 +2989,33 @@ namespace Gabriel.Cat.Extension
         }
         public static void SetArray(this byte[] datos, int offsetIncioArrayDatos, byte[] arrayAPoner)
         {
-            Buffer.BlockCopy(arrayAPoner, 0, datos, offsetIncioArrayDatos, arrayAPoner.Length);
+            if (arrayAPoner.Length + offsetIncioArrayDatos > datos.Length)
+                throw new ArgumentOutOfRangeException();
+            unsafe
+            {
+                byte* ptrDatos, ptrArrayAPoner;
+                datos.UnsafeMethod((ptDatos) =>
+                {
+                    arrayAPoner.UnsafeMethod((ptArrayAPoner) =>
+                    {
+                        ptrDatos = ptDatos.PtrArray + offsetIncioArrayDatos;
+                        ptrArrayAPoner = ptArrayAPoner.PtrArray;
+                        for (int i = 0; i < arrayAPoner.Length; i++)
+                        {
+                            *ptrDatos = *ptrArrayAPoner;
+                            ptrDatos++;
+                            ptrArrayAPoner++;
+                        }
+
+
+                    });
+
+
+
+                });
+
+            }
+
         }
         public static void Invertir(this byte[] array)
         {
