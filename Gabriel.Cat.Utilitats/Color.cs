@@ -1,9 +1,9 @@
 ﻿/*
  * Created by SharpDevelop.
- * User: tetra
+ * User: tetradog
  * Date: 06/05/2017
  * Time: 5:13
- * 
+ * Licencia GNU GPL v3
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
