@@ -2517,6 +2517,7 @@ namespace Gabriel.Cat.Extension
         public static byte ToByte(this bool[] bits)
         {
             byte byteBuild = new byte();
+            bits=bits.Reverse().ToArray();
             unsafe
             {
                 bool* ptrBits;
