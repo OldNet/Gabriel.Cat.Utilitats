@@ -2404,10 +2404,9 @@ namespace Gabriel.Cat.Extension
 				fixed (bool* ptBits = bits)
 				{
 					ptrBits = ptBits;
-
-					for (int i = 0; i < BITSBYTE; i++)
+				for (int i = BITSBYTE-1; i>=0; i--)
 					{
-						*ptrBits = (byteToBits & (1 << (i % 8))) != 0;
+						*ptrBits = (byteToBits & (1 << (i % BITSBYTE))) != 0;
 						ptrBits++;
 					}
 
