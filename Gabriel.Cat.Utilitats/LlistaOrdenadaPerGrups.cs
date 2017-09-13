@@ -9,12 +9,12 @@ namespace Gabriel.Cat
 {
     public class LlistaOrdenadaPerGrups<TKey,TValue>:ObjectAutoId
         where TKey :IComparable
-        where TValue:ObjectAutoId
+        where TValue:IComparable
     {
-        LlistaOrdenada<TKey, LlistaOrdenada<string,TValue>> diccionari;
+        LlistaOrdenada<TKey, LlistaOrdenada<IComparable,TValue>> diccionari;
         public LlistaOrdenadaPerGrups()
         {
-            diccionari = new LlistaOrdenada<TKey, LlistaOrdenada<string,TValue>>();
+            diccionari = new LlistaOrdenada<TKey, LlistaOrdenada<IComparable,TValue>>();
         }
         public TValue[] this[TKey key]
         {
@@ -51,8 +51,8 @@ namespace Gabriel.Cat
             if (value == null)
                 throw new ArgumentNullException();
             if (!diccionari.ContainsKey(key))
-                diccionari.Add(key, new LlistaOrdenada<string, TValue>());
-            diccionari[key].Add(value.IdAuto, value);
+                diccionari.Add(key, new LlistaOrdenada<IComparable, TValue>());
+            diccionari[key].Add(value, value);
         }
         public void Remove(TKey key,IList<TValue>values)
         {
@@ -73,9 +73,9 @@ namespace Gabriel.Cat
 
             if (diccionari.ContainsKey(key))
             {
-                if(diccionari[key].ContainsKey(value.IdAuto))
+                if(diccionari[key].ContainsKey(value))
                 {
-                    diccionari[key].Remove(value.IdAuto);
+                    diccionari[key].Remove(value);
                     if (diccionari[key].Count == 0)
                         diccionari.Remove(key);
                 }
@@ -120,7 +120,7 @@ namespace Gabriel.Cat
                 throw new ArgumentNullException();
             if (value == null)
                 throw new ArgumentNullException();
-            return ContainsKey(key) ? diccionari[key].ContainsKey(value.IdAuto) : false;
+            return ContainsKey(key) ? diccionari[key].ContainsKey(value) : false;
         }
         public bool ContainsValue(TValue value)
         {
@@ -128,7 +128,7 @@ namespace Gabriel.Cat
                 throw new ArgumentNullException();
             bool encontrado = false;
             for (int i = 0; i < diccionari.Count && !encontrado; i++)
-                encontrado = diccionari.GetValueAt(i).ContainsKey(value.IdAuto);
+                encontrado = diccionari.GetValueAt(i).ContainsKey(value);
             return encontrado;
         }
         public TValue GetValueAt(TKey key,int index)
