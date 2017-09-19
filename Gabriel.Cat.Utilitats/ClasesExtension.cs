@@ -2415,6 +2415,16 @@ namespace Gabriel.Cat.Extension
 			}
 			return bits;
 		}
+		public static byte GetHalfByte(this byte bToGet,bool getLeft=true)
+		{
+			byte bToReturn;
+			if(getLeft)
+				bToReturn=(byte)(0xF&bToGet>>4);
+			else bToReturn=(byte)(bToGet&0xF);
+			
+			return bToReturn;
+
+		}
 		public static bool[] ToBits(this IList<byte> byteToBits)
 		{ return byteToBits.ToArray().ToBits(); }
 		public static bool[] ToBits(this IEnumerable<byte> byteToBits)
