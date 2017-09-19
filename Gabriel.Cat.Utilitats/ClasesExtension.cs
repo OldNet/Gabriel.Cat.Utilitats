@@ -2421,7 +2421,8 @@ namespace Gabriel.Cat.Extension
 			if(getLeft)
 				bToReturn=(byte)(0xF&bToGet>>4);
 			else bToReturn=(byte)(bToGet&0xF);
-			
+
+
 			return bToReturn;
 
 		}
