@@ -33,7 +33,7 @@ namespace Gabriel.Cat
             {
                 if(idUnic==null)
                 {
-                    idUnic = genA.ToString().PadLeft(long.MaxValue.ToString().Length, '0') + genB.ToString().PadLeft(long.MaxValue.ToString().Length, '0');
+                    idUnic = partA.ToString().PadLeft(long.MaxValue.ToString().Length, '0') + partB.ToString().PadLeft(long.MaxValue.ToString().Length, '0');
                 }
                 return idUnic;
               
