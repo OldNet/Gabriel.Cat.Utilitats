@@ -2566,15 +2566,20 @@ namespace Gabriel.Cat.Extension
 					byte* ptrArrayLeft, ptrArrayRight;
 					fixed (byte* ptArrayLeft = arrayLeft, ptArrayRight = arrayRight)
 					{
-						ptrArrayLeft = ptArrayLeft + inicioArrayLeft;
-						ptrArrayRight = ptArrayRight + inicioArrayRight;
+                        
+                            ptrArrayLeft = ptArrayLeft + inicioArrayLeft;
+                            ptrArrayRight = ptArrayRight + inicioArrayRight;
 
-						for (int i = 0, f = arrayLeft.Length - inicioArrayLeft > arrayRight.Length - inicioArrayRight ? arrayRight.Length - inicioArrayRight : arrayLeft.Length - inicioArrayLeft; equals && (i < f && length == -1 || i < length); i++)
-						{
-							equals = *ptrArrayLeft == *ptrArrayRight;
-							ptrArrayLeft++;
-							ptrArrayRight++;
-						}
+                            for (int i = 0, f = arrayLeft.Length - inicioArrayLeft > arrayRight.Length - inicioArrayRight ? arrayRight.Length - inicioArrayRight : arrayLeft.Length - inicioArrayLeft; equals && (i < f && length == -1 || i < length); i++)
+                            {
+                                equals = *ptrArrayLeft == *ptrArrayRight;
+                                if (!equals)
+                                {
+                                    ptrArrayLeft++;
+                                    ptrArrayRight++;
+                                }
+                            }
+                      
 					}
 
 				}
