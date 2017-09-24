@@ -10,7 +10,7 @@ using System.IO;
 using Gabriel.Cat.Extension;
 namespace Gabriel.Cat
 {
-	public class PNG : IEnumerable<Chunk>,IComparable<PNG>
+	public class PNG : IEnumerable<Chunk>,IComparable<PNG>,IComparable
 	{
 		public enum Metadata
 		{
@@ -443,8 +443,17 @@ namespace Gabriel.Cat
 		{
 			return FCTL.SequenceNumber.CompareTo(other.FCTL.SequenceNumber);
 		}
-		#endregion
-	}
+
+        public int CompareTo(object obj)
+        {
+            PNG other = obj as PNG;
+            int compareTo = other != null ? 0 : -1;
+            if (compareTo == 0)
+                compareTo = CompareTo(other);
+            return compareTo;
+        }
+        #endregion
+    }
 }
 
 

@@ -26,7 +26,7 @@ namespace Gabriel.Cat
 	public class LlistaOrdenada<TKey, TValue> :ObjectAutoId ,IDictionary<TKey, TValue>,IReadOnlyDictionary<TKey,TValue>, IList<KeyValuePair<TKey,TValue>>, IReadOnlyList<KeyValuePair<TKey,TValue>>, IColeccion<KeyValuePair<TKey,TValue>>
 	{
 		protected  SortedList<TKey, TValue> llistaOrdenada;
-		protected List<TKey> llista;
+		internal List<TKey> llista;
 		public event EventHandler Updated;
 		ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> AddConfirmation;
 		ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> RemoveConfirmation;
@@ -546,11 +546,11 @@ namespace Gabriel.Cat
         }
 
     }
-	public class LlistaOrdenada<T>:LlistaOrdenada<IComparable,T> where T:IClauUnicaPerObjecte
+	public class LlistaOrdenada<T>:LlistaOrdenada<IComparable,T> where T:IComparable
 	{
 		public void Add(T value)
 		{
-			base.Add(value.Clau, value);
+			base.Add(value, value);
 		}
 		public void AddRange(IList<T> values, bool throwException = false)
 		{
@@ -558,7 +558,7 @@ namespace Gabriel.Cat
 				throw new ArgumentNullException();
 			for (int i = 0; i < values.Count; i++)
 				try {
-					base.Add(values[i].Clau, values[i]);
+					base.Add(values[i], values[i]);
 				} catch {
 					if (throwException)
 						throw;
@@ -570,7 +570,7 @@ namespace Gabriel.Cat
 				throw new ArgumentNullException();
 			for (int i = 0; i < values.Count; i++)
 				try {
-					base.AddOrReplace(values[i].Clau, values[i]);
+					base.AddOrReplace(values[i], values[i]);
 				} catch {
 					if (throwException)
 						throw;
@@ -578,7 +578,7 @@ namespace Gabriel.Cat
 		}
 		public bool Remove(T value)
 		{
-			return base.Remove(value.Clau);
+			return base.Remove(value);
 		}
 		public bool[] Remove(IList<T> values)
 		{
@@ -586,7 +586,7 @@ namespace Gabriel.Cat
 				throw new ArgumentNullException();
 			bool[] resultRemove = new bool[values.Count];
 			for (int i = 0; i < values.Count; i++)
-				resultRemove[i] = base.Remove(values[i].Clau);
+				resultRemove[i] = base.Remove(values[i]);
 			return resultRemove;
 		}
 	}
