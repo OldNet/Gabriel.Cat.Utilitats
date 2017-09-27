@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Gabriel.Cat.Extension;
 
 namespace Gabriel.Cat
 {
-    public class LlistaOrdenadaPerGrups<TKey,TValue>:ObjectAutoId
+	public class LlistaOrdenadaPerGrups<TKey,TValue>:ObjectAutoId,IEnumerable<KeyValuePair<TKey,TValue[]>>
         where TKey :IComparable
         where TValue:IComparable
     {
@@ -24,6 +25,13 @@ namespace Gabriel.Cat
                     throw new ArgumentNullException();
                 return (TValue[])diccionari[key].Values;
             }
+        }
+        public int Count()
+        {
+        	int total=0;
+        	foreach(var item in diccionari)
+        		total+=item.Value.Count;
+        	return total;
         }
         public int Count(TKey key)
         {
@@ -135,5 +143,24 @@ namespace Gabriel.Cat
         {
             return diccionari[key].GetValueAt(index);
         }
+
+		#region IEnumerable implementation
+
+		public IEnumerator<KeyValuePair<TKey,TValue[]>> GetEnumerator()
+		{
+			foreach(var item in diccionari)
+				yield return new KeyValuePair<TKey,TValue[]>(item.Key,item.Value.ValuesToArray());
+		}
+
+		#endregion
+
+		#region IEnumerable implementation
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		#endregion
     }
 }
