@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitmapAnimated.cs" />
+    <Compile Include="BitmapExtension.cs" />
     <Compile Include="BitmapPointerLocated.cs" />
     <Compile Include="Clases de Internet\Apng\APNG.cs" />
     <Compile Include="Clases de Internet\Apng\Chunks.cs" />
