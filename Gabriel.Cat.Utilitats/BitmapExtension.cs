@@ -18,6 +18,9 @@ namespace Gabriel.Cat
 	{
 		public static unsafe void SetFragment(byte* bmpTotalInicio,int alturaBmpTotal,int anchuraBmpTotal,bool bmpTotalIsArgb,byte* bmpFragmentoInicio,int alturaBmpFragmento,int anchuraBmpFragmento,bool bmpFragmentoIsArgb,System.Drawing.Point posicionFragmento)
 		{
+			const int OPCIONIGUALES = 0;
+			const int OPCIONSINCON = 1;
+			const int OPCIONCONSIN = 2;
 			//por acabar
 			int totalPixelesLinea;
 			int lineas=alturaBmpTotal-posicionFragmento.Y;
@@ -25,7 +28,8 @@ namespace Gabriel.Cat
 			byte*[] ptrsBmpFragmento;
 			int bytesPixelBmpTotal=bmpTotalIsArgb?4:3;
 			int bytesPixelBmpFragmento=bmpFragmentoIsArgb?4:3;
-		//tener en cuenta las posiciones negativas del fragmento...
+			int opcion;
+			//tener en cuenta las posiciones negativas del fragmento...
 			if(lineas<alturaBmpFragmento)
 				lineas=alturaBmpFragmento;
 			totalPixelesLinea=anchuraBmpTotal-posicionFragmento.X;
@@ -36,54 +40,80 @@ namespace Gabriel.Cat
 			ptrsBmpTotal=new byte*[lineas];
 			//posiciono todos los punteros
 			
-			//pongo las lineas
-			for(int i=0;i<lineas;i++)
+			//pongo  la opcion aqui asi solo se escoge una vez y no en cada linea como estaba antes :)
+			opcion=bmpTotalIsArgb.Equals(bmpFragmentoIsArgb)?OPCIONIGUALES:bmpTotalIsArgb?OPCIONCONSIN:OPCIONSINCON;
+			
+			switch(opcion)
 			{
-				SetLinea(ptrsBmpTotal[i],bmpTotalIsArgb,bytesPixelBmpTotal,ptrsBmpFragmento[i],bmpFragmentoIsArgb,bytesPixelBmpFragmento,totalPixelesLinea);
+					//pongo las lineas
+				case OPCIONIGUALES:
+					for(int i=0;i<lineas;i++)
+					{
+						SetLinea(ptrsBmpTotal[i],bytesPixelBmpTotal,ptrsBmpFragmento[i],totalPixelesLinea);
+					}
+					break;
+				case OPCIONCONSIN:
+					for(int i=0;i<lineas;i++)
+					{
+						SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
+					}
+					break;
+				case OPCIONSINCON:
+					for(int i=0;i<lineas;i++)
+					{
+						SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
+					}
+					break;
 			}
-		}//si fuera lento separar por cada if y luego llamar a un metodo distinto
-		static unsafe void SetLinea(byte* ptrBmpTotal,bool bmpTotalIsArgb,int bytesPixelBmpTotal,byte* ptrBmpFragmento,bool bmpFragmentoIsArgb,int bytesPixelBmpFragmento,int totalPixelesLinea)
+		}
+		static unsafe void SetLineaSC(byte* ptrBmpTotal,byte* ptrBmpFragmento,int totalPixelesLinea)
+		{
+			const int RGB=3;
+			for(int j=0;j<totalPixelesLinea;j++)
+			{
+				//pongo cada pixel
+				ptrBmpFragmento++;//me salto el byte de la transparencia porque la imagenTotal no tiene
+				for(int k=0;k<RGB;k++){
+					*ptrBmpTotal=*ptrBmpFragmento;
+					ptrBmpTotal++;
+					ptrBmpFragmento++;
+				}
+			}
+			
+		}
+		static unsafe void SetLineaCS(byte* ptrBmpTotal,byte* ptrBmpFragmento,int totalPixelesLinea)
 		{
 			const byte SINTRANSPARENCIA=0xFF;
-			if(bmpTotalIsArgb.Equals(bmpFragmentoIsArgb)){
+			const int RGB=3;
+			for(int j=0;j<totalPixelesLinea;j++)
+			{
 				//pongo cada pixel
-				for(int j=0;j<totalPixelesLinea;j++)
-				{
-					
-					//pongo cada byte
-					for(int k=0;k<bytesPixelBmpTotal;k++){
-						*ptrBmpTotal=*ptrBmpFragmento;
-						ptrBmpTotal++;
-						ptrBmpFragmento++;
-					}
-				}
-			}
-			else if(bmpTotalIsArgb&&!bmpFragmentoIsArgb){
-				for(int j=0;j<totalPixelesLinea;j++)
-				{
-					//pongo cada pixel
-					*ptrBmpTotal=SINTRANSPARENCIA;//como no tiene transparencia pongo el byte de la transparencia a sin
+				*ptrBmpTotal=SINTRANSPARENCIA;//como no tiene transparencia pongo el byte de la transparencia a sin
+				ptrBmpTotal++;
+				for(int k=0;k<RGB;k++){
+					*ptrBmpTotal=*ptrBmpFragmento;
 					ptrBmpTotal++;
-					for(int k=0;k<bytesPixelBmpFragmento;k++){
-						*ptrBmpTotal=*ptrBmpFragmento;
-						ptrBmpTotal++;
-						ptrBmpFragmento++;
-					}
-					
+					ptrBmpFragmento++;
+				}
+				
+			}
+		}
+		static unsafe void SetLinea(byte* ptrBmpTotal,int bytesPixel,byte* ptrBmpFragmento,int totalPixelesLinea)
+		{
+			
+			//pongo cada pixel
+			for(int j=0;j<totalPixelesLinea;j++)
+			{
+				
+				//pongo cada byte
+				for(int k=0;k<bytesPixel;k++){
+					*ptrBmpTotal=*ptrBmpFragmento;
+					ptrBmpTotal++;
+					ptrBmpFragmento++;
 				}
 			}
-			else if(!bmpTotalIsArgb&&bmpFragmentoIsArgb){
-				for(int j=0;j<totalPixelesLinea;j++)
-				{
-					//pongo cada pixel
-					ptrBmpFragmento++;//me salto el byte de la transparencia porque la imagenTotal no tiene
-					for(int k=0;k<bytesPixelBmpTotal;k++){
-						*ptrBmpTotal=*ptrBmpFragmento;
-						ptrBmpTotal++;
-						ptrBmpFragmento++;
-					}
-				}
-			}
+
+			
 
 		}
 		public static void SetFragment(this Bitmap bmpTotal,Bitmap bmpFragmento,Point posicionFragmento)
