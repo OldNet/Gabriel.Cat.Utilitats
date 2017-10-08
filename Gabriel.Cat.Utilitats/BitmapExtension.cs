@@ -23,47 +23,49 @@ namespace Gabriel.Cat
 			const int OPCIONCONSIN = 2;
 			//por acabar
 			int totalPixelesLinea;
-			int lineas=alturaBmpTotal-posicionFragmento.Y;
+			int lineas=alturaBmpTotal-posicionFragmento.Y;//pensar en las posiciones negativas
 			byte*[] ptrsBmpTotal;
 			byte*[] ptrsBmpFragmento;
 			int bytesPixelBmpTotal=bmpTotalIsArgb?4:3;
 			int bytesPixelBmpFragmento=bmpFragmentoIsArgb?4:3;
 			int opcion;
 			//tener en cuenta las posiciones negativas del fragmento...
-			if(lineas<alturaBmpFragmento)
-				lineas=alturaBmpFragmento;
-			totalPixelesLinea=anchuraBmpTotal-posicionFragmento.X;
-			if(totalPixelesLinea<anchuraBmpFragmento)
-				totalPixelesLinea=anchuraBmpFragmento;
-			
-			ptrsBmpFragmento=new byte*[lineas];
-			ptrsBmpTotal=new byte*[lineas];
-			//posiciono todos los punteros
-			
-			//pongo  la opcion aqui asi solo se escoge una vez y no en cada linea como estaba antes :)
-			opcion=bmpTotalIsArgb.Equals(bmpFragmentoIsArgb)?OPCIONIGUALES:bmpTotalIsArgb?OPCIONCONSIN:OPCIONSINCON;
-			
-			switch(opcion)
-			{
-					//pongo las lineas
-				case OPCIONIGUALES:
-					for(int i=0;i<lineas;i++)
-					{
-						SetLinea(ptrsBmpTotal[i],bytesPixelBmpTotal,ptrsBmpFragmento[i],totalPixelesLinea);
-					}
-					break;
-				case OPCIONCONSIN:
-					for(int i=0;i<lineas;i++)
-					{
-						SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
-					}
-					break;
-				case OPCIONSINCON:
-					for(int i=0;i<lineas;i++)
-					{
-						SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
-					}
-					break;
+			if(lineas>0){//si no esta dentro de la imagen no hace falta hacer nada :D
+				if(lineas<alturaBmpFragmento)
+					lineas=alturaBmpFragmento;
+				totalPixelesLinea=anchuraBmpTotal-posicionFragmento.X;
+				if(totalPixelesLinea<anchuraBmpFragmento)
+					totalPixelesLinea=anchuraBmpFragmento;
+				
+				ptrsBmpFragmento=new byte*[lineas];
+				ptrsBmpTotal=new byte*[lineas];
+				//posiciono todos los punteros
+				
+				//pongo  la opcion aqui asi solo se escoge una vez y no en cada linea como estaba antes :)
+				opcion=bmpTotalIsArgb.Equals(bmpFragmentoIsArgb)?OPCIONIGUALES:bmpTotalIsArgb?OPCIONCONSIN:OPCIONSINCON;
+				
+				switch(opcion)
+				{
+						//pongo las lineas
+					case OPCIONIGUALES:
+						for(int i=0;i<lineas;i++)
+						{
+							SetLinea(ptrsBmpTotal[i],bytesPixelBmpTotal,ptrsBmpFragmento[i],totalPixelesLinea);
+						}
+						break;
+					case OPCIONCONSIN:
+						for(int i=0;i<lineas;i++)
+						{
+							SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
+						}
+						break;
+					case OPCIONSINCON:
+						for(int i=0;i<lineas;i++)
+						{
+							SetLineaCS(ptrsBmpTotal[i],ptrsBmpFragmento[i],totalPixelesLinea);
+						}
+						break;
+				}
 			}
 		}
 		static unsafe void SetLineaSC(byte* ptrBmpTotal,byte* ptrBmpFragmento,int totalPixelesLinea)
