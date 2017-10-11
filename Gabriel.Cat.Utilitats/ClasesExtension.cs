@@ -3058,7 +3058,7 @@ namespace Gabriel.Cat.Extension
                                 posibleDireccion = i;//le pongo el inicio
 
                             }
-                            else if (numBytesEncontrados == totalBytesArrayAEncontrar)//si es la última vez
+                            if (numBytesEncontrados == totalBytesArrayAEncontrar)//si es la última vez
                                 direccionBytes = posibleDireccion;//le pongo el resultado para poder salir del bucle
 
                             ptrBytesAEcontrar++;
