@@ -87,6 +87,7 @@
     <Compile Include="LlistaOrdenada.cs" />
     <Compile Include="LlistaOrdenadaPerGrups.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="MetodosUnsafe.cs" />
     <Compile Include="MiPool.cs" />
     <Compile Include="MiRandom.cs" />
     <Compile Include="ObjectAutoId.cs" />

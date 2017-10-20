@@ -3590,6 +3590,7 @@ namespace Gabriel.Cat.Extension
             return time.Hours + ":" + time.Minutes + ":" + time.Seconds;
         }
         #endregion
+       
     }
 }
 
