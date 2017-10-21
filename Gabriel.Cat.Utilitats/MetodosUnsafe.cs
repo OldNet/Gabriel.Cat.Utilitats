@@ -32,6 +32,20 @@ namespace Gabriel.Cat
 			}
 			return array;
 		}
+		public unsafe static void WriteBytes( byte[] bytesLeft,byte* ptrBytesRight)
+		{
+			fixed(byte* ptrBytesLeft=bytesLeft)
+			{
+				WriteBytes(ptrBytesLeft,ptrBytesRight,bytesLeft.Length);
+			}
+		}
+		public unsafe static void WriteBytes( byte* ptrBytesLeft,byte[] bytesRight)
+		{
+			fixed(byte* ptrBytesRight=bytesRight)
+			{
+				WriteBytes(ptrBytesLeft,ptrBytesRight,bytesRight.Length);
+			}
+		}
 		public unsafe static void WriteBytes( byte* ptrBytesLeft,byte* ptrBytesRight,int lenght)
 		{
 			
