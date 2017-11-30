@@ -207,6 +207,8 @@ namespace Gabriel.Cat
 				Add(keyNew, this[keyAnt]);
 				if (ContainsKey(keyNew))//si se ha cancelado no se tien que reemplazar 
                     Remove(keyAnt);
+				if(Updated!=null)
+					Updated(this,new EventArgs());
 			}
 		}
 		public bool Remove(TKey key)
