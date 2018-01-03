@@ -8,6 +8,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -3617,6 +3618,18 @@ namespace Gabriel.Cat.Extension
 		{
 			string result = param.Substring(startIndex);
 			return result;
+		}
+		#endregion
+		#region DateTime
+		public static string NombreMes(this DateTime fecha,string idioma="es-ES")
+		{
+			DateTimeFormatInfo dtinfo = new CultureInfo(idioma, false).DateTimeFormat;
+			return dtinfo.GetMonthName(fecha.Month); 
+		}
+		public static string NombreDia(this DateTime fecha,string idioma="es-ES")
+		{
+			DateTimeFormatInfo dtinfo = new CultureInfo(idioma, false).DateTimeFormat;
+			return dtinfo.GetDayName(fecha.DayOfWeek); 
 		}
 		#endregion
 		#region System.Text.Encoding

@@ -27,9 +27,9 @@ namespace Gabriel.Cat
         /// <summary>
         /// Ocurre cuando la lista es modificada ya sea en el numero de elementos o en el orden
         /// </summary>
-        public event EventHandler Updated;
-        public event EventHandler Added;
-        public event EventHandler Removed;
+        public event EventHandler<ListEventArgs<T>> Updated;
+        public event EventHandler<ListEventArgs<T>> Added;
+        public event EventHandler<ListEventArgs<T>> Removed;
         ConfirmationEventHandler<Llista<T>, T> AddConfirmation;
         ConfirmationEventHandler<Llista<T>, IEnumerable<T>> AddRangeConfirmation;
         ConfirmationEventHandler<Llista<T>, T> RemoveConfirmation;
@@ -163,7 +163,7 @@ namespace Gabriel.Cat
                         {
                             Whaiting = false;
                             if (Updated != null)
-                                Updated(this, new EventArgs());
+                            	Updated(this,new ListEventArgs<T>(this,value));
                         }
                     }
             }
@@ -194,9 +194,9 @@ namespace Gabriel.Cat
                     semafor.Release();
                     Whaiting = false;
                     if (Updated != null)
-                        Updated(this, new EventArgs());
+                    	Updated(this, new ListEventArgs<T>(this,value));
                     if (Added != null)
-                        Added(this, new EventArgs());
+                        Added(this, new ListEventArgs<T>(this,value));
                 }
         }
         public void AddRange(IEnumerable<T> values)
@@ -226,9 +226,9 @@ namespace Gabriel.Cat
                         semafor.Release();
                         Whaiting = false;
                         if (Updated != null)
-                            Updated(this, new EventArgs());
+                            Updated(this,new ListEventArgs<T>(this,values));
                         if (Added != null)
-                            Added(this, new EventArgs());
+                            Added(this,new ListEventArgs<T>(this,values));
                     }
         }
         public bool Remove(T value)
@@ -248,9 +248,9 @@ namespace Gabriel.Cat
                     semafor.Release();
                     Whaiting = false;
                     if (Updated != null)
-                        Updated(this, new EventArgs());
+                        Updated(this, new ListEventArgs<T>(this,value));
                     if (Removed != null)
-                        Removed(this, new EventArgs());
+                        Removed(this, new ListEventArgs<T>(this,value));
 
                 }
             return removeDone;
@@ -283,21 +283,22 @@ namespace Gabriel.Cat
                         semafor.Release();
                         Whaiting = false;
                         if (Updated != null)
-                            Updated(this, new EventArgs());
+                            Updated(this, new ListEventArgs<T>(this,values));
                         if (Removed != null)
-                            Removed(this, new EventArgs());
+                            Removed(this, new ListEventArgs<T>(this,values));
                     }
             return result.ToArray();
         }
         public void RemoveAt(int pos)
         {
+        	T value=llista[pos];
             if (RemoveConfirmation == null || RemoveConfirmation(this, this[pos]))
                 try
                 {
                     semafor.WaitOne();
                     Whaiting = true;
                     if (llistaOrdenada != null)
-                        llistaOrdenada.Remove((llista[pos] as IClauUnicaPerObjecte).Clau);
+                        llistaOrdenada.Remove((value as IClauUnicaPerObjecte).Clau);
                     llista.RemoveAt(pos);
                 }
                 finally
@@ -305,9 +306,9 @@ namespace Gabriel.Cat
                     semafor.Release();
                     Whaiting = false;
                     if (Updated != null)
-                        Updated(this, new EventArgs());
+                        Updated(this, new ListEventArgs<T>(this,value));
                     if (Removed != null)
-                        Removed(this, new EventArgs());
+                        Removed(this,new ListEventArgs<T>(this,value));
                 }
         }
         public T FirstOrDefault(IComparable keyToFindItem)
@@ -319,7 +320,7 @@ namespace Gabriel.Cat
             {
                 value = llista.FirstOrDefault((item) =>
                 {
-                    return (object)keyToFindItem == (object)item;
+            	  return Equals(keyToFindItem,item);
                 });
             }
             else
@@ -417,7 +418,7 @@ namespace Gabriel.Cat
                     {
                         Whaiting = false;
                         if (Updated != null)
-                            Updated(this, new EventArgs());
+                            Updated(this, new ListEventArgs<T>(this,this));
                     }
                 }
         }
@@ -437,7 +438,7 @@ namespace Gabriel.Cat
                     semafor.Release();
                     Whaiting = false;
                     if (Updated != null)
-                        Updated(this, new EventArgs());
+                        Updated(this, new ListEventArgs<T>(this,this));
                 }
         }
 
@@ -454,9 +455,9 @@ namespace Gabriel.Cat
                 Whaiting = false;
 
                 if (Updated != null)
-                    Updated(this, new EventArgs());
+                    Updated(this, new ListEventArgs<T>(this));
                 if (Removed != null)
-                    Removed(this, new EventArgs());
+                    Removed(this, new ListEventArgs<T>(this));
             }
         }
 
@@ -479,9 +480,9 @@ namespace Gabriel.Cat
                     {
                         Whaiting = false;
                         if (Updated != null)
-                            Updated(this, new EventArgs());
+                        	Updated(this, new ListEventArgs<T>(this,valor));
                         if (Added != null)
-                            Added(this, new EventArgs());
+                            Added(this, new ListEventArgs<T>(this,valor));
                     }
                 }
         }
@@ -584,6 +585,32 @@ namespace Gabriel.Cat
             return GetEnumerator();
         }
         #endregion
+    }
+    public class ListEventArgs<T>:EventArgs
+    {
+    	IList<T> items;
+    	object list;
+    	public ListEventArgs(object list):this(list,new T[0])
+    	{}
+    	public ListEventArgs(object list,T item):this(list,new T[]{item})
+    	{}
+    	public ListEventArgs(object list,IEnumerable<T> items):this(list,items.ToTaula())
+    	{}
+    	public ListEventArgs(object list,IList<T> items)
+    	{
+    		this.list=list;
+    		this.items=items;
+    	}
+		public object List {
+			get {
+				return list;
+			}
+		}
+		public IList<T> Items {
+			get {
+				return items;
+			}
+		}
     }
  
 

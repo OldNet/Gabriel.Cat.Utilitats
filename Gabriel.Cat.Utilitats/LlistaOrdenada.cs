@@ -27,14 +27,14 @@ namespace Gabriel.Cat
 	{
 		protected  SortedList<TKey, TValue> llistaOrdenada;
 		internal List<TKey> llista;
-		public event EventHandler Updated;
+		public event EventHandler<DicEventArgs<TKey,TValue>> Updated;
 		ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>, TKey, TValue> AddConfirmation;
 		ConfirmationEventHandler<LlistaOrdenada<TKey, TValue>, TKey> RemoveConfirmation;
 		ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> ClearConfirmation;
 		ConfirmacionEventHandler<LlistaOrdenada<TKey, TValue>> UpdateConfirmatin;
 		ConfirmacionCambioClaveEventHandler<LlistaOrdenada<TKey, TValue>, TKey> ChangeKeyConfirmation;
-		public event EventHandler Added;
-		public event EventHandler Removed;
+		public event EventHandler<DicEventArgs<TKey,TValue>> Added;
+		public event EventHandler<DicEventArgs<TKey,TValue>> Removed;
 		public LlistaOrdenada()
 		{
 			llistaOrdenada = new SortedList<TKey, TValue>();
@@ -172,9 +172,9 @@ namespace Gabriel.Cat
 					Monitor.Exit(llistaOrdenada);
 
 					if (Updated != null)
-						Updated(this, new EventArgs());
+						Updated(this, new DicEventArgs<TKey,TValue>(key,value));
 					if (Added != null)
-						Added(this, new EventArgs());
+						Added(this, new DicEventArgs<TKey,TValue>(key,value));
 
 				}
 		}
@@ -208,12 +208,13 @@ namespace Gabriel.Cat
 				if (ContainsKey(keyNew))//si se ha cancelado no se tien que reemplazar 
                     Remove(keyAnt);
 				if(Updated!=null)
-					Updated(this,new EventArgs());
+					Updated(this,new DicEventArgs<TKey,TValue>(keyNew,this[keyNew]));
 			}
 		}
 		public bool Remove(TKey key)
 		{
 			bool fer = RemoveConfirmation == null || RemoveConfirmation(this, key);
+			TValue value=this[key];
 			if (fer)
 				try {
 					Monitor.Enter(llistaOrdenada);
@@ -225,9 +226,9 @@ namespace Gabriel.Cat
 					Monitor.Exit(llistaOrdenada);
 					if (fer) {
 						if (Updated != null)
-							Updated(this, new EventArgs());
+							Updated(this, new DicEventArgs<TKey,TValue>(key,value));
 						if (Removed != null)
-							Removed(this, new EventArgs());
+							Removed(this, new DicEventArgs<TKey,TValue>(key,value));
 					}
 				}
 			return fer;
@@ -244,12 +245,15 @@ namespace Gabriel.Cat
 
 		public void Clear()
 		{
+			IList<KeyValuePair<TKey,TValue>> items=null;
 			if (Removed == null || ClearConfirmation(this))
 				try {
 					Monitor.Enter(llistaOrdenada);
 
 					{
 
+						if(Removed!=null)
+							items=new Llista<KeyValuePair<TKey,TValue>>(this);
 						llistaOrdenada.Clear();
 						llista.Clear();
 
@@ -258,9 +262,9 @@ namespace Gabriel.Cat
 					Monitor.Exit(llistaOrdenada);
 
 					if (Updated != null)
-						Updated(this, new EventArgs());
+						Updated(this, new DicEventArgs<TKey,TValue>(new KeyValuePair<TKey,TValue>[0]));
 					if (Removed != null)
-						Removed(this, new EventArgs());
+						Removed(this, new DicEventArgs<TKey,TValue>(items));
 
 				}
 		}
@@ -284,7 +288,7 @@ namespace Gabriel.Cat
 						llistaOrdenada.Add(clau, nouValor);
 						llista.Add(clau);
 						if (Added != null)
-							Added(this, new EventArgs());
+							Added(this, new DicEventArgs<TKey,TValue>(clau,nouValor));
 						hecho = true;
 					}
 
@@ -295,7 +299,7 @@ namespace Gabriel.Cat
 				} finally {
 					if (hecho) {
 						if (Updated != null)
-							Updated(this, new EventArgs());
+							Updated(this, new DicEventArgs<TKey,TValue>(clau,nouValor));
 					}
 				}
 
@@ -410,7 +414,7 @@ namespace Gabriel.Cat
 				} finally {
 					Monitor.Exit(llistaOrdenada);
 					if (Updated != null && llistaOrdenada.ContainsKey(key))
-						Updated(this, new EventArgs());
+						Updated(this, new DicEventArgs<TKey,TValue>(key,value));
 				}
 		}
 		public TValue GetValueAt(int index)
@@ -590,6 +594,27 @@ namespace Gabriel.Cat
 			for (int i = 0; i < values.Count; i++)
 				resultRemove[i] = base.Remove(values[i]);
 			return resultRemove;
+		}
+	}
+	
+	public class DicEventArgs<TKey,TValue>:EventArgs
+	{
+		IList<KeyValuePair<TKey,TValue>> items;
+
+		public DicEventArgs(TKey key, TValue value):this(new KeyValuePair<TKey,TValue>[]{new KeyValuePair<TKey,TValue>(key,value)})
+		{
+		
+		}
+
+		public DicEventArgs(IList<KeyValuePair<TKey, TValue>> items)
+		{
+			this.items=items;
+		}
+
+		public IList<KeyValuePair<TKey, TValue>> Items {
+			get {
+				return items;
+			}
 		}
 	}
 
