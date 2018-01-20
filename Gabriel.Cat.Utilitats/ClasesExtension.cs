@@ -1283,7 +1283,12 @@ namespace Gabriel.Cat.Extension
 			}
 			catch
 			{
-				bmp = null;
+				try{
+					bmp=file.Icono();
+				}
+				catch{
+					bmp = null;
+				}
 			}
 			return bmp;
 		}
@@ -3624,12 +3629,12 @@ namespace Gabriel.Cat.Extension
 		public static string NombreMes(this DateTime fecha,string idioma="es-ES")
 		{
 			DateTimeFormatInfo dtinfo = new CultureInfo(idioma, false).DateTimeFormat;
-			return dtinfo.GetMonthName(fecha.Month); 
+			return dtinfo.GetMonthName(fecha.Month);
 		}
 		public static string NombreDia(this DateTime fecha,string idioma="es-ES")
 		{
 			DateTimeFormatInfo dtinfo = new CultureInfo(idioma, false).DateTimeFormat;
-			return dtinfo.GetDayName(fecha.DayOfWeek); 
+			return dtinfo.GetDayName(fecha.DayOfWeek);
 		}
 		#endregion
 		#region System.Text.Encoding
