@@ -3642,7 +3642,9 @@ namespace Gabriel.Cat.Extension
 		}
 		public static DateTime GetMesSiguiente(this DateTime fecha)
 		{
-			return fecha+new TimeSpan(fecha.GetDiaFinMes()-fecha.Day,0,0,0);
+			int dia=fecha.Day;
+			fecha= fecha+new TimeSpan(31,0,0,0);
+			return new DateTime(fecha.Year,fecha.Month,dia);
 		}
 		public static bool EsBisiesto(this DateTime fecha)
 		{//source:http://diagramas-de-flujo.blogspot.com.es/2013/02/Determinar-si-un-anio-es-bisiesto-CSharp.html
