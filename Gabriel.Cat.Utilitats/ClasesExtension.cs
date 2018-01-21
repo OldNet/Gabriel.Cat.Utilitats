@@ -3636,13 +3636,21 @@ namespace Gabriel.Cat.Extension
 			DateTimeFormatInfo dtinfo = new CultureInfo(idioma, false).DateTimeFormat;
 			return dtinfo.GetDayName(fecha.DayOfWeek);
 		}
+		public static DateTime GetMesAnterior(this DateTime fecha)
+		{
+			return fecha-new TimeSpan(fecha.Day,0,0,0);
+		}
+		public static DateTime GetMesSiguiente(this DateTime fecha)
+		{
+			return fecha+new TimeSpan(fecha.GetDiaFinMes()-fecha.Day,0,0,0);
+		}
 		public static bool EsBisiesto(this DateTime fecha)
-		{//source:http://diagramas-de-flujo.blogspot.com.es/2013/02/Determinar-si-un-anio-es-bisiesto-CSharp.html 
+		{//source:http://diagramas-de-flujo.blogspot.com.es/2013/02/Determinar-si-un-anio-es-bisiesto-CSharp.html
 			return fecha.Year % 4 == 0 && (fecha.Year % 100 != 0 || fecha.Year % 400 == 0);
 		}
 		public static DayOfWeek GetDayOfWeekInicioMes(this DateTime fecha)
 		{
-		
+			
 			const int DIAINICIO=1;
 			return new DateTime(fecha.Year,fecha.Month,DIAINICIO).DayOfWeek;
 			
