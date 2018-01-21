@@ -6,6 +6,7 @@
  * 
  * Para cambiar esta plantilla use Herramientas | Opciones | Codificación | Editar Encabezados Estándar
  */
+using System.Collections;
 using Gabriel.Cat.Extension;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Gabriel.Cat
     /// <summary>
     /// Description of Llista.
     /// </summary>
-    public class Llista<T> :ObjectAutoId, IList<T>, IReadOnlyList<T>, IColeccion<T>
+    public class Llista<T> :ObjectAutoId, IList<T>, IReadOnlyList<T>, IColeccion<T>,IEnumerable,IEnumerable<T> 
     {
         List<T> llista;
         Semaphore semafor;
