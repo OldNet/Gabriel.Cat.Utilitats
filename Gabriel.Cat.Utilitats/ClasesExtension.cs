@@ -3025,15 +3025,18 @@ namespace Gabriel.Cat.Extension
 			}
 			return subArray;
 		}
-
-
 		public static byte[] AddArray(this byte[] array, params byte[][] arraysToAdd)
+		{
+			return AddArray(array,(IList<byte[]>)arraysToAdd);
+		}
+
+		public static byte[] AddArray(this byte[] array, IList<byte[]> arraysToAdd)
 		{
 
 			byte[] bytesResult;
 			int espacioTotal = 0;
 			if (arraysToAdd != null)
-				for (int i = 0; i < arraysToAdd.Length; i++)
+				for (int i = 0; i < arraysToAdd.Count; i++)
 					if (arraysToAdd[i] != null)
 						espacioTotal += arraysToAdd[i].Length;
 			bytesResult = new byte[espacioTotal + array.Length];
@@ -3049,7 +3052,7 @@ namespace Gabriel.Cat.Extension
 						ptArrayResult++;
 					}
 					if (arraysToAdd != null)
-						for (int i = 0; i < arraysToAdd.Length; i++)
+						for (int i = 0; i < arraysToAdd.Count; i++)
 					{//pongo las demas arrays :D
 						if (arraysToAdd[i] != null)
 							fixed (byte* ptrArrayToAdd = arraysToAdd[i])
