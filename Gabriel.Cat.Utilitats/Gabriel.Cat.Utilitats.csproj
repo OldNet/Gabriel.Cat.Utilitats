@@ -73,6 +73,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="CopyLikeTorrent.cs" />
+    <Compile Include="DiscoLogico.cs" />
     <Compile Include="Enumerador.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Filter.cs" />
