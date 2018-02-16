@@ -62,23 +62,18 @@ namespace Gabriel.Cat.Extension
 	#region Serializar???
 	public struct Propiedad
 	{
-		private string nombre;
+		private PropiedadTipo tipo;
 		private object objeto;
-		public Propiedad(string nombre, object obj)
+		public Propiedad(PropiedadTipo tipo, object obj)
 		{
-			this.nombre = nombre;
+			this.tipo = tipo;
 			this.objeto = obj;
 		}
-		public Type Tipo
-		{
-			get { return objeto.GetType(); }
-		}
-
-		public string Nombre
+		public PropiedadTipo Tipo
 		{
 			get
 			{
-				return nombre;
+				return tipo;
 			}
 
 
@@ -102,23 +97,29 @@ namespace Gabriel.Cat.Extension
 	{
 		
 		string nombre;
-		System.Attribute[] atributos;
+		IList<System.Attribute> atributos;
 		Type tipo;
 		UsoPropiedad uso;
-		public PropiedadTipo(string nombre,Type tipo,System.Attribute[] atributos,UsoPropiedad uso)
+		public PropiedadTipo(string nombre,Type tipo,IList<System.Attribute> atributos,UsoPropiedad uso)
 		{
 			this.nombre=nombre;
 			this.atributos=atributos;
 			this.uso=uso;
 			this.tipo=tipo;
 		}
+
+		public PropiedadTipo(PropertyInfo campoTipo,Type typeObj):this(campoTipo.Name,typeObj,campoTipo.GetAttributes(),campoTipo.GetPropertyUsage())
+		{
+			
+		}
+
 		public string Nombre {
 			get {
 				return nombre;
 			}
 		}
 
-		public System.Attribute[] Atributos {
+		public IList<System.Attribute> Atributos {
 			get {
 				return atributos;
 			}
@@ -2404,8 +2405,8 @@ namespace Gabriel.Cat.Extension
 			Propiedad[] propiedades = obj.GetProperties();
 			for (int i = 0; i < propiedades.Length; i++)
 			{
-				if ((int)(clonNew.GetPropertyUsage(propiedades[i].Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
-					clonNew.SetProperty(propiedades[i].Nombre, propiedades[i].Objeto);
+				if ((int)(clonNew.GetPropertyUsage(propiedades[i].Tipo.Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
+					clonNew.SetProperty(propiedades[i].Tipo.Nombre, propiedades[i].Objeto);
 
 			}
 			return clonNew;
@@ -2435,8 +2436,8 @@ namespace Gabriel.Cat.Extension
 					clonObjPropiedad = ((IClonable<Tipo>)propiedades[i].Objeto).Clon();
 				else
 					clonObjPropiedad = propiedades[i].Objeto;
-				if ((int)(clonNew.GetPropertyUsage(propiedades[i].Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
-					clonNew.SetProperty(propiedades[i].Nombre, clonObjPropiedad);
+				if ((int)(clonNew.GetPropertyUsage(propiedades[i].Tipo.Nombre) ^ UsoPropiedad.Get) == (int)UsoPropiedad.Set)
+					clonNew.SetProperty(propiedades[i].Tipo.Nombre, clonObjPropiedad);
 
 			}
 			return clonNew;
@@ -2771,11 +2772,14 @@ namespace Gabriel.Cat.Extension
 			Type tipo = typeof(T);
 			PropertyInfo[] camposTipo = tipo.GetProperties();
 			PropertyInfo campoTipo;
+			object objectProperty;
 			for (int i = 0; i < camposTipo.Length; i++)
 			{
 				campoTipo = camposTipo[i];
 				if (!campoTipo.GetCustomAttributes(false).Contains(new SerialitzeIgnoreAttribute()))// no tiene el atributo SerialitzeIgnore lo añade :)
-					campos.Add(new Propiedad(campoTipo.Name, campoTipo.GetValue(obj)));
+				{
+					objectProperty=campoTipo.GetValue(obj);
+					campos.Add(new Propiedad(new PropiedadTipo(campoTipo,objectProperty.GetType()), objectProperty));}
 			}
 			return campos.ToTaula();
 		}
@@ -2799,10 +2803,10 @@ namespace Gabriel.Cat.Extension
 			LlistaOrdenada<string, object> lista = new LlistaOrdenada<string, object>();
 			PropertyInfo campoTipo;
 			foreach (Propiedad objPropiedad in objetosPropiedades)
-				if (!lista.ContainsKey(objPropiedad.Nombre))
-					lista.Add(objPropiedad.Nombre, objPropiedad.Objeto);
+				if (!lista.ContainsKey(objPropiedad.Tipo.Nombre))
+					lista.Add(objPropiedad.Tipo.Nombre, objPropiedad.Objeto);
 				else
-					lista[objPropiedad.Nombre] = objPropiedad.Objeto;
+					lista[objPropiedad.Tipo.Nombre] = objPropiedad.Objeto;
 			for (int i = 0; i < camposTipo.Length; i++)
 			{
 				campoTipo = camposTipo[i];
@@ -2827,7 +2831,7 @@ namespace Gabriel.Cat.Extension
 		}
 		public static void AddValue(this SerializationInfo info, Propiedad campo)
 		{
-			info.AddValue(campo.Nombre, campo.Objeto, campo.Tipo);
+			info.AddValue(campo.Tipo.Nombre, campo.Objeto, campo.Tipo.Tipo);
 		}
 		public static void AddValue(this SerializationInfo info, string nombre, object obj)
 		{
@@ -3557,22 +3561,26 @@ namespace Gabriel.Cat.Extension
 		{
 			PropertyInfo[] propiedadesInfo=type.GetProperties();
 			PropiedadTipo[] propiedades=new PropiedadTipo[propiedadesInfo.Length];
-			List<System.Attribute> atributos=new List<Attribute>();
-			System.Attribute aux;
-			object[] attributes;
+				
 			for(int i=0;i<propiedades.Length;i++)
 			{
-				atributos.Clear();
-				attributes=propiedadesInfo[i].GetCustomAttributes(true);
-				for(int j=0;j<attributes.Length;i++)
-				{
-					aux=attributes[i] as System.Attribute;
-					if(aux!=null)
-						atributos.Add(aux);
-				}
-				propiedades[i]=new PropiedadTipo(propiedadesInfo[i].Name,type.GetPropertyType(propiedadesInfo[i].Name),atributos.ToTaula(),propiedadesInfo[i].GetPropertyUsage());
+				propiedades[i]=new PropiedadTipo(propiedadesInfo[i].Name,type.GetPropertyType(propiedadesInfo[i].Name),propiedadesInfo[i].GetAttributes(),propiedadesInfo[i].GetPropertyUsage());
 			}
 			return propiedades;
+		}
+		public static IList<Attribute> GetAttributes(this PropertyInfo propiedad)
+		{
+			object[] attributes;
+			System.Attribute aux;
+			List<System.Attribute> atributos=new List<Attribute>();
+			attributes=propiedad.GetCustomAttributes(true);
+			for(int i=0;i<attributes.Length;i++)
+			{
+				aux=attributes[i] as System.Attribute;
+				if(aux!=null)
+					atributos.Add(aux);
+			}
+			return atributos;
 		}
 		#endregion
 		#region string
