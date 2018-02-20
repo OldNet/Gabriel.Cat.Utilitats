@@ -91,7 +91,7 @@ namespace Gabriel.Cat.Extension
 	[Flags]
 	public enum UsoPropiedad
 	{
-		Get,Set
+		Get=1,Set
 	}
 	public class  PropiedadTipo
 	{
@@ -2769,7 +2769,7 @@ namespace Gabriel.Cat.Extension
 		public static Propiedad[] GetProperties<T>(this T obj)
 		{
 			Llista<Propiedad> campos = new Llista<Propiedad>();
-			Type tipo = typeof(T);
+			Type tipo = obj.GetType();
 			PropertyInfo[] camposTipo = tipo.GetProperties();
 			PropertyInfo campoTipo;
 			object objectProperty;
@@ -2850,9 +2850,9 @@ namespace Gabriel.Cat.Extension
 		{
 			obj.GetType().GetProperty(nombrePropiedad).SetValue(obj, value);
 		}
-		public static Type GetPropertyType<Tipo>(this Tipo obj, string nombre)
+		public static Type GetPropertyType(this Type obj, string nombre)
 		{
-			return obj.GetType().GetProperty(nombre).PropertyType;
+			return obj.GetProperty(nombre).PropertyType;
 		}
 		
 		/// <summary>
@@ -2876,7 +2876,7 @@ namespace Gabriel.Cat.Extension
 			if(propiedad.CanRead)
 				uso=UsoPropiedad.Get;
 			if(propiedad.CanWrite)
-				uso|=UsoPropiedad.Set;
+				uso=(UsoPropiedad)((int)uso+(int)UsoPropiedad.Set);
 			return uso;
 		}
 		#endregion
