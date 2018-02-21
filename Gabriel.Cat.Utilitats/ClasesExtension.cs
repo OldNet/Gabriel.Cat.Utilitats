@@ -2841,6 +2841,17 @@ namespace Gabriel.Cat.Extension
 
 		#endregion
 		#region ReflexionExtension
+		#region https://stackoverflow.com/questions/1043755/c-sharp-generic-list-t-how-to-get-the-type-of-t
+		public static Type ListOfWhat(this IList list)
+		{
+			return IListOfWhat((dynamic)list);
+		}
+
+		private static Type IListOfWhat<T>(IList<T> list)
+		{
+			return typeof(T);
+		}
+		#endregion
 
 		public static object GetPropteryValue<T>(this T obj, string nombrePropiedad)
 		{
@@ -3561,7 +3572,7 @@ namespace Gabriel.Cat.Extension
 		{
 			PropertyInfo[] propiedadesInfo=type.GetProperties();
 			PropiedadTipo[] propiedades=new PropiedadTipo[propiedadesInfo.Length];
-				
+			
 			for(int i=0;i<propiedades.Length;i++)
 			{
 				propiedades[i]=new PropiedadTipo(propiedadesInfo[i].Name,type.GetPropertyType(propiedadesInfo[i].Name),propiedadesInfo[i].GetAttributes(),propiedadesInfo[i].GetPropertyUsage());
