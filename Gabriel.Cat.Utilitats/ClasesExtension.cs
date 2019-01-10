@@ -569,11 +569,11 @@ namespace Gabriel.Cat.Extension
 		}
 		#endregion
 		#region ICollection<T>Extension
-		public static void RemoveRange<T>(this ICollection<T> list, IEnumerable<T> elementsToRemove)
+		public static void RemoveRange<T>(this ICollection<T> list, IList<T> elementsToRemove)
 		{
 			if (elementsToRemove != null)
-				foreach (T element in elementsToRemove)
-					list.Remove(element);
+				for(int i=0;i<elementsToRemove.Count;i++)
+					list.Remove(elementsToRemove[i]);
 		}
 		#endregion
 		#region DirectoriInfoExtension
@@ -981,11 +981,11 @@ namespace Gabriel.Cat.Extension
 		}
 		#endregion
 		#region Bitmap
-		public static BitmapAnimated ToAnimatedBitmap(this IEnumerable<Bitmap> bmpsToAnimate, bool repetirSiempre = true)
+		public static BitmapAnimated ToAnimatedBitmap(this IList<Bitmap> bmpsToAnimate, bool repetirSiempre = true)
 		{
 			return bmpsToAnimate.ToAnimatedBitmap(repetirSiempre, 500);
 		}
-		public static BitmapAnimated ToAnimatedBitmap(this IEnumerable<Bitmap> bmpsToAnimate, bool repetirSiempre = true, params int[] delay)
+		public static BitmapAnimated ToAnimatedBitmap(this IList<Bitmap> bmpsToAnimate, bool repetirSiempre = true, params int[] delay)
 		{
 			return new BitmapAnimated(bmpsToAnimate, delay) { AnimarCiclicamente = repetirSiempre };
 		}
@@ -1095,7 +1095,7 @@ namespace Gabriel.Cat.Extension
 		{
 			return bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
 		}
-		public static APNG ToApng(this IEnumerable<Bitmap> fotogramas)
+		public static APNG ToApng(this IList<Bitmap> fotogramas)
 		{
 			APNG pngAnimated = new APNG();
 			pngAnimated.Add(fotogramas);
@@ -1525,7 +1525,7 @@ namespace Gabriel.Cat.Extension
 		}
 		#endregion
 		#region IEnumerable
-		public static bool ContainsAny<T>(this IEnumerable<T> list, IEnumerable<T> elementsToFindOne) where T : IComparable<T>
+		public static bool ContainsAny<T>(this IEnumerable<T> list, IList<T> elementsToFindOne) where T : IComparable<T>
 		{
 			bool contains = false;
 			SortedList<T, T> dicElements = elementsToFindOne.ToSortedList();
@@ -1537,19 +1537,19 @@ namespace Gabriel.Cat.Extension
 			return contains;
 
 		}
-		public static IEnumerable<T> ConvertTo<T>(this IEnumerable enumeracion, ConvertEventHandler<T, object> metodoParaConvertirUnoAUno, bool omitirExcepciones = true)
+		public static IEnumerable<T> ConvertTo<T>(this IList enumeracion, ConvertEventHandler<T, object> metodoParaConvertirUnoAUno, bool omitirExcepciones = true)
 		{
-			return ConvertTo(enumeracion.Casting<object>(), metodoParaConvertirUnoAUno, omitirExcepciones);
+			return ConvertTo<T,object>(enumeracion.Casting<object>(), metodoParaConvertirUnoAUno, omitirExcepciones);
 		}
-		public static IEnumerable<TOut> ConvertTo<TOut, TIn>(this IEnumerable<TIn> enumeracion, ConvertEventHandler<TOut, TIn> metodoParaConvertirUnoAUno, bool omitirExcepciones = true)
+		public static IEnumerable<TOut> ConvertTo<TOut, TIn>(this IList<TIn> enumeracion, ConvertEventHandler<TOut, TIn> metodoParaConvertirUnoAUno, bool omitirExcepciones = true)
 		{
 			if (metodoParaConvertirUnoAUno == null) throw new ArgumentNullException();
 			TOut outValue;
-			foreach (TIn obj in enumeracion)
+			for(int i=0;i<enumeracion.Count;i++)
 			{
 				try
 				{
-					outValue = metodoParaConvertirUnoAUno(obj);
+					outValue = metodoParaConvertirUnoAUno(enumeracion[i]);
 				}
 				catch
 				{
@@ -1560,36 +1560,36 @@ namespace Gabriel.Cat.Extension
 
 			}
 		}
-		public static SortedList<T, T> ToSortedList<T>(this IEnumerable<T> list) where T : IComparable<T>
+		public static SortedList<T, T> ToSortedList<T>(this IList<T> list) where T : IComparable<T>
 		{
 			SortedList<T, T> sortedList = new SortedList<T, T>();
-			foreach (T element in list)
-				if (!sortedList.ContainsKey(element))
-					sortedList.Add(element, element);
+			for(int i=0;i<list.Count;i++)
+				if (!sortedList.ContainsKey(list[i]))
+					sortedList.Add(list[i], list[i]);
 			return sortedList;
 		}
-		public static SortedList<IComparable, T> ToSortedListClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
+		public static SortedList<IComparable, T> ToSortedListClauUnicaPerObjecte<T>(this IList<T> list) where T : IClauUnicaPerObjecte
 		{
 			SortedList<IComparable, T> sortedList = new SortedList<IComparable, T>();
-			foreach (T element in list)
-				if (!sortedList.ContainsKey(element.Clau))
-					sortedList.Add(element.Clau, element);
+            for (int i = 0; i < list.Count; i++)
+                if (!sortedList.ContainsKey(list[i].Clau))
+					sortedList.Add(list[i].Clau, list[i]);
 			return sortedList;
 		}
-		public static LlistaOrdenada<T, T> ToLlistaOrdenada<T>(this IEnumerable<T> list) where T : IComparable<T>
+		public static LlistaOrdenada<T, T> ToLlistaOrdenada<T>(this IList<T> list) where T : IComparable<T>
 		{
 			LlistaOrdenada<T, T> llistaOrdenada = new LlistaOrdenada<T, T>();
-			foreach (T element in list)
-				if (!llistaOrdenada.ContainsKey(element))
-					llistaOrdenada.Add(element, element);
+            for (int i = 0; i < list.Count; i++)
+                if (!llistaOrdenada.ContainsKey(list[i]))
+					llistaOrdenada.Add(list[i], list[i]);
 			return llistaOrdenada;
 		}
-		public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IEnumerable<T> list) where T : IClauUnicaPerObjecte
+		public static LlistaOrdenada<IComparable, T> ToLlistaOrdenadaClauUnicaPerObjecte<T>(this IList<T> list) where T : IClauUnicaPerObjecte
 		{
 			LlistaOrdenada<IComparable, T> sortedList = new LlistaOrdenada<IComparable, T>();
-			foreach (T element in list)
-				if (!sortedList.ContainsKey(element.Clau))
-					sortedList.Add(element.Clau, element);
+            for (int i = 0; i < list.Count; i++)
+                if (!sortedList.ContainsKey(list[i].Clau))
+					sortedList.Add(list[i].Clau, list[i]);
 			return sortedList;
 		}
 		/// <summary>
@@ -1714,18 +1714,18 @@ namespace Gabriel.Cat.Extension
 			return listaParaOrdenar;
 
 		}
-		public static List<T> Clon<T>(this IEnumerable<T> listaHaClonar) where T : IClonable<T>
+		public static List<T> Clon<T>(this IList<T> listaHaClonar) where T : IClonable<T>
 		{
 			List<T> clones = new List<T>();
-			foreach (T item in listaHaClonar)
-				clones.Add(item.Clon());
+			for(int i=0;i<listaHaClonar.Count;i++)
+				clones.Add(listaHaClonar[i].Clon());
 			return clones;
 		}
-		public static List<T> Clone<T>(this IEnumerable<T> listaHaClonar) where T : ICloneable
+		public static List<T> Clone<T>(this IList<T> listaHaClonar) where T : ICloneable
 		{
 			List<T> clones = new List<T>();
-			foreach (T item in listaHaClonar)
-				clones.Add((T)item.Clone());
+            for (int i = 0; i < listaHaClonar.Count; i++)
+                clones.Add((T)listaHaClonar[i].Clone());
 			return clones;
 		}
 		public static int IndexOf<TValue>(this IEnumerable<TValue> valores, TValue valor) where TValue : IComparable
@@ -1838,14 +1838,14 @@ namespace Gabriel.Cat.Extension
 			}
 			return bytes;
 		}
-		public static List<TResult> Casting<TResult>(this System.Collections.IEnumerable source, bool conservarNoCompatiblesCasting = false)
+		public static List<TResult> Casting<TResult>(this System.Collections.IList source, bool conservarNoCompatiblesCasting = false)
 		{
 			List<TResult> llista = new List<TResult>();
-			foreach (Object obj in source)
+			for(int i=0;i<source.Count;i++)
 			{
 				try
 				{
-					llista.Add((TResult)obj);//lo malo es cuando no es un int casting double
+					llista.Add((TResult)source[i]);//lo malo es cuando no es un int casting double
 				}
 				catch
 				{

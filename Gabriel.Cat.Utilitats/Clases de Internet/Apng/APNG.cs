@@ -103,12 +103,12 @@ namespace Gabriel.Cat
         {
             Load(pathApng);
         }
-        public APNG(IEnumerable<Bitmap> frames)
+        public APNG(IList<Bitmap> frames)
             : this()
         {
             Add(frames);
         }
-        public APNG(IEnumerable<PNG> frames)
+        public APNG(IList<PNG> frames)
             : this()
         {
             Add(frames);
@@ -182,10 +182,10 @@ namespace Gabriel.Cat
         {
             Add(new PNG(bmp));
         }
-        public void Add(IEnumerable<Bitmap> bmps)
+        public void Add(IList<Bitmap> bmps)
         {
-            foreach (Bitmap bmp in bmps)
-                Add(bmp);
+            for(int i=0;i<bmps.Count;i++)
+                Add(bmps[i]);
         }
         public void Add(PNG png)
         {
@@ -200,10 +200,10 @@ namespace Gabriel.Cat
                 throw new Exception("la imagen no tiene el ihdr igual");
             pngs.Ordena();
         }
-        public void Add(IEnumerable<PNG> pngs)
+        public void Add(IList<PNG> pngs)
         {
-            foreach (PNG png in pngs)
-                Add(png);
+            for(int i=0;i<pngs.Count;i++)
+                Add(pngs[i]);
         }
         public void Remove(int index)
         {
